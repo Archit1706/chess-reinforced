@@ -1,0 +1,243 @@
+// Chess Reinforced Database Schema
+// Using SQLite for simplicity - can easily migrate to PostgreSQL for production
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// User model for tracking progress
+model User {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Profile
+  username      String   @unique
+  displayName   String?
+
+  // Skill tracking
+  estimatedElo  Int      @default(800)
+  gamesPlayed   Int      @default(0)
+  gamesWon      Int      @default(0)
+  gamesLost     Int      @default(0)
+  gamesDraw     Int      @default(0)
+
+  // Puzzle stats
+  puzzlesSolved Int      @default(0)
+  puzzlesFailed Int      @default(0)
+  puzzleStreak  Int      @default(0)
+  bestPuzzleStreak Int   @default(0)
+
+  // Daily tracking
+  currentStreak Int      @default(0)
+  longestStreak Int      @default(0)
+  lastActiveAt  DateTime @default(now())
+
+  // Relations
+  lessonProgress LessonProgress[]
+  gameHistory    GameHistory[]
+  puzzleAttempts PuzzleAttempt[]
+  dailyActivity  DailyActivity[]
+
+  @@index([username])
+}
+
+// Learning modules: Beginner, Intermediate, Advanced
+model Module {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  description String
+  level       String   // beginner, intermediate, advanced
+  order       Int      // Display order within level
+  icon        String?  // Icon name for UI
+
+  lessons     Lesson[]
+
+  @@index([level, order])
+}
+
+// Individual lessons within modules
+model Lesson {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  moduleId    String
+  module      Module   @relation(fields: [moduleId], references: [id])
+
+  title       String
+  description String
+  content     String   // Markdown content for theory
+  order       Int      // Order within module
+
+  // Lesson metadata
+  difficulty  Int      @default(1) // 1-5 difficulty scale
+  estimatedMinutes Int @default(10)
+
+  // Positions and puzzles for this lesson
+  positions   LessonPosition[]
+  puzzles     Puzzle[]
+
+  // Progress tracking
+  progress    LessonProgress[]
+
+  @@index([moduleId, order])
+}
+
+// Key positions to demonstrate in lessons
+model LessonPosition {
+  id          String   @id @default(cuid())
+  lessonId    String
+  lesson      Lesson   @relation(fields: [lessonId], references: [id])
+
+  fen         String   // FEN notation for position
+  description String?  // Explanation of position
+  arrows      String?  // JSON array of arrows to draw
+  highlights  String?  // JSON array of squares to highlight
+  order       Int      // Display order
+
+  @@index([lessonId, order])
+}
+
+// Chess puzzles for practice
+model Puzzle {
+  id          String   @id @default(cuid())
+
+  // Puzzle content
+  fen         String   // Starting position
+  moves       String   // Correct move sequence in UCI format (e.g., "e2e4 e7e5")
+  themes      String   // Comma-separated themes (fork, pin, mate, etc.)
+
+  // Metadata
+  rating      Int      @default(1200) // Difficulty rating
+  popularity  Int      @default(0)    // How often solved
+
+  // Optional lesson association
+  lessonId    String?
+  lesson      Lesson?  @relation(fields: [lessonId], references: [id])
+
+  // Daily puzzle flag
+  isDaily     Boolean  @default(false)
+  dailyDate   DateTime?
+
+  // Attempts
+  attempts    PuzzleAttempt[]
+
+  @@index([rating])
+  @@index([themes])
+  @@index([isDaily, dailyDate])
+}
+
+// Track user attempts at puzzles
+model PuzzleAttempt {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  puzzleId    String
+  puzzle      Puzzle   @relation(fields: [puzzleId], references: [id])
+
+  solved      Boolean
+  timeSpent   Int      // Seconds spent
+  hintsUsed   Int      @default(0)
+
+  @@index([userId, puzzleId])
+  @@index([createdAt])
+}
+
+// Track lesson completion
+model LessonProgress {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  lessonId    String
+  lesson      Lesson   @relation(fields: [lessonId], references: [id])
+
+  started     Boolean  @default(false)
+  completed   Boolean  @default(false)
+  completedAt DateTime?
+
+  // Track which positions/puzzles were completed
+  positionsViewed String? // JSON array of position IDs viewed
+  puzzlesSolved   String? // JSON array of puzzle IDs solved
+
+  @@unique([userId, lessonId])
+  @@index([userId])
+}
+
+// Game history for played games
+model GameHistory {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  // Game data
+  pgn         String   // Full PGN of the game
+  result      String   // 1-0, 0-1, 1/2-1/2, *
+  playerColor String   // white, black
+
+  // Opponent info
+  opponentType String  // computer, puzzle
+  opponentElo  Int?    // Computer ELO if applicable
+
+  // Game metadata
+  timeControl  String? // e.g., "10+0", "5+3"
+  openingName  String?
+  openingEco   String? // ECO code
+
+  // Analysis
+  analyzed    Boolean  @default(false)
+  analysisJson String? // JSON with move-by-move analysis
+
+  @@index([userId, createdAt])
+}
+
+// Daily activity tracking for streaks and calendar
+model DailyActivity {
+  id          String   @id @default(cuid())
+  date        DateTime // Date only, no time
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  // Activity counts
+  puzzlesSolved Int    @default(0)
+  lessonsCompleted Int @default(0)
+  gamesPlayed   Int    @default(0)
+  minutesSpent  Int    @default(0)
+
+  @@unique([userId, date])
+  @@index([userId, date])
+}
+
+// Famous games for study mode
+model FamousGame {
+  id          String   @id @default(cuid())
+
+  // Game info
+  white       String   // White player name
+  black       String   // Black player name
+  year        Int?
+  event       String?  // Tournament/match name
+  result      String   // 1-0, 0-1, 1/2-1/2
+
+  // Game data
+  pgn         String   // Full PGN with annotations
+  eco         String?  // ECO code
+
+  // Categorization
+  themes      String   // Comma-separated themes (tactical, positional, endgame, etc.)
+  difficulty  Int      @default(2) // 1-5 difficulty
+
+  @@index([themes])
+}
