@@ -1,14 +1,17 @@
 'use client';
 
 import React, { useCallback, useMemo, useState } from 'react';
-import { Chessboard, PromotionPieceOption } from 'react-chessboard';
+import { Chessboard } from 'react-chessboard';
 import { Square, PieceSymbol } from 'chess.js';
 import { useGameStore } from '@/store/game-store';
 import { useUIStore } from '@/store/ui-store';
 import { cn } from '@/lib/utils';
 
+// Define promotion piece option type (react-chessboard uses "wQ", "wR", etc.)
+type PromotionPiece = 'wQ' | 'wR' | 'wB' | 'wN' | 'bQ' | 'bR' | 'bB' | 'bN';
+
 // Helper to extract piece symbol from promotion option (e.g., "wQ" -> "q")
-function extractPieceSymbol(promotionPiece: PromotionPieceOption): PieceSymbol {
+function extractPieceSymbol(promotionPiece: PromotionPiece): PieceSymbol {
   return promotionPiece[1].toLowerCase() as PieceSymbol;
 }
 
@@ -159,9 +162,9 @@ export function ChessBoard({
   );
 
   // Handle promotion selection
-  // react-chessboard uses PromotionPieceOption like "wQ", "bR", etc.
+  // react-chessboard uses promotion pieces like "wQ", "bR", etc.
   const onPromotionPieceSelect = useCallback(
-    (piece?: PromotionPieceOption, promoteFromSquare?: Square, promoteToSquare?: Square) => {
+    (piece?: PromotionPiece, promoteFromSquare?: Square, promoteToSquare?: Square) => {
       setShowPromotion(false);
       if (!piece) return false;
 
