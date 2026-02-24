@@ -1,11 +1,16 @@
 'use client';
 
 import React, { useCallback, useMemo, useState } from 'react';
-import { Chessboard } from 'react-chessboard';
+import { Chessboard, PromotionPieceOption } from 'react-chessboard';
 import { Square, PieceSymbol } from 'chess.js';
 import { useGameStore } from '@/store/game-store';
 import { useUIStore } from '@/store/ui-store';
 import { cn } from '@/lib/utils';
+
+// Helper to extract piece symbol from promotion option (e.g., "wQ" -> "q")
+function extractPieceSymbol(promotionPiece: PromotionPieceOption): PieceSymbol {
+  return promotionPiece[1].toLowerCase() as PieceSymbol;
+}
 
 interface ChessBoardProps {
   className?: string;
@@ -154,18 +159,27 @@ export function ChessBoard({
   );
 
   // Handle promotion selection
+  // react-chessboard uses PromotionPieceOption like "wQ", "bR", etc.
   const onPromotionPieceSelect = useCallback(
-    (piece?: PieceSymbol) => {
+    (piece?: PromotionPieceOption, promoteFromSquare?: Square, promoteToSquare?: Square) => {
       setShowPromotion(false);
-      if (!promotionSquare || !piece) return false;
+      if (!piece) return false;
 
-      const { from, to } = promotionSquare;
+      // Use provided squares or fall back to stored promotion square
+      const from = promoteFromSquare || promotionSquare?.from;
+      const to = promoteToSquare || promotionSquare?.to;
+
+      if (!from || !to) return false;
+
       setPromotionSquare(null);
 
+      // Extract the piece symbol (e.g., "wQ" -> "q")
+      const pieceSymbol = extractPieceSymbol(piece);
+
       if (onMove) {
-        return onMove(from, to, piece);
+        return onMove(from, to, pieceSymbol);
       }
-      return movePiece(from, to, piece);
+      return movePiece(from, to, pieceSymbol);
     },
     [promotionSquare, onMove, movePiece]
   );
