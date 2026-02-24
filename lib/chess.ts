@@ -152,7 +152,7 @@ export function getPieceAt(game: Chess, square: Square) {
  */
 export function hasPieceOfColor(game: Chess, square: Square, color: 'w' | 'b'): boolean {
   const piece = game.get(square);
-  return piece !== null && piece.color === color;
+  return !!piece && piece.color === color;
 }
 
 /**
