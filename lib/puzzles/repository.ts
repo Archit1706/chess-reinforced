@@ -116,9 +116,10 @@ export async function getThemeCounts(limit = 40): Promise<{ theme: string; count
 }
 
 /**
- * Record a puzzle attempt. Tolerant by design: auto-provisions the guest user,
- * and silently no-ops if the puzzle isn't in the DB (e.g. a client fallback
- * puzzle) so attempt logging can never break the solving flow.
+ * Record a puzzle attempt. Tolerant by design: attributes the attempt to the
+ * signed-in user when `userId` is given, otherwise auto-provisions the local
+ * guest user. Silently no-ops if the puzzle isn't in the DB (e.g. a client
+ * fallback puzzle) so attempt logging can never break the solving flow.
  */
 export async function recordAttempt(params: {
   puzzleId: string;
@@ -132,15 +133,19 @@ export async function recordAttempt(params: {
   const puzzle = await prisma.puzzle.findUnique({ where: { id: puzzleId }, select: { id: true } });
   if (!puzzle) return { recorded: false };
 
-  const user = await prisma.user.upsert({
-    where: { username: GUEST_USERNAME },
-    update: {},
-    create: { username: GUEST_USERNAME, displayName: 'Guest' },
-    select: { id: true },
-  });
+  let userId = params.userId;
+  if (!userId) {
+    const guest = await prisma.user.upsert({
+      where: { username: GUEST_USERNAME },
+      update: {},
+      create: { username: GUEST_USERNAME, displayName: 'Guest' },
+      select: { id: true },
+    });
+    userId = guest.id;
+  }
 
   await prisma.puzzleAttempt.create({
-    data: { userId: user.id, puzzleId, solved, timeSpent, hintsUsed },
+    data: { userId, puzzleId, solved, timeSpent, hintsUsed },
   });
   return { recorded: true };
 }

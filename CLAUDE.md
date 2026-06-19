@@ -19,9 +19,10 @@ npm run db:import-puzzles -- --file <path.csv|.gz>   # Import a Lichess dump (cs
 zstdcat lichess_db_puzzle.csv.zst | npm run db:import-puzzles -- --stdin   # Full dump
 ```
 
-`DATABASE_URL` must start with `file:` for the SQLite datasource. Note the
-remote/CI environment may preset `DATABASE_URL` to a Postgres URL that overrides
-`.env`; prefix commands with `DATABASE_URL="file:./dev.db"` when that happens.
+The datasource is **PostgreSQL** (Neon / Vercel Postgres) — required because
+Vercel's filesystem is ephemeral. `DATABASE_URL` is a `postgresql://` URL (see
+`.env.example`). For local work, point it at a local Postgres or a Neon dev
+branch, e.g. `DATABASE_URL="postgresql://postgres@localhost:5433/chess"`.
 
 There is no test framework wired up. `npm run lint` is the only verification step.
 
@@ -85,11 +86,28 @@ Reading a `.zst` dump directly in Node is unreliable (its skippable-frame/large-
 defeats Node's built-in zstd), so the importer's first-class path for the full dump is piping
 `zstdcat ... | --stdin`; `--file` handles plain `.csv` and `.gz`.
 
+### Auth & user persistence (Clerk + Postgres)
+Authentication is **Clerk**, wired to **degrade gracefully**: a single
+`clerkEnabled` flag (presence of `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`) gates the
+`ClerkProvider` (`app/layout.tsx`), `clerkMiddleware` (`middleware.ts`), the
+navbar auth UI (`components/auth/AuthButtons.tsx`), and `UserSync`. With keys
+unset the app runs in anonymous guest mode (localStorage), so it builds and runs
+locally before any keys exist.
+- **`lib/auth.ts`** — server helpers: `isClerkConfigured`, `getClerkUserId`, and
+  `getOrCreateCurrentUser` (lazily provisions a Prisma `User` row keyed on
+  `clerkId` from the Clerk profile on first sign-in).
+- **`lib/user/repository.ts`** — maps DB rows to the client `User` DTO (deriving
+  `winRate`/`puzzleSuccessRate`) and writes whitelisted stat columns.
+- **`app/api/user` (GET)** and **`app/api/user/progress` (POST)** — back the
+  `user-store` calls that previously had no route; return 401 when signed out so
+  the store falls back to guest. `user-store` auto-saves after each game/puzzle/
+  lesson via `saveProgress()`. Puzzle attempts are attributed to the signed-in
+  user when available, else the guest.
+
 ### Rest of the database (`prisma/`) — still scaffolding
-The other models (Module, Lesson, LessonProgress, GameHistory, DailyActivity, FamousGame) are
+The remaining models (Module, Lesson, LessonProgress, GameHistory, DailyActivity, FamousGame) are
 defined and seeded but **not yet wired to the UI**: lessons still render from hardcoded arrays in
-the page components, and `user-store`'s `/api/user` calls have no backing route (it falls back to
-a localStorage guest). Use the puzzle slice above as the template when wiring these up.
+the page components. Use the puzzle slice (and now the user/auth slice) as the template.
 
 ### UI structure
 - `app/` — pages: `play` (vs Stockfish), `puzzles` (rush/practice), `lessons`, `dashboard`,

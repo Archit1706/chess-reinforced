@@ -52,7 +52,8 @@ A comprehensive chess learning platform built with Next.js, featuring interactiv
 - **Board Visualization**: react-chessboard
 - **Chess Engine**: Stockfish.js (WASM)
 - **State Management**: Zustand
-- **Database**: SQLite with Prisma ORM
+- **Database**: PostgreSQL (Neon / Vercel Postgres) with Prisma ORM
+- **Auth**: Clerk (optional — guest mode without keys)
 - **Charts**: Recharts
 - **Animations**: Framer Motion
 
@@ -182,10 +183,14 @@ The Stockfish engine runs in a Web Worker for:
 ## Configuration
 
 ### Environment Variables
-Create a `.env` file:
+Copy `.env.example` to `.env` and fill in:
 ```env
-DATABASE_URL="file:./dev.db"
-NEXT_PUBLIC_APP_URL="http://localhost:3000"
+# PostgreSQL (Neon / Vercel Postgres)
+DATABASE_URL="postgresql://user:password@host/dbname?sslmode=require"
+
+# Clerk auth (optional — omit for guest-only mode)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="pk_test_..."
+CLERK_SECRET_KEY="sk_test_..."
 ```
 
 ### Stockfish Settings

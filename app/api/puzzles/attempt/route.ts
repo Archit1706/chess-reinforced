@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { recordAttempt } from '@/lib/puzzles/repository';
+import { getOrCreateCurrentUser } from '@/lib/auth';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -22,11 +23,15 @@ export async function POST(request: Request) {
       );
     }
 
+    // Attribute to the signed-in user when available; otherwise the guest.
+    const user = await getOrCreateCurrentUser();
+
     const result = await recordAttempt({
       puzzleId: body.puzzleId,
       solved: body.solved,
       timeSpent: typeof body.timeSpent === 'number' ? body.timeSpent : undefined,
       hintsUsed: typeof body.hintsUsed === 'number' ? body.hintsUsed : undefined,
+      userId: user?.id,
     });
 
     return NextResponse.json(result);
