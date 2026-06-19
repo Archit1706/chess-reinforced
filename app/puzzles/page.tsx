@@ -1,14 +1,21 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { PuzzleBoard } from '@/components/chess';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useUserStore } from '@/store/user-store';
 import { cn } from '@/lib/utils';
+import {
+  fetchDailyPuzzle,
+  fetchRandomPuzzle,
+  fetchThemes,
+  recordPuzzleAttempt,
+} from '@/lib/puzzles/client';
+import { formatTheme } from '@/lib/puzzles/lichess';
+import type { NormalizedPuzzle } from '@/lib/puzzles/types';
 import {
   Flame,
   Trophy,
@@ -19,126 +26,155 @@ import {
   Calendar,
   BarChart3,
   Star,
-  RefreshCw,
+  Loader2,
   Play,
-  Pause,
 } from 'lucide-react';
 
-// Sample puzzles data (in production, this would come from the database)
-const samplePuzzles = [
-  {
-    id: '1',
-    fen: 'r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4',
-    moves: ['h5f7'], // Scholar's mate threat
-    rating: 800,
-    themes: ['mateIn1', 'sacrifice'],
-  },
-  {
-    id: '2',
-    fen: 'r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4',
-    moves: ['c4f7', 'e8f7', 'd1h5', 'g7g6', 'h5e5'],
-    rating: 1000,
-    themes: ['fork', 'discoveredAttack'],
-  },
-  {
-    id: '3',
-    fen: 'r2qkb1r/ppp2ppp/2np1n2/4p1B1/2B1P1b1/3P1N2/PPP2PPP/RN1QK2R w KQkq - 0 6',
-    moves: ['c4f7', 'e8e7', 'g5f6', 'g7f6'],
-    rating: 1200,
-    themes: ['sacrifice', 'attack'],
-  },
-  {
-    id: '4',
-    fen: 'r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3',
-    moves: ['g8f6', 'e1g1', 'f6e4', 'd2d3'],
-    rating: 900,
-    themes: ['development', 'opening'],
-  },
-  {
-    id: '5',
-    fen: '6k1/5ppp/8/8/8/8/5PPP/4R1K1 w - - 0 1',
-    moves: ['e1e8'],
-    rating: 600,
-    themes: ['mateIn1', 'backRankMate'],
-  },
-  {
-    id: '6',
-    fen: 'r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4',
-    moves: ['f3g5', 'd7d5', 'e4d5', 'f6d5'],
-    rating: 1100,
-    themes: ['attack', 'pawnStructure'],
-  },
-];
-
-// Daily puzzle (changes daily)
-const getDailyPuzzle = () => {
-  const today = new Date().toDateString();
-  const index = today.split('').reduce((a, b) => a + b.charCodeAt(0), 0) % samplePuzzles.length;
-  return samplePuzzles[index];
-};
+// Rating bands so practice puzzles roughly track the user's level.
+const PRACTICE_BAND = 250;
 
 export default function PuzzlesPage() {
-  const { user, recordPuzzleSolved } = useUserStore();
+  const { user, recordPuzzleSolved, startSession } = useUserStore();
   const [currentTab, setCurrentTab] = useState('daily');
-  const [currentPuzzleIndex, setCurrentPuzzleIndex] = useState(0);
+
+  // Puzzle data (fetched from /api/puzzles, with client fallback).
+  const [dailyPuzzle, setDailyPuzzle] = useState<NormalizedPuzzle | null>(null);
+  const [practicePuzzle, setPracticePuzzle] = useState<NormalizedPuzzle | null>(null);
+  const [rushPuzzle, setRushPuzzle] = useState<NormalizedPuzzle | null>(null);
+  const [loadingPractice, setLoadingPractice] = useState(false);
   const [dailyCompleted, setDailyCompleted] = useState(false);
 
-  // Puzzle Rush state
+  // Theme filter for practice and the available theme list.
+  const [practiceTheme, setPracticeTheme] = useState<string | null>(null);
+  const [themes, setThemes] = useState<{ theme: string; count: number }[]>([]);
+
+  // Puzzle Rush state.
   const [rushActive, setRushActive] = useState(false);
-  const [rushTime, setRushTime] = useState(300); // 5 minutes
+  const [rushTime, setRushTime] = useState(300);
   const [rushScore, setRushScore] = useState(0);
   const [rushBestScore, setRushBestScore] = useState(0);
 
-  // Timer for puzzle rush
+  // Per-puzzle timing for attempt logging.
+  const puzzleStartRef = useRef<number>(Date.now());
+  // Avoid showing the same puzzle twice in a row within a session.
+  const seenRef = useRef<Set<string>>(new Set());
+
+  const ratingBand = useCallback((): { minRating?: number; maxRating?: number } => {
+    const elo = user?.stats.estimatedElo;
+    if (!elo) return {};
+    return { minRating: elo - PRACTICE_BAND, maxRating: elo + PRACTICE_BAND };
+  }, [user?.stats.estimatedElo]);
+
+  const loadPractice = useCallback(
+    async (theme: string | null) => {
+      setLoadingPractice(true);
+      try {
+        const puzzle = await fetchRandomPuzzle({
+          ...ratingBand(),
+          theme: theme ?? undefined,
+          exclude: Array.from(seenRef.current),
+        });
+        seenRef.current.add(puzzle.id);
+        puzzleStartRef.current = Date.now();
+        setPracticePuzzle(puzzle);
+      } finally {
+        setLoadingPractice(false);
+      }
+    },
+    [ratingBand]
+  );
+
+  // Initial load: session, daily puzzle, theme list, first practice puzzle.
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (rushActive && rushTime > 0) {
-      interval = setInterval(() => {
-        setRushTime((t) => t - 1);
-      }, 1000);
-    } else if (rushTime === 0) {
-      setRushActive(false);
-      if (rushScore > rushBestScore) {
-        setRushBestScore(rushScore);
-      }
-    }
-    return () => clearInterval(interval);
-  }, [rushActive, rushTime, rushScore, rushBestScore]);
-
-  const dailyPuzzle = getDailyPuzzle();
-  const currentPuzzle = samplePuzzles[currentPuzzleIndex];
-
-  const handlePuzzleSolved = useCallback(() => {
-    recordPuzzleSolved(true);
-    if (currentTab === 'daily') {
-      setDailyCompleted(true);
-    } else if (currentTab === 'rush') {
-      setRushScore((s) => s + 1);
-      setCurrentPuzzleIndex((i) => (i + 1) % samplePuzzles.length);
-    }
-  }, [currentTab, recordPuzzleSolved]);
-
-  const handlePuzzleFailed = useCallback(() => {
-    recordPuzzleSolved(false);
-    if (currentTab === 'rush') {
-      // In rush mode, wrong answer ends the game
-      setRushActive(false);
-      if (rushScore > rushBestScore) {
-        setRushBestScore(rushScore);
-      }
-    }
-  }, [currentTab, recordPuzzleSolved, rushScore, rushBestScore]);
-
-  const handleNextPuzzle = useCallback(() => {
-    setCurrentPuzzleIndex((i) => (i + 1) % samplePuzzles.length);
+    startSession();
+    fetchDailyPuzzle().then(setDailyPuzzle);
+    fetchThemes().then(setThemes);
+    loadPractice(null);
+    // Intentionally run once on mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const startRush = () => {
-    setRushActive(true);
-    setRushTime(300);
+  // Puzzle Rush timer.
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    if (rushActive && rushTime > 0) {
+      interval = setInterval(() => setRushTime((t) => t - 1), 1000);
+    } else if (rushTime === 0 && rushActive) {
+      setRushActive(false);
+      setRushBestScore((best) => Math.max(best, rushScore));
+    }
+    return () => clearInterval(interval);
+  }, [rushActive, rushTime, rushScore]);
+
+  const logAttempt = useCallback(
+    (puzzle: NormalizedPuzzle | null, solved: boolean) => {
+      if (!puzzle) return;
+      const timeSpent = Math.round((Date.now() - puzzleStartRef.current) / 1000);
+      recordPuzzleSolved(solved); // client-side stats/streak
+      void recordPuzzleAttempt({ puzzleId: puzzle.id, solved, timeSpent }); // server log
+    },
+    [recordPuzzleSolved]
+  );
+
+  // === Daily ===
+  const handleDailySolved = useCallback(() => {
+    logAttempt(dailyPuzzle, true);
+    setDailyCompleted(true);
+  }, [dailyPuzzle, logAttempt]);
+
+  const handleDailyFailed = useCallback(() => {
+    logAttempt(dailyPuzzle, false);
+  }, [dailyPuzzle, logAttempt]);
+
+  // === Practice ===
+  const handlePracticeSolved = useCallback(() => {
+    logAttempt(practicePuzzle, true);
+  }, [practicePuzzle, logAttempt]);
+
+  const handlePracticeFailed = useCallback(() => {
+    logAttempt(practicePuzzle, false);
+  }, [practicePuzzle, logAttempt]);
+
+  const handleNextPractice = useCallback(() => {
+    loadPractice(practiceTheme);
+  }, [loadPractice, practiceTheme]);
+
+  const selectTheme = useCallback(
+    (theme: string | null) => {
+      setPracticeTheme(theme);
+      setCurrentTab('practice');
+      loadPractice(theme);
+    },
+    [loadPractice]
+  );
+
+  // === Rush ===
+  const loadRush = useCallback(async () => {
+    const puzzle = await fetchRandomPuzzle({ exclude: Array.from(seenRef.current) });
+    seenRef.current.add(puzzle.id);
+    puzzleStartRef.current = Date.now();
+    setRushPuzzle(puzzle);
+  }, []);
+
+  const startRush = useCallback(async () => {
+    seenRef.current.clear();
     setRushScore(0);
-    setCurrentPuzzleIndex(Math.floor(Math.random() * samplePuzzles.length));
-  };
+    setRushTime(300);
+    setRushActive(true);
+    await loadRush();
+  }, [loadRush]);
+
+  const handleRushSolved = useCallback(() => {
+    logAttempt(rushPuzzle, true);
+    setRushScore((s) => s + 1);
+    void loadRush();
+  }, [rushPuzzle, logAttempt, loadRush]);
+
+  const handleRushFailed = useCallback(() => {
+    logAttempt(rushPuzzle, false);
+    setRushActive(false);
+    setRushBestScore((best) => Math.max(best, rushScore));
+  }, [rushPuzzle, logAttempt, rushScore]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -197,12 +233,14 @@ export default function PuzzlesPage() {
                         Daily Puzzle
                       </CardTitle>
                       <CardDescription>
-                        Solve today's puzzle to maintain your streak
+                        Solve today&apos;s puzzle to maintain your streak
                       </CardDescription>
                     </div>
-                    <Badge variant="outline" className="font-mono">
-                      Rating: {dailyPuzzle.rating}
-                    </Badge>
+                    {dailyPuzzle && (
+                      <Badge variant="outline" className="font-mono">
+                        Rating: {dailyPuzzle.rating}
+                      </Badge>
+                    )}
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -217,15 +255,18 @@ export default function PuzzlesPage() {
                         Practice More Puzzles
                       </Button>
                     </div>
-                  ) : (
+                  ) : dailyPuzzle ? (
                     <PuzzleBoard
+                      key={dailyPuzzle.id}
                       fen={dailyPuzzle.fen}
                       moves={dailyPuzzle.moves}
                       rating={dailyPuzzle.rating}
-                      themes={dailyPuzzle.themes}
-                      onSolved={handlePuzzleSolved}
-                      onFailed={handlePuzzleFailed}
+                      themes={dailyPuzzle.themes.map(formatTheme)}
+                      onSolved={handleDailySolved}
+                      onFailed={handleDailyFailed}
                     />
+                  ) : (
+                    <BoardLoading />
                   )}
                 </CardContent>
               </Card>
@@ -242,25 +283,40 @@ export default function PuzzlesPage() {
                         Practice Puzzles
                       </CardTitle>
                       <CardDescription>
-                        Improve your tactics with unlimited puzzles
+                        {practiceTheme
+                          ? `Theme: ${formatTheme(practiceTheme)}`
+                          : 'Unlimited puzzles, matched to your rating'}
                       </CardDescription>
                     </div>
-                    <Badge variant="outline" className="font-mono">
-                      Rating: {currentPuzzle.rating}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      {practiceTheme && (
+                        <Button variant="ghost" size="sm" onClick={() => selectTheme(null)}>
+                          Clear theme
+                        </Button>
+                      )}
+                      {practicePuzzle && (
+                        <Badge variant="outline" className="font-mono">
+                          Rating: {practicePuzzle.rating}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <PuzzleBoard
-                    key={currentPuzzle.id}
-                    fen={currentPuzzle.fen}
-                    moves={currentPuzzle.moves}
-                    rating={currentPuzzle.rating}
-                    themes={currentPuzzle.themes}
-                    onSolved={handlePuzzleSolved}
-                    onFailed={handlePuzzleFailed}
-                    onSkip={handleNextPuzzle}
-                  />
+                  {practicePuzzle && !loadingPractice ? (
+                    <PuzzleBoard
+                      key={practicePuzzle.id}
+                      fen={practicePuzzle.fen}
+                      moves={practicePuzzle.moves}
+                      rating={practicePuzzle.rating}
+                      themes={practicePuzzle.themes.map(formatTheme)}
+                      onSolved={handlePracticeSolved}
+                      onFailed={handlePracticeFailed}
+                      onSkip={handleNextPractice}
+                    />
+                  ) : (
+                    <BoardLoading />
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -292,9 +348,7 @@ export default function PuzzlesPage() {
                           {formatTime(rushTime)}
                         </Badge>
                       )}
-                      <Badge className="font-mono text-lg px-4 py-2">
-                        Score: {rushScore}
-                      </Badge>
+                      <Badge className="font-mono text-lg px-4 py-2">Score: {rushScore}</Badge>
                     </div>
                   </div>
                 </CardHeader>
@@ -305,8 +359,8 @@ export default function PuzzlesPage() {
                       <div>
                         <h2 className="text-2xl font-bold mb-2">Puzzle Rush</h2>
                         <p className="text-muted-foreground max-w-md mx-auto">
-                          You have 5 minutes to solve as many puzzles as
-                          possible. One wrong move and the game is over!
+                          You have 5 minutes to solve as many puzzles as possible. One wrong
+                          move and the game is over!
                         </p>
                       </div>
 
@@ -322,18 +376,20 @@ export default function PuzzlesPage() {
                         Start Rush
                       </Button>
                     </div>
-                  ) : (
+                  ) : rushPuzzle ? (
                     <PuzzleBoard
-                      key={`rush-${currentPuzzleIndex}`}
-                      fen={currentPuzzle.fen}
-                      moves={currentPuzzle.moves}
-                      rating={currentPuzzle.rating}
-                      themes={currentPuzzle.themes}
-                      onSolved={handlePuzzleSolved}
-                      onFailed={handlePuzzleFailed}
+                      key={`rush-${rushPuzzle.id}`}
+                      fen={rushPuzzle.fen}
+                      moves={rushPuzzle.moves}
+                      rating={rushPuzzle.rating}
+                      themes={rushPuzzle.themes.map(formatTheme)}
+                      onSolved={handleRushSolved}
+                      onFailed={handleRushFailed}
                       showRating={false}
                       showHintButton={false}
                     />
+                  ) : (
+                    <BoardLoading />
                   )}
                 </CardContent>
               </Card>
@@ -397,38 +453,36 @@ export default function PuzzlesPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-yellow-500">
-                    {rushBestScore}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    Puzzles in 5 minutes
-                  </div>
+                  <div className="text-4xl font-bold text-yellow-500">{rushBestScore}</div>
+                  <div className="text-sm text-muted-foreground">Puzzles in 5 minutes</div>
                 </div>
               </CardContent>
             </Card>
           )}
 
-          {/* Theme Categories */}
+          {/* Theme Categories — click to practice that theme */}
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg">Puzzle Themes</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-2">
-                {[
-                  'Fork',
-                  'Pin',
-                  'Skewer',
-                  'Mate in 1',
-                  'Mate in 2',
-                  'Sacrifice',
-                  'Back Rank',
-                  'Discovery',
-                ].map((theme) => (
-                  <Badge key={theme} variant="outline" className="cursor-pointer hover:bg-muted">
-                    {theme}
+                {(themes.length ? themes.slice(0, 12) : []).map(({ theme, count }) => (
+                  <Badge
+                    key={theme}
+                    variant={practiceTheme === theme ? 'default' : 'outline'}
+                    className="cursor-pointer hover:bg-muted"
+                    onClick={() => selectTheme(theme)}
+                    title={`${count} puzzles`}
+                  >
+                    {formatTheme(theme)}
                   </Badge>
                 ))}
+                {themes.length === 0 && (
+                  <p className="text-sm text-muted-foreground">
+                    Seed the database to browse themes.
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -453,13 +507,22 @@ export default function PuzzlesPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <ChevronRight className="h-4 w-4 mt-0.5 text-primary-600" />
-                  If you're stuck, look for undefended pieces
+                  If you&apos;re stuck, look for undefended pieces
                 </li>
               </ul>
             </CardContent>
           </Card>
         </div>
       </div>
+    </div>
+  );
+}
+
+function BoardLoading() {
+  return (
+    <div className="flex items-center justify-center py-24 text-muted-foreground">
+      <Loader2 className="h-8 w-8 animate-spin" />
+      <span className="ml-3">Loading puzzle…</span>
     </div>
   );
 }

@@ -24,6 +24,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { useUserStore } from '@/store/user-store';
+import { AuthButtons } from '@/components/auth/AuthButtons';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -121,6 +122,9 @@ export function Navbar() {
               </TooltipTrigger>
               <TooltipContent>Settings</TooltipContent>
             </Tooltip>
+
+            {/* Auth (renders nothing when Clerk isn't configured) */}
+            <AuthButtons />
 
             {/* Mobile menu button */}
             <Button

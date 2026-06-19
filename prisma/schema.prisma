@@ -1,12 +1,12 @@
 // Chess Reinforced Database Schema
-// Using SQLite for simplicity - can easily migrate to PostgreSQL for production
+// PostgreSQL (Neon / Vercel Postgres) for serverless deployment on Vercel.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -19,6 +19,9 @@ model User {
   // Profile
   username      String   @unique
   displayName   String?
+  // Clerk user id (when signed in via Clerk). Null for the local 'guest' user.
+  clerkId       String?  @unique
+  imageUrl      String?
 
   // Skill tracking
   estimatedElo  Int      @default(800)

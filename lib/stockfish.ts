@@ -334,6 +334,20 @@ export function setElo(elo: number) {
 }
 
 /**
+ * Toggle UCI_LimitStrength. The engine is normally capped to `computerElo` for
+ * *playing*; analysis must run at full strength to produce trustworthy evals.
+ * Disabling the limit removes the cap; re-enabling it restores the configured
+ * ELO (UCI_Elo only takes effect while LimitStrength is on).
+ */
+export function setLimitStrength(enabled: boolean) {
+  if (!engineState.ready) return;
+  sendCommand(`setoption name UCI_LimitStrength value ${enabled ? 'true' : 'false'}`);
+  if (enabled) {
+    sendCommand(`setoption name UCI_Elo value ${engineState.settings.elo}`);
+  }
+}
+
+/**
  * Get current engine settings
  */
 export function getEngineSettings(): StockfishSettings {

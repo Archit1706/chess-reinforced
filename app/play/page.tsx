@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useGameStore } from '@/store/game-store';
 import { useUIStore } from '@/store/ui-store';
 import { useUserStore } from '@/store/user-store';
-import { ChessBoard, MoveHistory, GameControls, GameInfo, EvaluationBar } from '@/components/chess';
+import { ChessBoard, MoveHistory, GameControls, GameInfo, EvaluationBar, GameReview } from '@/components/chess';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -69,6 +69,7 @@ export default function PlayPage() {
     setBestMove,
     newGame,
     movePiece,
+    goToMove,
     getPgn,
   } = useGameStore();
 
@@ -78,6 +79,7 @@ export default function PlayPage() {
   const [engineReady, setEngineReady] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
   const [showNewGameDialog, setShowNewGameDialog] = useState(false);
+  const [showReview, setShowReview] = useState(false);
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<string | null>(null);
 
@@ -260,13 +262,23 @@ export default function PlayPage() {
           <div className="flex items-center justify-between bg-muted/50 p-2 rounded-lg">
             <GameControls showExportImport onExport={handleExportPgn} />
 
-            {/* Analysis toggle */}
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Analysis</span>
-              <Switch
-                checked={showAnalysis}
-                onCheckedChange={setShowAnalysis}
-              />
+            <div className="flex items-center gap-3">
+              {/* Game Review */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowReview(true)}
+                disabled={history.length === 0}
+              >
+                <BarChart3 className="h-4 w-4 mr-2" />
+                Game Review
+              </Button>
+
+              {/* Analysis toggle */}
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Analysis</span>
+                <Switch checked={showAnalysis} onCheckedChange={setShowAnalysis} />
+              </div>
             </div>
           </div>
 
@@ -365,6 +377,19 @@ export default function PlayPage() {
           </Card>
         </div>
       </div>
+
+      {/* Game Review Dialog */}
+      <Dialog open={showReview} onOpenChange={setShowReview}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Game Review</DialogTitle>
+            <DialogDescription>
+              Stockfish accuracy and a move-by-move breakdown. Click a move to jump to it.
+            </DialogDescription>
+          </DialogHeader>
+          <GameReview moves={history} onSelectMove={(index) => goToMove(index)} />
+        </DialogContent>
+      </Dialog>
 
       {/* New Game Dialog */}
       <Dialog open={showNewGameDialog} onOpenChange={setShowNewGameDialog}>

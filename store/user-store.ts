@@ -160,6 +160,7 @@ export const useUserStore = create<UserState & UserActions>()(
 
         get().updateStats(stats);
         get().updateStreak();
+        void get().saveProgress();
       },
 
       recordLessonCompleted: () => {
@@ -167,6 +168,7 @@ export const useUserStore = create<UserState & UserActions>()(
           lessonsCompletedToday: state.lessonsCompletedToday + 1,
         }));
         get().updateStreak();
+        void get().saveProgress();
       },
 
       recordGamePlayed: (result) => {
@@ -195,6 +197,7 @@ export const useUserStore = create<UserState & UserActions>()(
         set((state) => ({ gamesPlayedToday: state.gamesPlayedToday + 1 }));
         get().updateStats(stats);
         get().updateStreak();
+        void get().saveProgress();
       },
 
       updateStreak: () => {
