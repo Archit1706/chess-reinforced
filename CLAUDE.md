@@ -56,6 +56,13 @@ messages; async results resolve via a `pendingResolvers` map. `next.config.js` s
 `Cross-Origin-Embedder-Policy: require-corp` and `COOP: same-origin` headers (needed for
 SharedArrayBuffer / threaded Stockfish) and enables async WebAssembly in webpack.
 
+`lib/analysis.ts` builds on this for **post-game review**: it replays the game, evaluates every
+position, and derives per-move centipawn loss, a classification (`classifyMove`), and a
+Lichess-style accuracy per side. The engine is normally ELO-limited for *playing*, so analysis
+calls `setLimitStrength(false)` first (and restores it after) to evaluate at full strength. The
+scoring math is pure and the engine call is injected via an `evaluate` option, so it's testable
+without a worker. The `GameReview` component (in `components/chess/`) drives it from the play page.
+
 ### Puzzles — fully wired (DB → API → client)
 The puzzle feature is the one end-to-end vertical slice through the backend:
 - **`lib/puzzles/`** is the data layer. `lichess.ts` parses the open Lichess dump (CC0) and
