@@ -108,10 +108,23 @@ locally before any keys exist.
   lesson via `saveProgress()`. Puzzle attempts are attributed to the signed-in
   user when available, else the guest.
 
+### Lessons — wired (DB → API → client)
+`Module`/`Lesson` content is seeded (`prisma/seed.ts`) and served from the DB:
+- **`lib/lessons/repository.ts`** — `getModulesWithProgress`, `getLessonBySlug`, and
+  `setLessonCompleted` (upserts a `LessonProgress` row per (user, lesson), joining completion
+  state into the module/lesson DTOs).
+- **`app/api/lessons` (GET list), `app/api/lessons/[lesson]` (GET detail), and
+  `app/api/lessons/[lesson]/complete` (POST)** — scoped to the signed-in user, else the guest.
+- **`components/lessons/Markdown.tsx`** — a tiny, dependency-free, XSS-safe renderer (headings,
+  lists, bold, inline code) for the lessons' markdown `content`.
+- Pages: `app/lessons/page.tsx` (real modules + progress) and
+  `app/lessons/[module]/[lesson]/page.tsx` (markdown + a persistent "mark complete" toggle that
+  also feeds the streak via `recordLessonCompleted`).
+
 ### Rest of the database (`prisma/`) — still scaffolding
-The remaining models (Module, Lesson, LessonProgress, GameHistory, DailyActivity, FamousGame) are
-defined and seeded but **not yet wired to the UI**: lessons still render from hardcoded arrays in
-the page components. Use the puzzle slice (and now the user/auth slice) as the template.
+`GameHistory`, `DailyActivity`, and `FamousGame` are defined (and the first two seeded) but **not yet
+wired to the UI**: individual games aren't persisted (only aggregate stats), and there's no study
+UI for famous games. Use the puzzle / lesson slices as the template.
 
 ### UI structure
 - `app/` — pages: `play` (vs Stockfish), `puzzles` (rush/practice), `lessons`, `dashboard`,
