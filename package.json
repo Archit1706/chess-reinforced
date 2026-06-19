@@ -11,7 +11,8 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "tsx prisma/seed.ts",
+    "db:import-puzzles": "tsx prisma/import-puzzles.ts"
   },
   "dependencies": {
     "next": "^14.2.35",

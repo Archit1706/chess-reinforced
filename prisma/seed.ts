@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { importPuzzles } from './import-puzzles';
 
 const prisma = new PrismaClient();
 
@@ -439,6 +440,11 @@ One of the oldest and most popular chess openings.
   }
 
   console.log('Created famous games');
+
+  // Import the bundled sample of real Lichess puzzles (CC0). For the full set,
+  // run `npm run db:import-puzzles` against the downloaded dump.
+  const puzzleResult = await importPuzzles({ log: false });
+  console.log(`Imported ${puzzleResult.inserted} puzzles (skipped ${puzzleResult.skipped})`);
 
   console.log('Seeding complete!');
 }

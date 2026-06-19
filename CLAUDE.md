@@ -12,9 +12,16 @@ npm run lint         # next lint — the ONLY automated check in this repo (no t
 
 npm run db:generate  # prisma generate (regenerate client after schema changes)
 npm run db:push      # Push prisma/schema.prisma to SQLite (no migrations used)
-npm run db:seed      # tsx prisma/seed.ts — seeds modules/lessons/puzzles
+npm run db:seed      # tsx prisma/seed.ts — seeds modules/lessons + imports the bundled puzzle sample
 npm run db:studio    # Open Prisma Studio
+npm run db:import-puzzles            # Import the bundled 800-puzzle sample
+npm run db:import-puzzles -- --file <path.csv|.gz>   # Import a Lichess dump (csv or gz)
+zstdcat lichess_db_puzzle.csv.zst | npm run db:import-puzzles -- --stdin   # Full dump
 ```
+
+`DATABASE_URL` must start with `file:` for the SQLite datasource. Note the
+remote/CI environment may preset `DATABASE_URL` to a Postgres URL that overrides
+`.env`; prefix commands with `DATABASE_URL="file:./dev.db"` when that happens.
 
 There is no test framework wired up. `npm run lint` is the only verification step.
 
@@ -49,13 +56,33 @@ messages; async results resolve via a `pendingResolvers` map. `next.config.js` s
 `Cross-Origin-Embedder-Policy: require-corp` and `COOP: same-origin` headers (needed for
 SharedArrayBuffer / threaded Stockfish) and enables async WebAssembly in webpack.
 
-### Database (`prisma/`) — defined but largely NOT wired
-`schema.prisma` (SQLite) and `seed.ts` define a full model set (User, Module, Lesson, Puzzle,
-PuzzleAttempt, LessonProgress, GameHistory, DailyActivity, FamousGame). However there is **no
-`app/api/` directory and no usage of `lib/db.ts` in the UI**. Lessons and puzzles shown in the
-pages come from **hardcoded sample arrays inside the page components** (e.g. `samplePuzzles` in
-`app/puzzles/page.tsx`), not from Prisma. Treat the DB layer as scaffolding for a future backend;
-wiring it up means adding API routes and replacing the in-component sample data.
+### Puzzles — fully wired (DB → API → client)
+The puzzle feature is the one end-to-end vertical slice through the backend:
+- **`lib/puzzles/`** is the data layer. `lichess.ts` parses the open Lichess dump (CC0) and
+  **normalizes** each row to "solver-first" form: the raw FEN is *before* the opponent's setup
+  move and `moves[0]` is that setup move, so import applies it (via chess.js) and stores the
+  resulting FEN + remaining moves. Everything downstream (DB, API, `PuzzleBoard`) assumes
+  solver-first, so don't re-introduce the offset. `repository.ts` holds the Prisma queries
+  (deterministic daily via FNV hash of the date, count+offset random with rating/theme filters,
+  tolerant attempt logging that auto-provisions a `guest` user). `client.ts` wraps the API with a
+  bundled `FALLBACK_PUZZLES` set so the page still works if the DB/API is down.
+- **`app/api/puzzles/{daily,random,attempt,themes}/route.ts`** — Node-runtime, `force-dynamic`
+  handlers that delegate to the repository. These are the first real API routes in the app.
+- **`prisma/import-puzzles.ts`** — streaming, fault-tolerant, idempotent importer (batched upserts
+  keyed on Lichess PuzzleId; skips malformed rows). Scales from the bundled sample to the full
+  multi-million-row dump at flat memory. `prisma/seed.ts` calls it for the bundled sample.
+- **`prisma/data/puzzles.sample.csv`** — 800 real Lichess puzzles in the official dump format,
+  committed so seeding works offline.
+
+Reading a `.zst` dump directly in Node is unreliable (its skippable-frame/large-window layout
+defeats Node's built-in zstd), so the importer's first-class path for the full dump is piping
+`zstdcat ... | --stdin`; `--file` handles plain `.csv` and `.gz`.
+
+### Rest of the database (`prisma/`) — still scaffolding
+The other models (Module, Lesson, LessonProgress, GameHistory, DailyActivity, FamousGame) are
+defined and seeded but **not yet wired to the UI**: lessons still render from hardcoded arrays in
+the page components, and `user-store`'s `/api/user` calls have no backing route (it falls back to
+a localStorage guest). Use the puzzle slice above as the template when wiring these up.
 
 ### UI structure
 - `app/` — pages: `play` (vs Stockfish), `puzzles` (rush/practice), `lessons`, `dashboard`,

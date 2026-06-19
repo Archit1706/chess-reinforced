@@ -113,7 +113,7 @@ export default function DashboardPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
         <p className="text-muted-foreground">
-          Track your progress and see how you're improving
+          Track your progress and see how you&apos;re improving
         </p>
       </div>
 
@@ -459,7 +459,7 @@ export default function DashboardPage() {
                 <div>
                   <h3 className="font-semibold">Daily Puzzle</h3>
                   <p className="text-sm text-muted-foreground">
-                    Solve today's challenge
+                    Solve today&apos;s challenge
                   </p>
                 </div>
               </div>
