@@ -9,6 +9,7 @@ import {
   BookOpen,
   Puzzle,
   Swords,
+  Trophy,
   BarChart3,
   Settings,
   Sun,
@@ -31,6 +32,7 @@ const navItems = [
   { href: '/lessons', label: 'Learn', icon: BookOpen },
   { href: '/puzzles', label: 'Puzzles', icon: Puzzle },
   { href: '/play', label: 'Play', icon: Swords },
+  { href: '/study', label: 'Study', icon: Trophy },
   { href: '/dashboard', label: 'Progress', icon: BarChart3 },
 ];
 

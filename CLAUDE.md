@@ -121,10 +121,19 @@ locally before any keys exist.
   `app/lessons/[module]/[lesson]/page.tsx` (markdown + a persistent "mark complete" toggle that
   also feeds the streak via `recordLessonCompleted`).
 
+### Famous games — wired (DB → API → client)
+Seeded `FamousGame` rows (e.g. the Immortal Game, Fischer's Game of the Century) power a study mode:
+- **`lib/famous-games/repository.ts`** + **`app/api/famous-games`** (list) and
+  **`app/api/famous-games/[id]`** (detail with PGN).
+- **`components/chess/GameViewer.tsx`** — a self-contained PGN replay board (parses with chess.js,
+  precomputes per-ply FENs; button/keyboard/click navigation), decoupled from the game store.
+- Pages `app/study/page.tsx` (browse) and `app/study/[id]/page.tsx` (replay); reachable via the
+  "Study" navbar item.
+
 ### Rest of the database (`prisma/`) — still scaffolding
-`GameHistory`, `DailyActivity`, and `FamousGame` are defined (and the first two seeded) but **not yet
-wired to the UI**: individual games aren't persisted (only aggregate stats), and there's no study
-UI for famous games. Use the puzzle / lesson slices as the template.
+`GameHistory` and `DailyActivity` are defined (and seeded) but **not yet wired to the UI**:
+individual games aren't persisted (only aggregate stats live in `user-store`). Use the puzzle /
+lesson / famous-games slices as the template.
 
 ### UI structure
 - `app/` — pages: `play` (vs Stockfish), `puzzles` (rush/practice), `lessons`, `dashboard`,
