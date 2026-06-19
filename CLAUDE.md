@@ -117,6 +117,10 @@ locally before any keys exist.
   `app/api/lessons/[lesson]/complete` (POST)** — scoped to the signed-in user, else the guest.
 - **`components/lessons/Markdown.tsx`** — a tiny, dependency-free, XSS-safe renderer (headings,
   lists, bold, inline code) for the lessons' markdown `content`.
+- **`components/lessons/LessonBoard.tsx`** + **`lessonDemos.ts`** — interactive learning aids: an
+  `animate` board (steps through legal FEN frames) and an `interactive` sandbox (drag legal moves,
+  chess.js-validated). `LESSON_DEMOS` keys topic-matched demos by lesson slug at the UI layer (no
+  DB/seed dependency); the lesson page also always renders a free practice sandbox.
 - Pages: `app/lessons/page.tsx` (real modules + progress) and
   `app/lessons/[module]/[lesson]/page.tsx` (markdown + a persistent "mark complete" toggle that
   also feeds the streak via `recordLessonCompleted`).

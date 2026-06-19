@@ -3,10 +3,12 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Markdown } from '@/components/lessons/Markdown';
+import { LessonBoard } from '@/components/lessons/LessonBoard';
+import { LESSON_DEMOS, framesFromMoves } from '@/components/lessons/lessonDemos';
 import { useUserStore } from '@/store/user-store';
 import { fetchLesson, setLessonComplete } from '@/lib/lessons/client';
 import type { LessonDetail } from '@/lib/lessons/types';
@@ -17,6 +19,8 @@ import {
   Loader2,
   RotateCcw,
   Star,
+  Gamepad2,
+  Sparkles,
 } from 'lucide-react';
 
 type Status = 'loading' | 'ready' | 'notfound';
@@ -116,10 +120,56 @@ export default function LessonDetailPage() {
         </div>
       </div>
 
+      {/* Topic demo (animated or interactive), matched to the lesson */}
+      {(() => {
+        const demo = LESSON_DEMOS[lesson.slug];
+        if (!demo) return null;
+        return (
+          <Card className="mb-6 border-primary-200 dark:border-primary-800">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-primary-600" />
+                {demo.mode === 'interactive' ? 'Try it on the board' : 'See it in action'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex justify-center">
+              <LessonBoard
+                interactive={demo.mode === 'interactive'}
+                fen={demo.fen}
+                frames={
+                  demo.mode === 'animate'
+                    ? framesFromMoves(demo.fen, demo.moves ?? [])
+                    : undefined
+                }
+                autoPlay={demo.autoPlay}
+                flip={demo.flip}
+                caption={demo.caption}
+              />
+            </CardContent>
+          </Card>
+        );
+      })()}
+
       {/* Content */}
       <Card>
         <CardContent className="prose-none pt-6">
           <Markdown content={lesson.content} />
+        </CardContent>
+      </Card>
+
+      {/* Always-available practice sandbox */}
+      <Card className="mt-6">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Gamepad2 className="h-4 w-4 text-primary-600" />
+            Practice board
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex justify-center">
+          <LessonBoard
+            interactive
+            caption="A free board to experiment — make any legal moves you like."
+          />
         </CardContent>
       </Card>
 
