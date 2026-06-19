@@ -14,6 +14,17 @@ import type { NormalizedPuzzle, PuzzleQuery } from './types';
 
 const GUEST_USERNAME = 'guest';
 
+/** Id of the shared local guest user, provisioning it on first use. */
+export async function ensureGuestUserId(): Promise<string> {
+  const guest = await prisma.user.upsert({
+    where: { username: GUEST_USERNAME },
+    update: {},
+    create: { username: GUEST_USERNAME, displayName: 'Guest' },
+    select: { id: true },
+  });
+  return guest.id;
+}
+
 function toDTO(row: Puzzle): NormalizedPuzzle {
   return {
     id: row.id,
@@ -133,19 +144,98 @@ export async function recordAttempt(params: {
   const puzzle = await prisma.puzzle.findUnique({ where: { id: puzzleId }, select: { id: true } });
   if (!puzzle) return { recorded: false };
 
-  let userId = params.userId;
-  if (!userId) {
-    const guest = await prisma.user.upsert({
-      where: { username: GUEST_USERNAME },
-      update: {},
-      create: { username: GUEST_USERNAME, displayName: 'Guest' },
-      select: { id: true },
-    });
-    userId = guest.id;
-  }
+  const userId = params.userId ?? (await ensureGuestUserId());
 
   await prisma.puzzleAttempt.create({
     data: { userId, puzzleId, solved, timeSpent, hintsUsed },
   });
+
+  // Update the spaced-repetition schedule. Never let this break attempt logging.
+  try {
+    await scheduleReview(userId, puzzleId, solved);
+  } catch (error) {
+    console.error('Failed to schedule review:', error);
+  }
+
   return { recorded: true };
+}
+
+// === Spaced repetition (Leitner boxes) ======================================
+
+const MAX_BOX = 5;
+/** Minutes until a puzzle in each box is due again. Box 0 resurfaces quickly. */
+const BOX_INTERVAL_MINUTES = [10, 1440, 4320, 10080, 23040, 50400];
+
+function nextBox(currentBox: number, solved: boolean): number {
+  if (!solved) return 0; // a miss drops the puzzle back to the front of the queue
+  return Math.min(currentBox + 1, MAX_BOX);
+}
+
+function dueDateForBox(box: number, from: Date = new Date()): Date {
+  const minutes = BOX_INTERVAL_MINUTES[box] ?? BOX_INTERVAL_MINUTES[MAX_BOX];
+  return new Date(from.getTime() + minutes * 60_000);
+}
+
+/**
+ * Advance the Leitner schedule for a (user, puzzle) after an attempt. Solved →
+ * climb a box (longer interval); failed → reset to box 0 (resurfaces soon).
+ */
+export async function scheduleReview(
+  userId: string,
+  puzzleId: string,
+  solved: boolean
+): Promise<void> {
+  const existing = await prisma.puzzleReview.findUnique({
+    where: { userId_puzzleId: { userId, puzzleId } },
+    select: { box: true },
+  });
+
+  const box = nextBox(existing?.box ?? 0, solved);
+  const dueAt = dueDateForBox(box);
+
+  await prisma.puzzleReview.upsert({
+    where: { userId_puzzleId: { userId, puzzleId } },
+    create: {
+      userId,
+      puzzleId,
+      box,
+      dueAt,
+      lastResult: solved,
+      timesSeen: 1,
+      timesSolved: solved ? 1 : 0,
+      timesFailed: solved ? 0 : 1,
+    },
+    update: {
+      box,
+      dueAt,
+      lastResult: solved,
+      timesSeen: { increment: 1 },
+      timesSolved: solved ? { increment: 1 } : undefined,
+      timesFailed: solved ? undefined : { increment: 1 },
+    },
+  });
+}
+
+/** How many puzzles are due for review right now. */
+export function countDueReviews(userId: string): Promise<number> {
+  return prisma.puzzleReview.count({
+    where: { userId, dueAt: { lte: new Date() } },
+  });
+}
+
+/**
+ * Due review puzzles for a user, soonest first. Returns fully-normalized
+ * puzzles ready for the board.
+ */
+export async function getDueReviews(
+  userId: string,
+  count = 20
+): Promise<NormalizedPuzzle[]> {
+  const reviews = await prisma.puzzleReview.findMany({
+    where: { userId, dueAt: { lte: new Date() } },
+    orderBy: { dueAt: 'asc' },
+    take: Math.max(1, Math.min(count, 100)),
+    include: { puzzle: true },
+  });
+  return reviews.map((r) => toDTO(r.puzzle));
 }

@@ -45,6 +45,7 @@ model User {
   lessonProgress LessonProgress[]
   gameHistory    GameHistory[]
   puzzleAttempts PuzzleAttempt[]
+  puzzleReviews  PuzzleReview[]
   dailyActivity  DailyActivity[]
 
   @@index([username])
@@ -129,10 +130,36 @@ model Puzzle {
 
   // Attempts
   attempts    PuzzleAttempt[]
+  reviews     PuzzleReview[]
 
   @@index([rating])
   @@index([themes])
   @@index([isDaily, dailyDate])
+}
+
+// Spaced-repetition schedule for a (user, puzzle): a Leitner box plus a due
+// time. Failed puzzles drop to box 0 and resurface soon; solved puzzles climb
+// to higher boxes with progressively longer intervals.
+model PuzzleReview {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  puzzleId    String
+  puzzle      Puzzle   @relation(fields: [puzzleId], references: [id])
+
+  box         Int      @default(0) // Leitner box (0 = review soonest)
+  dueAt       DateTime // When this puzzle should be reviewed next
+  lastResult  Boolean  @default(false) // Was the most recent attempt solved?
+
+  timesSeen   Int      @default(0)
+  timesSolved Int      @default(0)
+  timesFailed Int      @default(0)
+
+  @@unique([userId, puzzleId])
+  @@index([userId, dueAt])
 }
 
 // Track user attempts at puzzles

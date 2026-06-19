@@ -74,8 +74,12 @@ The puzzle feature is the one end-to-end vertical slice through the backend:
   (deterministic daily via FNV hash of the date, count+offset random with rating/theme filters,
   tolerant attempt logging that auto-provisions a `guest` user). `client.ts` wraps the API with a
   bundled `FALLBACK_PUZZLES` set so the page still works if the DB/API is down.
-- **`app/api/puzzles/{daily,random,attempt,themes}/route.ts`** — Node-runtime, `force-dynamic`
+- **`app/api/puzzles/{daily,random,attempt,themes,review}/route.ts`** — Node-runtime, `force-dynamic`
   handlers that delegate to the repository. These are the first real API routes in the app.
+- **Spaced repetition**: every attempt updates a `PuzzleReview` (Leitner box + `dueAt`) per
+  (user, puzzle) — a miss drops to box 0 (resurfaces in ~10 min), a solve climbs to a longer
+  interval. `/api/puzzles/review` serves due puzzles for the current user (signed-in or guest),
+  surfaced as the Puzzles page **Review** tab with a due-count badge.
 - **`prisma/import-puzzles.ts`** — streaming, fault-tolerant, idempotent importer (batched upserts
   keyed on Lichess PuzzleId; skips malformed rows). Scales from the bundled sample to the full
   multi-million-row dump at flat memory. `prisma/seed.ts` calls it for the bundled sample.

@@ -12,6 +12,7 @@ import {
   fetchDailyPuzzle,
   fetchRandomPuzzle,
   fetchThemes,
+  fetchReviewPuzzles,
   recordPuzzleAttempt,
 } from '@/lib/puzzles/client';
 import { formatTheme } from '@/lib/puzzles/lichess';
@@ -28,6 +29,8 @@ import {
   Star,
   Loader2,
   Play,
+  RotateCcw,
+  CheckCircle2,
 } from 'lucide-react';
 
 // Rating bands so practice puzzles roughly track the user's level.
@@ -47,6 +50,12 @@ export default function PuzzlesPage() {
   // Theme filter for practice and the available theme list.
   const [practiceTheme, setPracticeTheme] = useState<string | null>(null);
   const [themes, setThemes] = useState<{ theme: string; count: number }[]>([]);
+
+  // Spaced-repetition review queue.
+  const [reviewQueue, setReviewQueue] = useState<NormalizedPuzzle[]>([]);
+  const [reviewIndex, setReviewIndex] = useState(0);
+  const [reviewDue, setReviewDue] = useState(0);
+  const [loadingReview, setLoadingReview] = useState(false);
 
   // Puzzle Rush state.
   const [rushActive, setRushActive] = useState(false);
@@ -84,12 +93,25 @@ export default function PuzzlesPage() {
     [ratingBand]
   );
 
-  // Initial load: session, daily puzzle, theme list, first practice puzzle.
+  const loadReviews = useCallback(async () => {
+    setLoadingReview(true);
+    try {
+      const queue = await fetchReviewPuzzles();
+      setReviewQueue(queue.puzzles);
+      setReviewIndex(0);
+      setReviewDue(queue.due);
+    } finally {
+      setLoadingReview(false);
+    }
+  }, []);
+
+  // Initial load: session, daily puzzle, theme list, first practice puzzle, reviews.
   useEffect(() => {
     startSession();
     fetchDailyPuzzle().then(setDailyPuzzle);
     fetchThemes().then(setThemes);
     loadPractice(null);
+    loadReviews();
     // Intentionally run once on mount.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -176,6 +198,33 @@ export default function PuzzlesPage() {
     setRushBestScore((best) => Math.max(best, rushScore));
   }, [rushPuzzle, logAttempt, rushScore]);
 
+  // === Review (spaced repetition) ===
+  const reviewPuzzle = reviewQueue[reviewIndex] ?? null;
+
+  const advanceReview = useCallback(() => {
+    setReviewDue((d) => Math.max(0, d - 1));
+    if (reviewIndex + 1 < reviewQueue.length) {
+      setReviewIndex((i) => i + 1);
+    } else {
+      // Exhausted the batch — pull the next set of due puzzles.
+      loadReviews();
+    }
+  }, [reviewIndex, reviewQueue.length, loadReviews]);
+
+  const handleReviewSolved = useCallback(() => {
+    logAttempt(reviewPuzzle, true);
+    advanceReview();
+  }, [reviewPuzzle, logAttempt, advanceReview]);
+
+  const handleReviewFailed = useCallback(() => {
+    // Record the miss (reschedules it sooner); let the user retry on the board.
+    logAttempt(reviewPuzzle, false);
+  }, [reviewPuzzle, logAttempt]);
+
+  const handleSkipReview = useCallback(() => {
+    advanceReview();
+  }, [advanceReview]);
+
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -207,7 +256,7 @@ export default function PuzzlesPage() {
           </div>
 
           <Tabs value={currentTab} onValueChange={setCurrentTab}>
-            <TabsList className="grid w-full grid-cols-3 max-w-md">
+            <TabsList className="grid w-full grid-cols-4 max-w-xl">
               <TabsTrigger value="daily">
                 <Calendar className="h-4 w-4 mr-2" />
                 Daily
@@ -219,6 +268,15 @@ export default function PuzzlesPage() {
               <TabsTrigger value="rush">
                 <Zap className="h-4 w-4 mr-2" />
                 Rush
+              </TabsTrigger>
+              <TabsTrigger value="review">
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Review
+                {reviewDue > 0 && (
+                  <span className="ml-1.5 rounded-full bg-primary-600 text-white text-xs px-1.5 py-0.5 leading-none">
+                    {reviewDue}
+                  </span>
+                )}
               </TabsTrigger>
             </TabsList>
 
@@ -390,6 +448,58 @@ export default function PuzzlesPage() {
                     />
                   ) : (
                     <BoardLoading />
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Review (spaced repetition) */}
+            <TabsContent value="review" className="mt-6">
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <RotateCcw className="h-5 w-5 text-primary-600" />
+                        Review
+                      </CardTitle>
+                      <CardDescription>
+                        Re-solve puzzles you previously missed, scheduled by spaced repetition
+                      </CardDescription>
+                    </div>
+                    {reviewPuzzle && (
+                      <Badge variant="outline" className="font-mono">
+                        {reviewDue} due
+                      </Badge>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {loadingReview ? (
+                    <BoardLoading />
+                  ) : reviewPuzzle ? (
+                    <PuzzleBoard
+                      key={`review-${reviewPuzzle.id}`}
+                      fen={reviewPuzzle.fen}
+                      moves={reviewPuzzle.moves}
+                      rating={reviewPuzzle.rating}
+                      themes={reviewPuzzle.themes.map(formatTheme)}
+                      onSolved={handleReviewSolved}
+                      onFailed={handleReviewFailed}
+                      onSkip={handleSkipReview}
+                    />
+                  ) : (
+                    <div className="text-center py-12 space-y-4">
+                      <CheckCircle2 className="h-16 w-16 mx-auto text-green-500" />
+                      <h2 className="text-2xl font-bold">All caught up!</h2>
+                      <p className="text-muted-foreground max-w-md mx-auto">
+                        No puzzles are due for review right now. Missed puzzles from Daily,
+                        Practice, and Rush will show up here to reinforce your weak spots.
+                      </p>
+                      <Button variant="outline" onClick={() => setCurrentTab('practice')}>
+                        Practice Puzzles
+                      </Button>
+                    </div>
                   )}
                 </CardContent>
               </Card>

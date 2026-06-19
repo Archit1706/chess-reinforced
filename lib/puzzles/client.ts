@@ -79,6 +79,25 @@ export async function recordPuzzleAttempt(input: {
   }
 }
 
+export interface ReviewQueue {
+  /** Total puzzles currently due for review. */
+  due: number;
+  /** A batch of due puzzles, soonest first. */
+  puzzles: NormalizedPuzzle[];
+}
+
+/** Due spaced-repetition puzzles for the current user. Empty on error. */
+export async function fetchReviewPuzzles(count = 20): Promise<ReviewQueue> {
+  try {
+    const res = await fetch(`/api/puzzles/review?count=${count}`);
+    if (!res.ok) throw new Error(`status ${res.status}`);
+    return (await res.json()) as ReviewQueue;
+  } catch (error) {
+    console.warn('Failed to load review puzzles:', error);
+    return { due: 0, puzzles: [] };
+  }
+}
+
 export async function fetchThemes(): Promise<{ theme: string; count: number }[]> {
   try {
     const res = await fetch('/api/puzzles/themes');
