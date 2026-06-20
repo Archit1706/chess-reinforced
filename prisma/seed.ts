@@ -38,6 +38,12 @@ The pawn is the most numerous piece on the board, with each player starting with
 - Pawns capture **diagonally**, one square forward
 - They cannot capture pieces directly in front of them
 
+\`\`\`chess
+mode: interactive
+fen: 4k3/8/8/3p4/4P3/8/8/4K3 w - - 0 1
+caption: Your move — capture diagonally with exd5.
+\`\`\`
+
 ## Special Rules
 
 ### En Passant
@@ -122,6 +128,14 @@ A fork is when one piece attacks two or more enemy pieces simultaneously.
 Knights are the best forking pieces because they can't be blocked.
 - The "family fork" attacks king and queen
 - Royal fork: attacking king, queen, and rook
+
+\`\`\`chess
+mode: animate
+fen: 4q1k1/8/8/8/4N3/8/8/6K1 w - - 0 1
+moves: Nf6+ Kh8 Nxe8
+autoplay: true
+caption: Nf6+ forks the king and queen, then the knight grabs the queen.
+\`\`\`
 
 ### Pawn Forks
 Pawns can fork pieces on adjacent diagonals.
@@ -399,17 +413,21 @@ One of the oldest and most popular chess openings.
     },
   ];
 
-  for (const puzzle of puzzles) {
-    await prisma.puzzle.create({
-      data: puzzle,
-    });
+  // Only insert the tiny built-in sample if no puzzles exist yet; the real
+  // 800-puzzle Lichess import (idempotent upsert) runs at the end of seeding.
+  if ((await prisma.puzzle.count()) === 0) {
+    for (const puzzle of puzzles) {
+      await prisma.puzzle.create({ data: puzzle });
+    }
+    console.log('Created sample puzzles');
+  } else {
+    console.log('Puzzles already present — skipping built-in sample');
   }
-
-  console.log('Created sample puzzles');
 
   // Create some famous games for study mode
   const famousGames = [
     {
+      id: 'immortal-game',
       white: 'Adolf Anderssen',
       black: 'Lionel Kieseritzky',
       year: 1851,
@@ -421,6 +439,7 @@ One of the oldest and most popular chess openings.
       difficulty: 4,
     },
     {
+      id: 'game-of-the-century',
       white: 'Donald Byrne',
       black: 'Robert James Fischer',
       year: 1956,
@@ -433,10 +452,11 @@ One of the oldest and most popular chess openings.
     },
   ];
 
+  // Reference data with no foreign keys — replace wholesale so re-seeding is
+  // clean (and removes any rows from earlier runs that used generated ids).
+  await prisma.famousGame.deleteMany({});
   for (const game of famousGames) {
-    await prisma.famousGame.create({
-      data: game,
-    });
+    await prisma.famousGame.create({ data: game });
   }
 
   console.log('Created famous games');

@@ -6,6 +6,7 @@ import { Chess, Square } from 'chess.js';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Play, Pause, RotateCcw, ChevronLeft, ChevronRight, Hand } from 'lucide-react';
+import { framesFromMoves } from './lessonDemos';
 
 const BOARD_STYLE = {
   customDarkSquareStyle: { backgroundColor: '#b58863' },
@@ -15,6 +16,8 @@ const BOARD_STYLE = {
 interface LessonBoardProps {
   /** Explicit FEN frames to animate through (overrides moves). */
   frames?: string[];
+  /** Legal SAN/UCI moves from `fen`; expanded to frames when `frames` is absent. */
+  moves?: string[];
   /** Starting FEN (interactive sandbox, or animation start). */
   fen?: string;
   /** Let the reader drag legal moves from `fen`. */
@@ -36,6 +39,7 @@ const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
  */
 export function LessonBoard({
   frames,
+  moves,
   fen,
   interactive = false,
   autoPlay = false,
@@ -58,9 +62,16 @@ export function LessonBoard({
     );
   }
 
+  const resolvedFrames =
+    frames && frames.length > 0
+      ? frames
+      : moves && moves.length > 0
+        ? framesFromMoves(fen, moves)
+        : [fen ?? START_FEN];
+
   return (
     <AnimatedBoard
-      frames={frames && frames.length > 0 ? frames : [fen ?? START_FEN]}
+      frames={resolvedFrames}
       orientation={orientation}
       autoPlay={autoPlay}
       caption={caption}

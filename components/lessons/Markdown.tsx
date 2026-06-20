@@ -1,13 +1,52 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { LessonBoard } from './LessonBoard';
 
 /**
  * Minimal, dependency-free Markdown renderer for trusted lesson content.
  *
  * Supports the subset the lessons use — h1/h2/h3 headings, unordered lists,
- * paragraphs, **bold**, and `inline code`. Renders to React elements (no
+ * paragraphs, **bold**, `inline code`, and a ```chess fenced block that embeds
+ * an interactive/animated board. Renders to React elements (no
  * dangerouslySetInnerHTML), so there's no XSS surface.
+ *
+ * A ```chess block accepts key: value lines, e.g.
+ *   ```chess
+ *   mode: interactive            # or: animate (default)
+ *   fen: 4k3/8/8/3N4/8/8/8/4K3 w - - 0 1
+ *   moves: e4 e5 Nf3             # SAN/UCI, for animate mode
+ *   autoplay: true
+ *   flip: false
+ *   caption: Drag the knight
+ *   ```
  */
+
+interface ChessBlockConfig {
+  interactive?: boolean;
+  fen?: string;
+  moves?: string[];
+  autoPlay?: boolean;
+  flip?: boolean;
+  caption?: string;
+}
+
+function parseChessBlock(body: string): ChessBlockConfig {
+  const cfg: ChessBlockConfig = {};
+  for (const line of body.split('\n')) {
+    const idx = line.indexOf(':');
+    if (idx === -1) continue;
+    const key = line.slice(0, idx).trim().toLowerCase();
+    const val = line.slice(idx + 1).trim();
+    if (!val) continue;
+    if (key === 'fen') cfg.fen = val;
+    else if (key === 'mode') cfg.interactive = val.toLowerCase() === 'interactive';
+    else if (key === 'moves') cfg.moves = val.split(/\s+/).filter(Boolean);
+    else if (key === 'autoplay') cfg.autoPlay = val.toLowerCase() === 'true';
+    else if (key === 'flip') cfg.flip = val.toLowerCase() === 'true';
+    else if (key === 'caption') cfg.caption = val;
+  }
+  return cfg;
+}
 
 function renderInline(text: string, keyPrefix: string): React.ReactNode[] {
   const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g).filter(Boolean);
@@ -54,9 +93,49 @@ export function Markdown({ content, className }: { content: string; className?: 
     list = [];
   };
 
-  lines.forEach((raw, idx) => {
+  for (let idx = 0; idx < lines.length; idx++) {
+    const raw = lines[idx];
     const line = raw.trimEnd();
     const key = String(idx);
+
+    // Fenced code block: ```lang ... ```
+    const fence = line.match(/^```(\w*)/);
+    if (fence) {
+      flushPara(key);
+      flushList(key);
+      const lang = fence[1].toLowerCase();
+      const bodyLines: string[] = [];
+      idx++; // move past the opening fence
+      while (idx < lines.length && !/^```/.test(lines[idx])) {
+        bodyLines.push(lines[idx]);
+        idx++;
+      }
+      // idx now points at the closing fence (or end of input)
+      const body = bodyLines.join('\n');
+      if (lang === 'chess') {
+        const cfg = parseChessBlock(body);
+        blocks.push(
+          <div key={`chess-${key}`} className="flex justify-center">
+            <LessonBoard
+              interactive={cfg.interactive}
+              fen={cfg.fen}
+              moves={cfg.moves}
+              autoPlay={cfg.autoPlay}
+              flip={cfg.flip}
+              caption={cfg.caption}
+            />
+          </div>
+        );
+      } else {
+        blocks.push(
+          <pre key={`pre-${key}`} className="overflow-x-auto rounded-lg bg-muted p-3 text-sm">
+            <code className="font-mono">{body}</code>
+          </pre>
+        );
+      }
+      continue;
+    }
+
     if (/^###\s+/.test(line)) {
       flushPara(key);
       flushList(key);
@@ -91,7 +170,7 @@ export function Markdown({ content, className }: { content: string; className?: 
       flushList(key);
       para.push(line.trim());
     }
-  });
+  }
   flushPara('end');
   flushList('end');
 
