@@ -36,6 +36,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getComputerMove, setElo, initEngine, isEngineReady, analyzePosition } from '@/lib/stockfish';
+import { getLocalBestMove } from '@/lib/local-engine';
 import { parseUciMove } from '@/lib/chess';
 
 // Difficulty presets
@@ -83,29 +84,33 @@ export default function PlayPage() {
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<string | null>(null);
 
-  // Initialize engine and session
+  // Initialize engine and session. Default to playing the computer so the
+  // opponent responds immediately (instead of landing in free/both-sides mode).
   useEffect(() => {
     startSession();
+    if (mode === 'free') {
+      setMode('vsComputer');
+      newGame();
+    }
     initEngine().then((ready) => {
       setEngineReady(ready);
       if (ready) {
         setElo(computerElo);
       }
     });
-  }, [computerElo, startSession]);
+    // Run once on mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  // Make computer move when it's the computer's turn
+  // Make the computer move when it's its turn. Not gated on engineReady: if
+  // Stockfish hasn't loaded, makeComputerMove falls back to the local engine,
+  // so the computer always replies.
   useEffect(() => {
-    if (
-      mode === 'vsComputer' &&
-      engineReady &&
-      !isGameOver &&
-      turn !== playerColor &&
-      !isThinking
-    ) {
+    if (mode === 'vsComputer' && !isGameOver && turn !== playerColor && !isThinking) {
       makeComputerMove();
     }
-  }, [mode, turn, playerColor, engineReady, isGameOver, isThinking, fen]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, turn, playerColor, isGameOver, isThinking, fen]);
 
   // Analyze position when autoAnalyze is enabled
   useEffect(() => {
@@ -128,13 +133,32 @@ export default function PlayPage() {
   const makeComputerMove = async () => {
     setIsThinking(true);
     try {
-      const uciMove = await getComputerMove(fen);
+      let uciMove: string | null = null;
+
+      // Prefer Stockfish when it's loaded, but cap the wait so a stuck/blocked
+      // engine can't freeze the game; otherwise use the built-in local engine.
+      if (isEngineReady()) {
+        uciMove = await Promise.race<string | null>([
+          getComputerMove(fen),
+          new Promise<null>((resolve) => setTimeout(() => resolve(null), 3500)),
+        ]);
+      }
+      if (!uciMove) {
+        uciMove = getLocalBestMove(fen, computerElo);
+      }
+
       if (uciMove) {
         const { from, to, promotion } = parseUciMove(uciMove);
         movePiece(from, to, promotion);
       }
     } catch (error) {
       console.error('Error getting computer move:', error);
+      // Last resort so the game never stalls.
+      const fallback = getLocalBestMove(fen, computerElo);
+      if (fallback) {
+        const { from, to, promotion } = parseUciMove(fallback);
+        movePiece(from, to, promotion);
+      }
     } finally {
       setIsThinking(false);
     }

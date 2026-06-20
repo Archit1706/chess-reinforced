@@ -57,6 +57,12 @@ messages; async results resolve via a `pendingResolvers` map. `next.config.js` s
 `Cross-Origin-Embedder-Policy: require-corp` and `COOP: same-origin` headers (needed for
 SharedArrayBuffer / threaded Stockfish) and enables async WebAssembly in webpack.
 
+`lib/local-engine.ts` is a **pure-JS fallback opponent** (negamax + alpha-beta with
+piece-square eval, iterative deepening under a ~700ms budget, strength scaled to ELO). The play
+page defaults to `vsComputer` and, in `makeComputerMove`, prefers Stockfish when it's loaded (with
+a timeout) but falls back to the local engine — so the computer always replies even if the
+CDN/worker is blocked.
+
 `lib/analysis.ts` builds on this for **post-game review**: it replays the game, evaluates every
 position, and derives per-move centipawn loss, a classification (`classifyMove`), and a
 Lichess-style accuracy per side. The engine is normally ELO-limited for *playing*, so analysis
