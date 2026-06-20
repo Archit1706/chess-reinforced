@@ -149,7 +149,7 @@ export default function PlayPage() {
 
       if (uciMove) {
         const { from, to, promotion } = parseUciMove(uciMove);
-        movePiece(from, to, promotion);
+        movePiece(from, to, promotion, true);
       }
     } catch (error) {
       console.error('Error getting computer move:', error);
@@ -157,7 +157,7 @@ export default function PlayPage() {
       const fallback = getLocalBestMove(fen, computerElo);
       if (fallback) {
         const { from, to, promotion } = parseUciMove(fallback);
-        movePiece(from, to, promotion);
+        movePiece(from, to, promotion, true);
       }
     } finally {
       setIsThinking(false);

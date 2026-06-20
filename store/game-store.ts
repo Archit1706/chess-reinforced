@@ -65,7 +65,7 @@ interface GameActions {
 
   // Moves
   selectSquare: (square: Square | null) => void;
-  movePiece: (from: Square, to: Square, promotion?: string) => boolean;
+  movePiece: (from: Square, to: Square, promotion?: string, isEngineMove?: boolean) => boolean;
   undo: () => void;
   redo: () => void;
   goToMove: (index: number) => void;
@@ -260,11 +260,12 @@ export const useGameStore = create<GameState & GameActions>()(
         }
       },
 
-      movePiece: (from, to, promotion = 'q') => {
+      movePiece: (from, to, promotion = 'q', isEngineMove = false) => {
         const { game, mode, playerColor, turn } = get();
 
-        // In vsComputer mode, only allow player's moves
-        if (mode === 'vsComputer' && turn !== playerColor) {
+        // In vsComputer mode, reject the human's input on the computer's turn —
+        // but let engine-issued moves through (they're the computer's move).
+        if (!isEngineMove && mode === 'vsComputer' && turn !== playerColor) {
           return false;
         }
 
