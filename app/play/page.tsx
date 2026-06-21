@@ -39,6 +39,9 @@ import { getComputerMove, setElo, initEngine, isEngineReady, analyzePosition } f
 import { getLocalBestMove } from '@/lib/local-engine';
 import { parseUciMove } from '@/lib/chess';
 
+// Minimum time the computer "thinks" before moving, so its reply is easy to follow.
+const COMPUTER_MIN_THINK_MS = 650;
+
 // Difficulty presets
 const difficultyPresets = [
   { name: 'Beginner', elo: 800, description: 'Just learning' },
@@ -132,6 +135,7 @@ export default function PlayPage() {
 
   const makeComputerMove = async () => {
     setIsThinking(true);
+    const started = Date.now();
     try {
       let uciMove: string | null = null;
 
@@ -145,6 +149,13 @@ export default function PlayPage() {
       }
       if (!uciMove) {
         uciMove = getLocalBestMove(fen, computerElo);
+      }
+
+      // Keep a minimum "thinking" pause so the move is easy to follow instead
+      // of snapping instantly after the player moves.
+      const elapsed = Date.now() - started;
+      if (elapsed < COMPUTER_MIN_THINK_MS) {
+        await new Promise((resolve) => setTimeout(resolve, COMPUTER_MIN_THINK_MS - elapsed));
       }
 
       if (uciMove) {

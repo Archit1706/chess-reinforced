@@ -72,7 +72,7 @@ export function GameReview({ moves, onSelectMove, depth = 12, className }: GameR
         return;
       }
       console.error('Game review failed:', e);
-      setError('Analysis failed. The engine needs network access to load.');
+      setError('Analysis failed. Please try again.');
       setStatus('error');
     } finally {
       abortRef.current = null;

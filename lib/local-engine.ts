@@ -148,6 +148,31 @@ function toUci(move: { from: string; to: string; promotion?: string }): string {
 }
 
 /**
+ * Static/shallow-search evaluation of a position, in centipawns from the side
+ * to move's perspective (positive = side to move is better). Used as an offline
+ * evaluator for post-game analysis when Stockfish isn't available.
+ */
+export function evaluateFen(fen: string, depth = 2): number {
+  let game: Chess;
+  try {
+    game = new Chess(fen);
+  } catch {
+    return 0;
+  }
+  if (game.isCheckmate()) return -MATE;
+  if (game.isDraw() || game.isStalemate() || game.isThreefoldRepetition()) return 0;
+
+  deadline = Date.now() + 400;
+  nodeCount = 0;
+  try {
+    return negamax(game, depth, -Infinity, Infinity);
+  } catch {
+    const e = evaluate(game);
+    return game.turn() === 'w' ? e : -e;
+  }
+}
+
+/**
  * Best move (UCI) for the side to move at `fen`, or null if there are none.
  * Uses iterative deepening under a ~700ms time budget (so the UI never blocks)
  * and scales strength with `elo`: lower ratings cap depth shallower and

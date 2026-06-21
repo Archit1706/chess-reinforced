@@ -12,7 +12,8 @@
 
 import { Chess } from 'chess.js';
 import type { Move } from 'chess.js';
-import { analyzePosition, setLimitStrength, initEngine } from './stockfish';
+import { analyzePosition, setLimitStrength, isEngineReady } from './stockfish';
+import { evaluateFen } from './local-engine';
 import { classifyMove } from './chess';
 import type { AnalyzedMove, GameAnalysis, MoveClassification } from '@/types/chess';
 
@@ -71,22 +72,49 @@ function mean(values: number[]): number {
   return values.reduce((a, b) => a + b, 0) / values.length;
 }
 
-const defaultEvaluator: Evaluator = async (fen, depth) => {
-  const a = await analyzePosition(fen, depth, 1);
-  return { cp: normalizeScore(a.evaluation, a.mate), bestMove: a.bestMove };
-};
+/** Local (offline) evaluator — always available, no worker/network needed. */
+const localEvaluator: Evaluator = async (fen) => ({ cp: evaluateFen(fen, 2) });
 
 /**
  * Analyze a full game. `moves` is the verbose chess.js history (as stored in the
  * game store). Returns per-move classifications plus aggregate accuracy and
  * blunder/mistake/inaccuracy counts.
+ *
+ * Uses Stockfish only when it's already loaded (it is never awaited, so a
+ * blocked CDN/worker can't hang the analysis); otherwise it evaluates with the
+ * built-in local engine. Either way the analysis always completes.
  */
 export async function analyzeGame(
   moves: Move[],
   options: AnalyzeOptions = {}
 ): Promise<GameAnalysis> {
   const depth = options.depth ?? DEFAULT_DEPTH;
-  const evaluate = options.evaluate ?? defaultEvaluator;
+
+  let evaluate = options.evaluate;
+  let stockfish = false;
+  if (!evaluate) {
+    if (isEngineReady()) {
+      stockfish = true;
+      setLimitStrength(false); // analyse at full strength
+      evaluate = async (fen, d) => {
+        // Per-position timeout so a single stuck call falls back instead of hanging.
+        let a: Awaited<ReturnType<typeof analyzePosition>> | null = null;
+        try {
+          a = await Promise.race([
+            analyzePosition(fen, d, 1),
+            new Promise<null>((resolve) => setTimeout(() => resolve(null), 1500)),
+          ]);
+        } catch {
+          a = null;
+        }
+        return a
+          ? { cp: normalizeScore(a.evaluation, a.mate), bestMove: a.bestMove }
+          : { cp: evaluateFen(fen, 2) };
+      };
+    } else {
+      evaluate = localEvaluator;
+    }
+  }
 
   // Reconstruct the FEN after every ply (plus the starting position).
   const chess = options.startFen ? new Chess(options.startFen) : new Chess();
@@ -98,19 +126,17 @@ export async function analyzeGame(
 
   // Evaluate each position once; loss for ply i uses evals[i] and evals[i+1].
   const evals: Evaluation[] = [];
-  const usingEngine = !options.evaluate;
-  if (usingEngine) {
-    await initEngine(); // ensure the engine exists before lifting the ELO cap
-    setLimitStrength(false); // analyse at full strength
-  }
   try {
     for (let i = 0; i < fens.length; i++) {
       if (options.signal?.aborted) throw new DOMException('Analysis aborted', 'AbortError');
+      // Yield to the event loop so the progress bar repaints and the UI stays
+      // responsive during the (synchronous) local evaluations.
+      await new Promise((resolve) => setTimeout(resolve, 0));
       evals.push(await evaluate(fens[i], depth));
       options.onProgress?.(i + 1, fens.length);
     }
   } finally {
-    if (usingEngine) setLimitStrength(true); // restore playing strength
+    if (stockfish) setLimitStrength(true); // restore playing strength
   }
 
   const analyzed: AnalyzedMove[] = [];
