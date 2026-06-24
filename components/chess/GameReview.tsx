@@ -17,6 +17,8 @@ interface GameReviewProps {
   onSelectMove?: (index: number) => void;
   /** Analysis depth per position (lower = faster). */
   depth?: number;
+  /** Fires once the full-game analysis completes (e.g. to derive practice puzzles). */
+  onAnalyzed?: (analysis: GameAnalysis) => void;
   className?: string;
 }
 
@@ -43,7 +45,7 @@ function formatWhiteEval(cp: number): string {
  * Runs a full-game Stockfish review and renders accuracy, a blunder/mistake/
  * inaccuracy summary, and a clickable move-by-move breakdown.
  */
-export function GameReview({ moves, onSelectMove, depth = 12, className }: GameReviewProps) {
+export function GameReview({ moves, onSelectMove, depth = 12, onAnalyzed, className }: GameReviewProps) {
   const [status, setStatus] = useState<Status>('idle');
   const [progress, setProgress] = useState({ done: 0, total: 0 });
   const [result, setResult] = useState<GameAnalysis | null>(null);
@@ -66,6 +68,7 @@ export function GameReview({ moves, onSelectMove, depth = 12, className }: GameR
       });
       setResult(analysis);
       setStatus('done');
+      onAnalyzed?.(analysis);
     } catch (e) {
       if (e instanceof DOMException && e.name === 'AbortError') {
         setStatus('idle');
@@ -77,7 +80,7 @@ export function GameReview({ moves, onSelectMove, depth = 12, className }: GameR
     } finally {
       abortRef.current = null;
     }
-  }, [moves, depth]);
+  }, [moves, depth, onAnalyzed]);
 
   const cancel = useCallback(() => abortRef.current?.abort(), []);
 

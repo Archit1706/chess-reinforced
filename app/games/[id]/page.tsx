@@ -4,14 +4,15 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Chess, type Move } from 'chess.js';
-import { ArrowLeft, Bot, Loader2, Trash2, Download, BarChart3 } from 'lucide-react';
+import { ArrowLeft, Bot, Loader2, Trash2, Download, BarChart3, Target } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { GameViewer, GameReview } from '@/components/chess';
+import { GameViewer, GameReview, MistakeTrainer } from '@/components/chess';
 import { cn } from '@/lib/utils';
 import { fetchGame, deleteGame } from '@/lib/games/client';
 import type { GameDetailDTO, GameOutcome } from '@/lib/games/types';
+import type { GameAnalysis } from '@/types/chess';
 
 const OUTCOME_STYLES: Record<GameOutcome, string> = {
   win: 'bg-green-500/15 text-green-600 dark:text-green-400 border-green-500/30',
@@ -33,6 +34,7 @@ export default function GameDetailPage({ params }: { params: { id: string } }) {
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [showReview, setShowReview] = useState(false);
+  const [analysis, setAnalysis] = useState<GameAnalysis | null>(null);
 
   useEffect(() => {
     fetchGame(params.id)
@@ -170,7 +172,7 @@ export default function GameDetailPage({ params }: { params: { id: string } }) {
         </CardHeader>
         <CardContent>
           {showReview ? (
-            <GameReview moves={moves} />
+            <GameReview moves={moves} onAnalyzed={setAnalysis} />
           ) : (
             <div className="text-center py-4 space-y-3">
               <p className="text-sm text-muted-foreground">
@@ -184,6 +186,21 @@ export default function GameDetailPage({ params }: { params: { id: string } }) {
           )}
         </CardContent>
       </Card>
+
+      {/* Train your mistakes — derived from the analysis above */}
+      {analysis && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Target className="h-5 w-5" />
+              Train Your Mistakes
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <MistakeTrainer analysis={analysis} playerColor={orientation} />
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
