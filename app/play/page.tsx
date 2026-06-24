@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useGameStore } from '@/store/game-store';
+import { saveGameResult } from '@/lib/games/client';
 import { useUIStore } from '@/store/ui-store';
 import { useUserStore } from '@/store/user-store';
 import { ChessBoard, MoveHistory, GameControls, GameInfo, EvaluationBar, GameReview } from '@/components/chess';
@@ -66,6 +67,8 @@ export default function PlayPage() {
     computerElo,
     config,
     evaluation,
+    openingName,
+    openingEco,
     setMode,
     setPlayerColor,
     setComputerElo,
@@ -86,6 +89,8 @@ export default function PlayPage() {
   const [showReview, setShowReview] = useState(false);
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<string | null>(null);
+  // Guard so a finished game is persisted to history exactly once.
+  const savedGameRef = useRef(false);
 
   // Initialize engine and session. Default to playing the computer so the
   // opponent responds immediately (instead of landing in free/both-sides mode).
@@ -122,16 +127,48 @@ export default function PlayPage() {
     }
   }, [fen, autoAnalyze, engineReady]);
 
-  // Record game result
+  // Reset the save guard whenever a fresh game is in progress.
   useEffect(() => {
-    if (isGameOver && mode === 'vsComputer') {
-      let gameResult: 'win' | 'loss' | 'draw' = 'draw';
-      if (isCheckmate) {
-        gameResult = turn === playerColor ? 'loss' : 'win';
-      }
-      recordGamePlayed(gameResult);
+    if (!isGameOver) savedGameRef.current = false;
+  }, [isGameOver]);
+
+  // Record game result (stats) and persist the game to history — once.
+  useEffect(() => {
+    if (!isGameOver || mode !== 'vsComputer' || savedGameRef.current) return;
+    savedGameRef.current = true;
+
+    let gameResult: 'win' | 'loss' | 'draw' = 'draw';
+    if (isCheckmate) {
+      gameResult = turn === playerColor ? 'loss' : 'win';
     }
-  }, [isGameOver, isCheckmate, turn, playerColor, mode, recordGamePlayed]);
+    recordGamePlayed(gameResult);
+
+    // Only persist games that actually have moves.
+    if (history.length > 0 && result && result !== '*') {
+      void saveGameResult({
+        pgn: getPgn(),
+        result,
+        playerColor,
+        opponentType: 'computer',
+        opponentElo: computerElo,
+        openingName,
+        openingEco,
+      });
+    }
+  }, [
+    isGameOver,
+    isCheckmate,
+    turn,
+    playerColor,
+    mode,
+    recordGamePlayed,
+    history.length,
+    result,
+    computerElo,
+    openingName,
+    openingEco,
+    getPgn,
+  ]);
 
   const makeComputerMove = async () => {
     setIsThinking(true);

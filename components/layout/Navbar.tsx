@@ -17,6 +17,7 @@ import {
   Menu,
   X,
   Flame,
+  History,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -32,6 +33,7 @@ const navItems = [
   { href: '/lessons', label: 'Learn', icon: BookOpen },
   { href: '/puzzles', label: 'Puzzles', icon: Puzzle },
   { href: '/play', label: 'Play', icon: Swords },
+  { href: '/games', label: 'My Games', icon: History },
   { href: '/study', label: 'Study', icon: Trophy },
   { href: '/dashboard', label: 'Progress', icon: BarChart3 },
 ];
