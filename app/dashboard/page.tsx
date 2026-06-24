@@ -35,6 +35,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatTheme } from '@/lib/puzzles/lichess';
+import { ActivityHeatmap } from '@/components/dashboard/ActivityHeatmap';
 import type { DashboardData } from '@/lib/dashboard/repository';
 
 function relativeTime(iso: string): string {
@@ -86,11 +87,13 @@ export default function DashboardPage() {
   // Achievements evaluated against real stats.
   const achievements = [
     { id: 1, name: 'First Tactic', description: 'Solve your first puzzle', icon: Target, unlocked: stats.puzzlesSolved >= 1 },
-    { id: 2, name: 'Puzzle Solver', description: 'Solve 100 puzzles', icon: Zap, unlocked: stats.puzzlesSolved >= 100 },
-    { id: 3, name: 'On Fire', description: 'Reach a 7-day streak', icon: Flame, unlocked: stats.longestStreak >= 7 },
-    { id: 4, name: 'Rising Star', description: 'Reach 1000 ELO', icon: Star, unlocked: stats.estimatedElo >= 1000 },
-    { id: 5, name: 'Tactical Master', description: 'Solve 500 puzzles', icon: Award, unlocked: stats.puzzlesSolved >= 500 },
-    { id: 6, name: 'Grandmaster', description: 'Reach 2000 ELO', icon: Trophy, unlocked: stats.estimatedElo >= 2000 },
+    { id: 2, name: 'First Win', description: 'Win a game vs the computer', icon: Swords, unlocked: stats.gamesWon >= 1 },
+    { id: 3, name: 'Puzzle Solver', description: 'Solve 100 puzzles', icon: Zap, unlocked: stats.puzzlesSolved >= 100 },
+    { id: 4, name: 'On Fire', description: 'Reach a 7-day streak', icon: Flame, unlocked: stats.longestStreak >= 7 },
+    { id: 5, name: 'Rising Star', description: 'Reach 1000 ELO', icon: Star, unlocked: stats.estimatedElo >= 1000 },
+    { id: 6, name: 'Veteran', description: 'Play 50 games', icon: Award, unlocked: stats.gamesPlayed >= 50 },
+    { id: 7, name: 'Tactical Master', description: 'Solve 500 puzzles', icon: Award, unlocked: stats.puzzlesSolved >= 500 },
+    { id: 8, name: 'Grandmaster', description: 'Reach 2000 ELO', icon: Trophy, unlocked: stats.estimatedElo >= 2000 },
   ];
 
   const activity = dash?.activity ?? [];
@@ -292,6 +295,35 @@ export default function DashboardPage() {
               <EmptyChart message="No puzzle activity yet this week" />
             )}
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Activity Calendar */}
+      <Card className="mb-8">
+        <CardHeader>
+          <div className="flex items-start justify-between gap-3 flex-wrap">
+            <div>
+              <CardTitle>Activity Calendar</CardTitle>
+              <CardDescription>Puzzles, games, and lessons over the last 17 weeks</CardDescription>
+            </div>
+            <div className="flex gap-4 text-sm">
+              <div className="text-right">
+                <div className="text-xl font-bold leading-none">{dash?.currentStreak ?? 0}</div>
+                <div className="text-xs text-muted-foreground">day streak</div>
+              </div>
+              <div className="text-right">
+                <div className="text-xl font-bold leading-none">{dash?.activeDays ?? 0}</div>
+                <div className="text-xs text-muted-foreground">active days</div>
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {dash?.heatmap && dash.heatmap.length > 0 ? (
+            <ActivityHeatmap days={dash.heatmap} />
+          ) : (
+            <EmptyChart message="No activity yet — play, solve, or learn to fill the calendar" />
+          )}
         </CardContent>
       </Card>
 
