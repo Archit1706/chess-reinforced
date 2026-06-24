@@ -78,7 +78,7 @@ export function GameViewer({ pgn, orientation = 'white', boardWidth = 480, class
 
   return (
     <div className={cn('grid gap-4 lg:grid-cols-[1fr_220px]', className)}>
-      <div className="space-y-3">
+      <div className="space-y-3 min-w-0">
         <div ref={boardRef} className="w-full overflow-hidden" style={{ maxWidth: boardWidth }}>
           <Chessboard
             position={fens[ply]}

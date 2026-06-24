@@ -222,7 +222,7 @@ export default function PlayPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="grid lg:grid-cols-[1fr_350px] gap-8">
         {/* Main board area */}
-        <div className="space-y-4">
+        <div className="space-y-4 min-w-0">
           {/* Board header */}
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3 flex-wrap">
@@ -247,12 +247,12 @@ export default function PlayPage() {
           </div>
 
           {/* Board with evaluation bar */}
-          <div className="flex gap-2 items-stretch">
+          <div className="flex gap-2 items-stretch min-w-0">
             {showEvaluation && (
               <EvaluationBar
                 evaluation={evaluation || 0}
                 orientation="vertical"
-                className="self-stretch"
+                className="self-stretch shrink-0"
               />
             )}
             <div className="relative flex-1 min-w-0">
@@ -331,7 +331,7 @@ export default function PlayPage() {
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-4">
+        <div className="space-y-4 min-w-0">
           {/* Game Info */}
           <Card>
             <CardHeader className="pb-3">

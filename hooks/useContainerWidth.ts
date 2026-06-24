@@ -18,9 +18,15 @@ export function useContainerWidth<T extends HTMLElement = HTMLDivElement>() {
     if (!el) return;
     const update = () => setWidth(el.clientWidth);
     update();
+    // Re-measure once after layout settles, in case the first read was taken
+    // before flex/grid constraints were applied.
+    const raf = requestAnimationFrame(update);
     const observer = new ResizeObserver(update);
     observer.observe(el);
-    return () => observer.disconnect();
+    return () => {
+      cancelAnimationFrame(raf);
+      observer.disconnect();
+    };
   }, []);
 
   return [ref, width] as const;
