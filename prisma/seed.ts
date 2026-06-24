@@ -104,6 +104,77 @@ Bishops are long-range pieces that control diagonals.
           difficulty: 1,
           estimatedMinutes: 8,
         },
+        {
+          slug: 'rook-movement',
+          title: 'The Rook',
+          description: 'Master straight-line movement and the power of connected rooks',
+          content: `# The Rook
+
+Rooks are powerful long-range pieces worth about five pawns.
+
+## Movement
+- Moves in **straight lines** — horizontally and vertically
+- Any number of squares, but **cannot jump** over pieces
+- Captures by landing on an enemy piece
+
+## Where Rooks Belong
+- **Open files** (columns with no pawns) are a rook's highway
+- A rook on the **7th rank** attacks the enemy's pawns and traps the king
+- **Connected rooks** (defending each other on a rank) are very strong
+
+## Castling
+The rook takes part in castling — the only move where two pieces move at once. The king slides two squares toward a rook, and the rook jumps to the king's other side, tucking the king to safety.`,
+          order: 4,
+          difficulty: 1,
+          estimatedMinutes: 8,
+        },
+        {
+          slug: 'queen-movement',
+          title: 'The Queen',
+          description: 'Command the board with the most powerful piece',
+          content: `# The Queen
+
+The queen is the most powerful piece, combining the moves of a rook and a bishop.
+
+## Movement
+- Moves in **straight lines and diagonals**
+- Any number of squares in any of the eight directions
+- Cannot jump over pieces
+
+## Using the Queen Well
+- Worth about **nine pawns** — never trade it cheaply
+- **Don't bring it out too early** — opponents develop pieces while chasing it, gaining time
+- Devastating in the attack once your other pieces are developed
+
+## A Word of Caution
+Because the queen is so valuable, it makes a poor blockader and a tempting target. Keep it active but safe from forks and pins.`,
+          order: 5,
+          difficulty: 1,
+          estimatedMinutes: 8,
+        },
+        {
+          slug: 'king-movement',
+          title: 'The King',
+          description: 'Protect your king and activate it in the endgame',
+          content: `# The King
+
+The king is the piece you cannot afford to lose — checkmate ends the game.
+
+## Movement
+- Moves **one square** in any direction
+- Cannot move into check (a square attacked by an enemy piece)
+- Two kings can never stand on adjacent squares
+
+## The King in Two Phases
+- **Opening and middlegame:** keep the king safe, usually by castling behind a wall of pawns
+- **Endgame:** with fewer pieces around, the king becomes a **fighting piece** — march it toward the center to support pawns and attack
+
+## Castling Rights
+You may castle only if neither the king nor that rook has moved, the squares between are empty, and the king is not in check or passing through an attacked square.`,
+          order: 6,
+          difficulty: 1,
+          estimatedMinutes: 8,
+        },
       ],
     },
     {
@@ -182,6 +253,61 @@ The piece behind is valuable but not the king - moving is legal but costly.
           difficulty: 2,
           estimatedMinutes: 15,
         },
+        {
+          slug: 'skewers',
+          title: 'Skewers',
+          description: 'Force a valuable piece to move and win the one behind it',
+          content: `# Skewers
+
+A skewer is a pin in reverse: a **more valuable** piece is attacked and forced to move, exposing a **less valuable** piece behind it.
+
+## How It Works
+- Line up your rook, bishop, or queen against two enemy pieces
+- The front piece is the more valuable one (often the king or queen)
+- When it moves out of danger, you capture the piece behind
+
+\`\`\`chess
+mode: animate
+fen: 1q6/8/8/1k6/8/8/6K1/7R w - - 0 1
+moves: Rb1+ Kc5 Rxb8
+autoplay: true
+caption: Rb1+ checks the king through the b-file; when it steps aside, Rxb8 wins the queen.
+\`\`\`
+
+## Skewer vs Pin
+- **Pin:** the valuable piece is *behind* and cannot move
+- **Skewer:** the valuable piece is *in front* and must move
+
+## Finding Skewers
+1. Look for enemy king and queen (or queen and rook) on the same line
+2. Deliver a check or threat that forces the front piece to move
+3. Capture the piece that was hiding behind it`,
+          order: 3,
+          difficulty: 2,
+          estimatedMinutes: 12,
+        },
+        {
+          slug: 'discovered-attacks',
+          title: 'Discovered Attacks',
+          description: 'Unleash a hidden attack by moving a piece out of the way',
+          content: `# Discovered Attacks
+
+A discovered attack happens when you move one piece and **reveal** an attack from the piece behind it.
+
+## The Mechanism
+- A "front" piece sits in front of a long-range piece (rook, bishop, or queen)
+- When the front piece moves, it unmasks the attack
+- The front piece can also make its **own** threat as it moves — a double whammy
+
+## Discovered Check
+The strongest version: the unmasked attack is a **check**. The opponent must respond to the check, so the front piece can grab material with impunity.
+
+## Why They're Deadly
+Two pieces attack at once, but the opponent can usually only deal with one threat. Discovered attacks win material more often than almost any other tactic.`,
+          order: 4,
+          difficulty: 3,
+          estimatedMinutes: 15,
+        },
       ],
     },
     {
@@ -216,6 +342,87 @@ The back rank mate is one of the most common checkmate patterns.
 - Keep a rook on the back rank for defense`,
           order: 1,
           difficulty: 2,
+          estimatedMinutes: 12,
+        },
+        {
+          slug: 'two-rook-mate',
+          title: 'Two-Rook Checkmate',
+          description: 'The "lawnmower" mate that drives the king off the board',
+          content: `# Two-Rook Checkmate
+
+Also called the **ladder** or **lawnmower** mate, this is the easiest mate to learn with two heavy pieces.
+
+## The Technique
+1. Place one rook to cut off the rank (or file) the king is on
+2. Use the second rook to check the king, forcing it back a rank
+3. The king retreats; "climb the ladder" by alternating rooks rank by rank
+4. Drive the king to the edge, then deliver checkmate
+
+\`\`\`chess
+mode: animate
+fen: 4k3/8/8/8/8/8/R7/1R5K w - - 0 1
+moves: Ra7 Kd8 Rb8#
+autoplay: true
+caption: One rook seals the 7th rank, the other delivers mate on the 8th.
+\`\`\`
+
+## Key Tip
+If the king ever moves *toward* your rooks, simply slide the threatened rook far away along its rank — never give up the rook, and keep climbing.`,
+          order: 2,
+          difficulty: 2,
+          estimatedMinutes: 12,
+        },
+        {
+          slug: 'queen-king-mate',
+          title: 'Queen and King Checkmate',
+          description: 'Corner the lone king with your queen and king working together',
+          content: `# Queen and King vs King
+
+With a queen and king against a lone king, mate is quick — but you must avoid stalemate.
+
+## The Plan
+1. Use the queen to **fence the king** toward an edge, staying a knight's-move away
+2. Bring your **own king** up to support — the queen alone cannot mate
+3. Deliver checkmate with the king guarding the queen
+
+\`\`\`chess
+mode: animate
+fen: 4k3/8/3K4/8/8/8/8/4Q3 w - - 0 1
+moves: Qe7#
+caption: With the king on e6 guarding, Qe7 is checkmate.
+\`\`\`
+
+## Avoiding Stalemate
+The danger is trapping the king with **no legal moves but no check**. Always check that the enemy king keeps a free square until the moment of mate. When in doubt, bring your king closer rather than grabbing with the queen.`,
+          order: 3,
+          difficulty: 2,
+          estimatedMinutes: 15,
+        },
+        {
+          slug: 'smothered-mate',
+          title: 'Smothered Mate',
+          description: 'The knight delivers mate while the king is trapped by its own pieces',
+          content: `# Smothered Mate
+
+A beautiful pattern where the king is **smothered** by its own pieces and a lone knight delivers checkmate.
+
+## The Classic Pattern (Philidor's Legacy)
+1. A knight checks the king in the corner
+2. The king's only escape is blocked by its own pieces
+3. Often a queen sacrifice forces a rook to block the last escape square
+4. The knight returns with checkmate
+
+\`\`\`chess
+mode: animate
+fen: 6rk/6pp/8/6N1/8/8/8/6K1 w - - 0 1
+moves: Nf7#
+caption: Boxed in by its own rook and pawns, the king falls to the knight on f7.
+\`\`\`
+
+## Why It Works
+The knight is the only piece that can't be blocked, so when every escape square is occupied by friendly pieces, a single knight check is mate.`,
+          order: 4,
+          difficulty: 3,
           estimatedMinutes: 12,
         },
       ],
@@ -263,6 +470,59 @@ Attack the center without occupying it.
           difficulty: 2,
           estimatedMinutes: 15,
         },
+        {
+          slug: 'develop-pieces',
+          title: 'Develop Your Pieces',
+          description: 'Get your knights and bishops into the game quickly',
+          content: `# Develop Your Pieces
+
+Development means bringing your pieces from their starting squares into active positions. In the opening, **time is everything**.
+
+## The Golden Rules
+- **Knights before bishops** — knights have fewer good squares, so commit them first
+- **One move per piece** — don't move the same piece twice in the opening without a reason
+- **Don't bring the queen out early** — it gets chased and you lose tempo
+- **Castle early** to connect your rooks and tuck the king away
+
+\`\`\`chess
+mode: animate
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+moves: e4 e5 Nf3 Nc6 Bc4 Bc5 O-O Nf6
+autoplay: true
+caption: Knights and bishops come out, then White castles — textbook development.
+\`\`\`
+
+## Count Your Tempi
+Every move that doesn't develop a piece or fight for the center is a move your opponent can use to get ahead. A lead in development can be turned into an attack before the opponent is ready.`,
+          order: 2,
+          difficulty: 2,
+          estimatedMinutes: 15,
+        },
+        {
+          slug: 'king-safety',
+          title: 'King Safety and Castling',
+          description: 'Tuck your king away before launching into the middlegame',
+          content: `# King Safety and Castling
+
+A king caught in the center is a king in danger. Castling is your fastest route to safety.
+
+## Why Castle
+- Moves the king to the side, away from the open central files
+- Brings a rook toward the center where it belongs
+- Usually completed within the first 6–10 moves
+
+## Kingside vs Queenside
+- **Kingside (O-O):** quick and safe, the most common choice
+- **Queenside (O-O-O):** brings the rook to an active file faster, but the king is slightly more exposed on c1/c8
+
+## Keep the Shelter Intact
+- Avoid pushing the pawns in front of your castled king without a reason
+- Watch for sacrifices that rip open your pawn shield
+- If the center is closed, you can sometimes delay castling — but never forget about your king`,
+          order: 3,
+          difficulty: 2,
+          estimatedMinutes: 15,
+        },
       ],
     },
     {
@@ -301,6 +561,29 @@ For each pawn, there are "key squares" the attacking king must reach.
           order: 1,
           difficulty: 3,
           estimatedMinutes: 20,
+        },
+        {
+          slug: 'rook-endgames',
+          title: 'Rook Endgames',
+          description: 'The most common endgame — learn the key drawing and winning ideas',
+          content: `# Rook Endgames
+
+Rook endgames are the most common of all endgames. "All rook endings are drawn" is an exaggeration — but they are famously resilient.
+
+## The Lucena Position (Winning)
+The fundamental **winning** technique when you have a rook and pawn vs rook and your king is in front of the pawn. The method is called **building a bridge**: use your rook to shield the king from checks so the pawn can promote.
+
+## The Philidor Position (Drawing)
+The fundamental **drawing** technique for the defender. Keep your rook on the third rank (from your side) to stop the enemy king from advancing; once the pawn is pushed, swing your rook behind to check from the rear.
+
+## Practical Rules of Thumb
+- **Rooks belong behind passed pawns** — yours and your opponent's
+- **Keep the rook active** — a passive rook tied to defense usually loses
+- **Cut off the enemy king** along a file or rank to limit its help
+- An **active rook** is often worth more than a pawn`,
+          order: 2,
+          difficulty: 4,
+          estimatedMinutes: 25,
         },
       ],
     },
@@ -351,6 +634,103 @@ One of the oldest and most popular chess openings.
 - Quick kingside attack possible`,
           order: 1,
           difficulty: 3,
+          estimatedMinutes: 25,
+        },
+        {
+          slug: 'ruy-lopez',
+          title: 'Ruy Lopez',
+          description: 'The "Spanish Torture" — one of the most respected openings in chess',
+          content: `# The Ruy Lopez
+
+Named after a 16th-century Spanish priest, the Ruy Lopez remains a top choice at every level.
+
+## Main Line
+1. e4 e5
+2. Nf3 Nc6
+3. Bb5 (attacking the knight that defends e5)
+
+\`\`\`chess
+mode: animate
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+moves: e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O
+autoplay: true
+caption: The Ruy Lopez: White pressures the c6-knight and castles quickly.
+\`\`\`
+
+## Key Ideas for White
+- Pressure the e5-pawn by attacking its defender on c6
+- Build a strong pawn center with a later c3 and d4
+- Slow, strategic squeeze — hence the nickname "Spanish Torture"
+
+## Common Variations
+- **Morphy Defense:** 3...a6, the main line
+- **Berlin Defense:** 3...Nf6, famously solid for Black
+- **Exchange Variation:** 4.Bxc6 trading to damage Black's pawns`,
+          order: 2,
+          difficulty: 4,
+          estimatedMinutes: 25,
+        },
+        {
+          slug: 'sicilian-defense',
+          title: 'Sicilian Defense',
+          description: "Black's most aggressive and popular answer to 1.e4",
+          content: `# The Sicilian Defense
+
+The Sicilian is the most popular and most combative response to 1.e4, scoring well for Black at all levels.
+
+## Starting Moves
+1. e4 c5
+
+\`\`\`chess
+mode: animate
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+moves: e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3
+autoplay: true
+caption: The Open Sicilian: Black trades a flank pawn for a central one and free play.
+\`\`\`
+
+## Why Play It
+- Black fights for the center **asymmetrically** with the c-pawn instead of ...e5
+- Leads to rich, imbalanced positions where Black plays for a win
+- The half-open c-file gives Black active rook play
+
+## Major Variations
+- **Najdorf** (5...a6) — flexible and razor-sharp, a favorite of world champions
+- **Dragon** (...g6) — Black fianchettoes and aims down the long diagonal
+- **Scheveningen, Classical, Taimanov** — solid central setups`,
+          order: 3,
+          difficulty: 4,
+          estimatedMinutes: 25,
+        },
+        {
+          slug: 'queens-gambit',
+          title: "Queen's Gambit",
+          description: 'A classical queenside opening that fights for the center',
+          content: `# The Queen's Gambit
+
+One of the oldest and most respected openings, offering a pawn to seize the center.
+
+## Starting Moves
+1. d4 d5
+2. c4
+
+\`\`\`chess
+mode: animate
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+moves: d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3
+autoplay: true
+caption: The Queen's Gambit Declined: Black supports d5 with ...e6 and develops solidly.
+\`\`\`
+
+## It's Not a Real Gambit
+White offers the c4-pawn, but Black usually can't keep it safely — after ...dxc4, White regains the pawn with moves like e3 and Bxc4. The point is to **deflect** Black's d5-pawn and dominate the center.
+
+## Main Replies for Black
+- **Queen's Gambit Declined** (2...e6) — solid and classical
+- **Slav Defense** (2...c6) — supports d5 while keeping the bishop free
+- **Queen's Gambit Accepted** (2...dxc4) — grabs the pawn, gives up the center temporarily`,
+          order: 4,
+          difficulty: 4,
           estimatedMinutes: 25,
         },
       ],
