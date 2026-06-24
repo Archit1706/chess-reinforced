@@ -80,7 +80,7 @@ export function GameControls({
 
   return (
     <TooltipProvider>
-      <div className={cn('flex items-center gap-1', className)}>
+      <div className={cn('flex flex-wrap items-center gap-1', className)}>
         {/* Navigation controls */}
         {showNavigationControls && (
           <>
