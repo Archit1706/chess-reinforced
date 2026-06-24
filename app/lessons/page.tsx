@@ -12,6 +12,10 @@ import {
   Target,
   Lightbulb,
   Zap,
+  Sparkles,
+  PenLine,
+  Brain,
+  Flame,
   Loader2,
   type LucideIcon,
 } from 'lucide-react';
@@ -32,6 +36,10 @@ const ICONS: Record<string, LucideIcon> = {
   BookOpen,
   Lightbulb,
   Zap,
+  Sparkles,
+  PenLine,
+  Brain,
+  Flame,
 };
 
 const levelColors: Record<string, string> = {

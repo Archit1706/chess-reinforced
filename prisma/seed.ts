@@ -308,6 +308,92 @@ Two pieces attack at once, but the opponent can usually only deal with one threa
           difficulty: 3,
           estimatedMinutes: 15,
         },
+        {
+          slug: 'double-attack',
+          title: 'The Double Attack',
+          description: 'Create two threats at once so the opponent cannot parry both',
+          content: `# The Double Attack
+
+The double attack is the engine behind almost every tactic: make **two threats in one move** and your opponent can only answer one.
+
+## Fork vs Double Attack
+A fork is one piece attacking two targets. A **double attack** is broader — the two threats can come from different ideas (a capture and a checkmate, a check and an attack on a loose piece).
+
+\`\`\`chess
+mode: animate
+fen: r5k1/6pp/8/8/8/8/5PPP/3Q2K1 w - - 0 1
+moves: Qd5+ Kh8 Qxa8+
+autoplay: true
+caption: Qd5+ checks the king and eyes the a8-rook on the same diagonal; after Kh8, Qxa8+ wins it.
+\`\`\`
+
+## How to Spot Them
+1. Hunt for **undefended (loose) pieces** — "loose pieces drop off"
+2. Look for a square from which you hit two things at once
+3. Checks are the most forcing double attacks — the opponent *must* respond
+
+## Why It Wins
+Chess is a one-move-at-a-time game. Two simultaneous threats overload that single tempo, and material falls.`,
+          order: 5,
+          difficulty: 2,
+          estimatedMinutes: 12,
+        },
+        {
+          slug: 'removing-the-defender',
+          title: 'Removing the Defender',
+          description: 'Capture or chase away the piece that holds the position together',
+          content: `# Removing the Defender
+
+Sometimes a piece is safe only because **one defender** guards it. Eliminate that defender and the target falls. This idea is also called *removing the guard*.
+
+## The Method
+1. Identify a valuable piece (or key square) that is defended exactly once
+2. Capture, trade, or chase away that single defender
+3. Take the now-undefended target
+
+\`\`\`chess
+mode: animate
+fen: 6k1/3b1ppp/5n2/8/Q7/8/1B3PPP/6K1 w - - 0 1
+moves: Bxf6 gxf6 Qxd7
+autoplay: true
+caption: The f6-knight is the only guard of the d7-bishop; Bxf6 removes it, and Qxd7 collects the piece.
+\`\`\`
+
+## Common Targets
+- A piece defending the square in front of the king
+- The lone defender of a back-rank
+- A knight that guards a key central square
+
+Always ask: *"What is this piece doing?"* If the answer is "defending," consider taking it.`,
+          order: 6,
+          difficulty: 3,
+          estimatedMinutes: 15,
+        },
+        {
+          slug: 'deflection-decoy',
+          title: 'Deflection & Decoy',
+          description: 'Lure an enemy piece to the wrong square — or away from the right one',
+          content: `# Deflection & Decoy
+
+Two sides of the same coin: both tactics use force to put an enemy piece where *you* want it.
+
+## Deflection
+**Drive a piece away** from an important duty. A defender that is forced to move can no longer defend — often you sacrifice material to pull it off its job.
+
+## Decoy (Attraction)
+**Lure a piece onto a bad square**, usually with a sacrifice, so you can hit it with a fork, pin, or check. The classic decoy drags the enemy king into a mating net.
+
+## The Common Thread
+Both rely on **forcing moves** — checks, captures, and threats the opponent cannot ignore. The piece is compelled to go where it does not want to be.
+
+## How to Find Them
+1. Notice a defender doing an essential job (guarding a mate square or a piece)
+2. Look for a check or capture that forces it to abandon that job
+3. Calculate the follow-up that exploits the gap`,
+          order: 7,
+          difficulty: 3,
+          estimatedMinutes: 15,
+        },
       ],
     },
     {
@@ -425,6 +511,240 @@ The knight is the only piece that can't be blocked, so when every escape square 
           difficulty: 3,
           estimatedMinutes: 12,
         },
+        {
+          slug: 'scholars-mate',
+          title: "Scholar's Mate",
+          description: 'The four-move mate beginners love — and how to stop it',
+          content: `# Scholar's Mate
+
+The most famous beginner trap: a four-move checkmate aimed at the weak **f7** square.
+
+## The Attack
+1. e4 e5
+2. Bc4 (eyeing f7)
+3. Qh5 (threatening Qxf7#)
+4. Qxf7# if Black is careless
+
+\`\`\`chess
+mode: animate
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+moves: e4 e5 Bc4 Nc6 Qh5 Nf6 Qxf7#
+autoplay: true
+caption: The queen and bishop gang up on f7 — and Nf6?? walks into Qxf7 mate.
+\`\`\`
+
+## How to Defend
+- **...g6** chases the queen and defends
+- **...Qe7** guards f7
+- Develop knights toward the center: **...Nf6** is fine *only* if f7 is already covered
+
+## The Lesson
+Don't try to win by move four — a defender who knows this trap will repel the queen and gain time hunting it. But always watch your f7 (and f2) square: it's defended only by the king.`,
+          order: 5,
+          difficulty: 1,
+          estimatedMinutes: 12,
+        },
+        {
+          slug: 'arabian-mate',
+          title: 'Arabian Mate',
+          description: 'A knight and rook combine to trap the king in the corner',
+          content: `# Arabian Mate
+
+One of the oldest known mating patterns — a **knight and rook** working in perfect harmony against a cornered king.
+
+## The Pattern
+- The enemy king is in the corner (e.g. h8)
+- A knight sits on **f6**, covering the g8 escape and guarding the rook
+- The rook delivers mate on **h7**, controlling the back rank and protected by the knight
+
+\`\`\`chess
+mode: animate
+fen: 7k/R7/5N2/8/8/8/8/K7 w - - 0 1
+moves: Rh7#
+caption: Rh7 is mate — the knight on f6 guards both the rook and the king's only flight square.
+\`\`\`
+
+## Why It Works
+The rook covers h8 and g7; the knight covers g8 and defends the rook on h7, so the king cannot capture. With every square sealed, it's checkmate. This pattern shows up constantly in rook-and-knight endgames.`,
+          order: 6,
+          difficulty: 3,
+          estimatedMinutes: 12,
+        },
+      ],
+    },
+
+    {
+      slug: 'special-moves',
+      title: 'Rules & Special Moves',
+      description: 'Castling, en passant, promotion, and how games are drawn',
+      level: 'beginner',
+      order: 4,
+      icon: 'Sparkles',
+      lessons: [
+        {
+          slug: 'castling',
+          title: 'Castling',
+          description: 'The only move where the king and a rook move together',
+          content: `# Castling
+
+Castling is a special move that improves king safety and develops a rook in one go.
+
+## How It Works
+- **Kingside (O-O):** the king moves two squares toward the h-rook, and that rook hops to the king's other side
+- **Queenside (O-O-O):** the same idea toward the a-rook; the king ends a little further from the corner
+
+\`\`\`chess
+mode: animate
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+moves: e4 e5 Bc4 Bc5 Nf3 Nf6 O-O O-O
+autoplay: true
+caption: Both sides develop a bishop and knight, then castle kingside to safety.
+\`\`\`
+
+## The Five Rules
+You may castle **only** if:
+1. The king has not moved
+2. That rook has not moved
+3. There are no pieces between them
+4. The king is not currently in check
+5. The king does not pass through or land on an attacked square
+
+## Why Castle
+A king in the center is exposed to checks and tactics. Castling tucks it behind a wall of pawns and connects your rooks.`,
+          order: 1,
+          difficulty: 1,
+          estimatedMinutes: 10,
+        },
+        {
+          slug: 'en-passant',
+          title: 'En Passant',
+          description: 'The special pawn capture that surprises every beginner',
+          content: `# En Passant
+
+*En passant* (French for "in passing") is a special pawn capture that exists to stop a pawn from sneaking past an enemy pawn by using its two-square first move.
+
+## The Rule
+- It applies only when an enemy pawn moves **two squares** from its start and lands **beside** your pawn
+- On your **very next move**, you may capture it as if it had moved only one square
+- You capture by moving diagonally to the square the pawn skipped over
+
+\`\`\`chess
+mode: animate
+fen: 4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1
+moves: exd6
+caption: Black's pawn just played ...d7-d5; White answers exd6, capturing in passing.
+\`\`\`
+
+## Key Points
+- The chance to capture en passant lasts for **one move only** — use it or lose it
+- It can only be done by a pawn that has advanced to its fifth rank
+- The captured pawn is removed even though your pawn lands on an empty square`,
+          order: 2,
+          difficulty: 2,
+          estimatedMinutes: 10,
+        },
+        {
+          slug: 'pawn-promotion',
+          title: 'Pawn Promotion',
+          description: 'Turn a humble pawn into a queen — or something cleverer',
+          content: `# Pawn Promotion
+
+When a pawn reaches the far end of the board (the 8th rank for White, the 1st for Black), it **must** promote to another piece.
+
+## The Rule
+- Promote to a **queen, rook, bishop, or knight** of your own color — never a king or a pawn
+- You may promote even if you already have that piece (two queens is legal!)
+- The new piece takes effect immediately
+
+\`\`\`chess
+mode: animate
+fen: 4k3/P7/8/8/8/8/8/4K3 w - - 0 1
+moves: a8=Q
+caption: The a-pawn reaches the back rank and becomes a brand-new queen.
+\`\`\`
+
+## Underpromotion
+Choosing a piece other than the queen is called **underpromotion**. It's rare but powerful:
+- **Knight** to deliver a check or fork the queen can't
+- **Rook or bishop** to avoid stalemating the enemy king
+
+## Strategy
+A passed pawn — one with no enemy pawns able to stop it — is a long-term asset precisely because it threatens to promote.`,
+          order: 3,
+          difficulty: 1,
+          estimatedMinutes: 10,
+        },
+        {
+          slug: 'draws-and-stalemate',
+          title: 'Draws & Stalemate',
+          description: 'The five ways a chess game can end in a draw',
+          content: `# Draws & Stalemate
+
+Not every game ends in checkmate. Knowing the drawing rules can **save** a lost position — or cost you a won one.
+
+## Stalemate
+If the player to move has **no legal move** but is **not in check**, the game is an immediate draw. This is the most common way a winning side throws away a point.
+
+\`\`\`chess
+mode: animate
+fen: 7k/8/6K1/8/8/8/8/5Q2 w - - 0 1
+moves: Qf7
+caption: Careful! Qf7?? leaves the black king with no legal move and no check — stalemate, a draw.
+\`\`\`
+
+## The Other Four Draws
+- **Threefold repetition:** the same position occurs three times
+- **Fifty-move rule:** 50 moves by each side with no capture and no pawn move
+- **Insufficient material:** neither side has enough to mate (e.g. K vs K, or K+B vs K)
+- **Agreement:** both players simply agree to a draw
+
+## The Practical Lesson
+When you are winning, **give the enemy king a flight square** until you are ready to mate. When you are losing, hunt for stalemate tricks and perpetual checks.`,
+          order: 4,
+          difficulty: 2,
+          estimatedMinutes: 12,
+        },
+      ],
+    },
+    {
+      slug: 'chess-notation',
+      title: 'Reading Chess Notation',
+      description: 'Learn to read and write moves in algebraic notation',
+      level: 'beginner',
+      order: 5,
+      icon: 'PenLine',
+      lessons: [
+        {
+          slug: 'algebraic-notation',
+          title: 'Algebraic Notation',
+          description: 'The universal language for recording chess moves',
+          content: `# Algebraic Notation
+
+Every square on the board has a unique name, which lets us record any move precisely. This is **algebraic notation**, used worldwide.
+
+## Naming the Squares
+- **Files** (columns) are letters **a–h**, left to right from White's view
+- **Ranks** (rows) are numbers **1–8**, from White's side upward
+- So the square in White's bottom-left corner is **a1**, and the top-right is **h8**
+
+## Writing a Move
+- Pieces use a capital letter: **K**ing, **Q**ueen, **R**ook, **B**ishop, k**N**ight
+- Pawns have no letter — just the destination square (**e4**)
+- Give the piece and its destination: **Nf3** means "knight to f3"
+
+## Special Symbols
+- **x** — capture (Bxe5)
+- **+** — check, **#** — checkmate
+- **O-O** — kingside castling, **O-O-O** — queenside
+- **=Q** — promotion (e8=Q)
+- **!** good move, **?** mistake
+
+## Why It Matters
+Notation lets you replay famous games, study openings, solve puzzles, and review your own games. Every lesson and puzzle in this app speaks it.`,
+          order: 1,
+          difficulty: 1,
+          estimatedMinutes: 10,
+        },
       ],
     },
 
@@ -523,6 +843,62 @@ A king caught in the center is a king in danger. Castling is your fastest route 
           difficulty: 2,
           estimatedMinutes: 15,
         },
+        {
+          slug: 'queen-too-early',
+          title: "Don't Bring the Queen Out Too Early",
+          description: 'Why an early queen sortie hands your opponent free development',
+          content: `# Don't Bring the Queen Out Too Early
+
+It's tempting to unleash your most powerful piece immediately — but in the opening, an early queen is a **liability**.
+
+## The Problem
+Because the queen is so valuable, it must flee from any minor piece that attacks it. Your opponent develops knights and bishops **with tempo** — gaining time by hitting the queen — while you waste moves running away.
+
+\`\`\`chess
+mode: animate
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+moves: e4 e5 Qh5 Nc6 Bc4 g6 Qf3 Nf6
+autoplay: true
+caption: White's early queen is chased by ...g6 and Black develops freely while White shuffles.
+\`\`\`
+
+## The Principle
+- Develop **knights and bishops first**, then castle
+- Bring the queen out only when it has a safe, active square
+- Count tempi: every move spent saving the queen is a move your opponent spends developing
+
+## The Exception
+A few openings deploy the queen early for a concrete reason (like the Scandinavian's ...Qxd5). Even then, the queen must have a plan to reach safety without losing time.`,
+          order: 4,
+          difficulty: 2,
+          estimatedMinutes: 12,
+        },
+        {
+          slug: 'opening-traps',
+          title: 'Common Opening Traps',
+          description: 'Recognize the quick tricks that catch unprepared players',
+          content: `# Common Opening Traps
+
+A trap is a move that sets a hidden threat, hoping the opponent walks into it. Knowing the famous ones means you'll **spring them — and never fall for them**.
+
+## The Légal Trap
+A queen sacrifice that leads to a smothered-style mate when Black pins the f3-knight with ...Bg4 and then grabs material too greedily.
+
+## The Fried Liver Attack
+After 1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 d5 5.exd5 Nxd5?!, White plays **6.Nxf7!?**, dragging the king out for a fierce attack.
+
+## The Englund Gambit Trap
+A swindle for Black after 1.d4 e5 that punishes a greedy White who grabs too many pawns and gets mated on the back rank.
+
+## How to Avoid Traps
+1. **Develop soundly** — most traps punish greed or neglected development
+2. Before grabbing a free pawn or piece, ask **"why is this offered?"**
+3. Watch your **f2/f7** square and your back rank
+4. When something looks too good to be true in the opening, look twice`,
+          order: 5,
+          difficulty: 3,
+          estimatedMinutes: 15,
+        },
       ],
     },
     {
@@ -584,6 +960,245 @@ The fundamental **drawing** technique for the defender. Keep your rook on the th
           order: 2,
           difficulty: 4,
           estimatedMinutes: 25,
+        },
+        {
+          slug: 'the-opposition',
+          title: 'The Opposition',
+          description: 'The king battle that decides countless pawn endgames',
+          content: `# The Opposition
+
+In king-and-pawn endgames, the kings fight a silent duel. The key weapon is **the opposition**.
+
+## What It Is
+The kings stand on the same file (or rank) with **one square between them**. Whoever does **not** have to move "has the opposition" — the other king must give way.
+
+\`\`\`chess
+mode: interactive
+fen: 4k3/8/4K3/8/8/8/8/8 w - - 0 1
+caption: The kings face off with one square between them. Whoever must move has to step aside.
+\`\`\`
+
+## Why It Matters
+The side with the opposition can force the enemy king backward, clearing a path for a pawn to advance toward promotion. Losing the opposition often means losing the game — or only drawing a winning position.
+
+## Types of Opposition
+- **Direct opposition:** kings one square apart on the same line
+- **Distant opposition:** an odd number of squares apart on the same line — the same battle, fought from afar
+- **Diagonal opposition:** the kings oppose along a diagonal
+
+## The Practical Rule
+To win with a pawn, get your **king in front of the pawn** with the opposition. Then you can shoulder the enemy king aside and escort the pawn home.`,
+          order: 3,
+          difficulty: 3,
+          estimatedMinutes: 18,
+        },
+        {
+          slug: 'passed-pawns',
+          title: 'Passed Pawns',
+          description: 'The runaway pawns that decide endgames',
+          content: `# Passed Pawns
+
+A **passed pawn** is one with no enemy pawns in front of it on its own file or the adjacent files — nothing can stop it from advancing except enemy pieces.
+
+\`\`\`chess
+mode: animate
+fen: 8/2P5/8/8/8/8/k7/2K5 w - - 0 1
+moves: c8=Q
+autoplay: true
+caption: Nothing can catch the c-pawn — it marches in and promotes to a queen.
+\`\`\`
+
+## Why They're Powerful
+- They tie down enemy pieces, which must babysit the promotion square
+- In the endgame, a passed pawn is often worth more than its single-pawn value
+- A **protected passed pawn** (defended by another pawn) is especially strong
+
+## Famous Advice
+- *"Passed pawns must be pushed!"* — advance them to cramp the enemy
+- *"Rooks belong behind passed pawns"* — both yours and your opponent's
+- An **outside passed pawn** (far from the kings) is a winning trump: it lures the enemy king away while yours feasts elsewhere
+
+## The Rule of the Square
+To know if a lone king can catch a passed pawn, picture the square from the pawn to its promotion square. If the king can step inside that square, it stops the pawn; if not, the pawn queens.`,
+          order: 4,
+          difficulty: 3,
+          estimatedMinutes: 18,
+        },
+        {
+          slug: 'two-bishop-mate',
+          title: 'Two-Bishop Checkmate',
+          description: 'Force mate in the corner with the bishop pair and your king',
+          content: `# Two-Bishop Checkmate
+
+King and **two bishops** versus a lone king is a forced win. The bishops sweep parallel diagonals to herd the king into a corner.
+
+## The Technique
+1. Use the bishops to build a **barrier** of diagonals the king cannot cross
+2. Bring your king up to take away escape squares
+3. Drive the enemy king to **any corner** (unlike the bishop-and-knight mate, any corner works)
+4. Deliver mate with one bishop checking and the other (plus your king) sealing the escape
+
+\`\`\`chess
+mode: animate
+fen: 7k/8/6K1/3B4/8/8/8/2B5 w - - 0 1
+moves: Bb2#
+caption: Bb2 checks along the long diagonal; the d5-bishop covers g8 and the king seals the rest — mate.
+\`\`\`
+
+## Key Tips
+- Keep the bishops **side by side** on adjacent diagonals to form a moving wall
+- The king does the herding; the bishops do the cutting
+- Watch for stalemate as the enemy king nears the corner — leave it a square until the mating move`,
+          order: 5,
+          difficulty: 4,
+          estimatedMinutes: 20,
+        },
+      ],
+    },
+
+    {
+      slug: 'middlegame-strategy',
+      title: 'Middlegame Strategy',
+      description: 'Positional ideas that guide your plans after the opening',
+      level: 'intermediate',
+      order: 3,
+      icon: 'Brain',
+      lessons: [
+        {
+          slug: 'pawn-structure',
+          title: 'Pawn Structure',
+          description: 'Pawns are the skeleton of the position — learn to read them',
+          content: `# Pawn Structure
+
+Pawns move slowly and can't go backward, so the pawn structure is the most **permanent** feature of a position. It dictates where your pieces belong and where the weaknesses lie.
+
+## Pawn Weaknesses
+- **Isolated pawn:** no friendly pawn on an adjacent file — it can't be defended by a pawn and the square in front is a great blockade post
+- **Doubled pawns:** two pawns on the same file — they can't defend each other and one may become weak
+- **Backward pawn:** a pawn left behind its neighbors, unable to advance safely; the square in front is an outpost for the enemy
+
+## Pawn Strengths
+- **Pawn chain:** a diagonal line of pawns defending each other — attack it at the **base**
+- **Pawn majority:** more pawns than the opponent on one wing can create a passed pawn
+- **Connected pawns:** side-by-side pawns that support each other's advance
+
+## The Big Idea
+Don't move pawns carelessly — each push leaves squares behind it permanently weak. Ask whether a pawn move improves your structure or creates a hole.`,
+          order: 1,
+          difficulty: 3,
+          estimatedMinutes: 18,
+        },
+        {
+          slug: 'open-files-and-rooks',
+          title: 'Open Files & Rook Power',
+          description: 'Put your rooks where they dominate — on open lines',
+          content: `# Open Files & Rook Power
+
+Rooks are clumsy in the opening but become monsters once lines open. Their natural habitat is the **open file**.
+
+## Files Explained
+- **Open file:** no pawns of either color — a highway for your rook
+- **Half-open file:** no pawns of *your* color; aim the rook at the enemy pawn that remains
+- **Closed file:** blocked by pawns — no work for a rook here
+
+## Rook Principles
+1. **Seize open files** before your opponent — a rook on an open file controls the whole board
+2. **Double your rooks** (stack them on the same file) to multiply the pressure
+3. Aim for the **7th rank** — a rook there attacks pawns and pins the king to the back
+
+\`\`\`chess
+mode: interactive
+fen: 3r2k1/pp3ppp/8/8/8/8/PP3PPP/3R2K1 w - - 0 1
+caption: The d-file is wide open — both sides fight to own it with their rook.
+\`\`\`
+
+## Connected Rooks
+Once your back rank is cleared of minor pieces and the king has castled, your rooks defend each other — "connected" rooks are a sign your development is complete.`,
+          order: 2,
+          difficulty: 3,
+          estimatedMinutes: 18,
+        },
+        {
+          slug: 'outposts',
+          title: 'Outposts',
+          description: 'Plant a knight on a protected square deep in enemy territory',
+          content: `# Outposts
+
+An **outpost** is a square — usually on the 4th, 5th, or 6th rank — that an enemy pawn can never attack, protected by one of your own pawns. A knight parked there is worth its weight in gold.
+
+## What Makes a Good Outpost
+- It **cannot be challenged by a pawn** (no enemy pawn can advance to hit it)
+- It is **defended by your pawn**, so trading it off costs the opponent a better piece
+- It sits **near the enemy camp**, cramping their position
+
+\`\`\`chess
+mode: interactive
+fen: r2q1rk1/pp3ppp/2n1p3/2Np4/3P4/2P5/PP3PPP/R2Q1RK1 w - - 0 1
+caption: The knight on c5 is a dream outpost — no black pawn can ever drive it away.
+\`\`\`
+
+## Knights Love Outposts
+A knight is short-ranged, so a permanent advanced home transforms it into a dominant piece. Bishops and rooks also enjoy outposts, but the **knight on a central outpost** is the classic positional trophy.
+
+## Creating Them
+Look for holes in the enemy structure — squares they weakened by pushing pawns — and maneuver a knight toward them, supported by a pawn.`,
+          order: 3,
+          difficulty: 3,
+          estimatedMinutes: 18,
+        },
+        {
+          slug: 'good-and-bad-bishops',
+          title: 'Good & Bad Bishops',
+          description: 'Why some bishops shine and others bite on granite',
+          content: `# Good & Bad Bishops
+
+A bishop is only as good as the diagonals it can use. Your **pawn structure** decides whether a bishop is a hero or a spectator.
+
+## The Definitions
+- **Bad bishop:** blocked by your **own** pawns fixed on its color — it stares at its own wall
+- **Good bishop:** free of such pawns, with open diagonals to roam
+
+## How to Handle Each
+- If you have a **bad bishop**, try to **trade it off** or get its pawns off its color
+- Place **your pawns on the opposite color** of your remaining bishop so it stays active
+- A bad bishop can become "good" if you can free it — sometimes a single pawn break does it
+
+## The Bishop Pair
+Holding **both bishops** while the opponent has given one up is a lasting edge, especially in open positions: together the bishops cover both square colors and dominate long diagonals.
+
+## Practical Tip
+Before trading a bishop for a knight, ask whether your remaining bishop will be good or bad given the pawn structure to come.`,
+          order: 4,
+          difficulty: 3,
+          estimatedMinutes: 18,
+        },
+        {
+          slug: 'space-advantage',
+          title: 'Space Advantage',
+          description: 'Use advanced pawns to cramp your opponent and maneuver freely',
+          content: `# Space Advantage
+
+**Space** is the territory your pawns control. The side with more space can shuffle pieces behind the lines while the opponent stumbles over each other in a cramped camp.
+
+## How Space Is Gained
+- Advanced pawns (like a chain on e5/d4) push the enemy back and seize squares
+- The more rows your pawns control, the more room your pieces have to maneuver
+
+## Using a Space Edge
+1. **Avoid trades** — exchanges relieve the cramped side; keep pieces on to highlight their lack of room
+2. **Maneuver on the side where you have more space**, switching the attack from wing to wing faster than the opponent can react
+3. Use the extra room to **reroute knights** to strong squares
+
+## The Counterplay
+The cramped side has a clear plan too:
+- **Trade pieces** to gain breathing room
+- Strike at the **base of the pawn chain** with a timely pawn break (like ...c5 or ...f6) to challenge the space
+
+## The Balance
+Space is an asset, not a guarantee. Over-extend and those advanced pawns become weaknesses. Hold the space *and* keep the pawns defensible.`,
+          order: 5,
+          difficulty: 3,
+          estimatedMinutes: 18,
         },
       ],
     },
@@ -732,6 +1347,210 @@ White offers the c4-pawn, but Black usually can't keep it safely — after ...dx
           order: 4,
           difficulty: 4,
           estimatedMinutes: 25,
+        },
+        {
+          slug: 'french-defense',
+          title: 'French Defense',
+          description: 'A solid, counterattacking answer to 1.e4',
+          content: `# The French Defense
+
+A rock-solid choice for Black that invites White to build a big center — then attacks it.
+
+## Starting Moves
+1. e4 e6
+2. d4 d5
+
+\`\`\`chess
+mode: animate
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+moves: e4 e6 d4 d5 Nc3 Bb4 e5 c5
+autoplay: true
+caption: The Winawer French: Black pins the knight and strikes the center with ...c5.
+\`\`\`
+
+## The Trade-Off
+- Black gets a **solid, durable** structure that's hard to break down
+- The downside: the **light-squared bishop** on c8 can become "bad," hemmed in by the e6-pawn
+- Black's standard plan is the pawn break **...c5**, hitting White's d4
+
+## Main Variations
+- **Advance** (3.e5) — White grabs space; Black undermines with ...c5 and ...f6
+- **Winawer** (3.Nc3 Bb4) — sharp and double-edged
+- **Tarrasch** (3.Nd2) — a flexible, low-risk try for White
+- **Exchange** (3.exd5) — symmetrical and quiet`,
+          order: 5,
+          difficulty: 4,
+          estimatedMinutes: 25,
+        },
+        {
+          slug: 'caro-kann',
+          title: 'Caro-Kann Defense',
+          description: 'Solid like the French, but with a free light-squared bishop',
+          content: `# The Caro-Kann Defense
+
+A favorite of positional players: as solid as the French, but Black develops the light-squared bishop *before* locking it in.
+
+## Starting Moves
+1. e4 c6
+2. d4 d5
+
+\`\`\`chess
+mode: animate
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+moves: e4 c6 d4 d5 Nc3 dxe4 Nxe4 Bf5
+autoplay: true
+caption: The Classical Caro-Kann: Black trades on e4 and develops the bishop actively to f5.
+\`\`\`
+
+## Why Play It
+- A **sound, reliable** structure with few weaknesses
+- Unlike the French, the **c8-bishop gets out** to f5 or g4 before ...e6
+- Leads to slightly better endgames for Black thanks to a healthy pawn structure
+
+## Main Variations
+- **Classical** (4...Bf5) — the principled main line
+- **Advance** (3.e5) — White gains space; Black plays ...Bf5 and ...e6
+- **Exchange / Panov** (3.exd5) — can become a sharp IQP middlegame after c4`,
+          order: 6,
+          difficulty: 4,
+          estimatedMinutes: 25,
+        },
+        {
+          slug: 'english-opening',
+          title: 'English Opening',
+          description: 'A flexible flank opening that fights for the center from the side',
+          content: `# The English Opening
+
+1.c4 — a flexible, strategic opening favored by players who like to control the center from the flank before committing pawns.
+
+## Starting Move
+1. c4 (staking a claim on d5 from the side)
+
+\`\`\`chess
+mode: animate
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+moves: c4 e5 Nc3 Nf6 Nf3 Nc6 g3 d5 cxd5 Nxd5
+autoplay: true
+caption: A Reversed Sicilian: White plays the Sicilian setup a move up, fianchettoing on g3.
+\`\`\`
+
+## Why Play It
+- **Flexible** — it can transpose into many other openings (Queen's Gambit, Catalan, even Sicilian structures)
+- Avoids heavily-analyzed 1.e4 and 1.d4 main lines
+- Emphasizes **piece play and the long diagonal** after a kingside fianchetto
+
+## Common Setups
+- **Reversed Sicilian** (1...e5) — White plays the Sicilian a tempo up
+- **Symmetrical** (1...c5) — both sides mirror each other
+- **King's English** with g3, Bg2, and pressure down the long diagonal`,
+          order: 7,
+          difficulty: 4,
+          estimatedMinutes: 22,
+        },
+        {
+          slug: 'london-system',
+          title: 'London System',
+          description: 'An easy-to-learn setup you can play against almost anything',
+          content: `# The London System
+
+A low-maintenance, solid system: White develops the same way against almost any Black setup, making it ideal for club players.
+
+## The Setup
+1. d4 followed by Bf4, e3, Nf3, Bd3, c3, and Nbd2
+
+\`\`\`chess
+mode: animate
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+moves: d4 d5 Nf3 Nf6 Bf4 e6 e3 Bd6 Bg3
+autoplay: true
+caption: The London System: the dark-squared bishop comes out early to f4 before e3 locks it in.
+\`\`\`
+
+## Why It's Popular
+- **Easy to learn** — one harmonious setup against most defenses
+- The key move is getting the **dark-squared bishop outside the pawn chain** (to f4) before playing e3
+- Solid and hard to crack, with a typical plan of Ne5, f4, and a kingside push
+
+## Things to Watch
+- Don't get *too* routine — Black can challenge with ...c5 and ...Qb6 hitting b2 and d4
+- It's safe but can be a little passive; learn the standard attacking plan with Ne5 to inject life`,
+          order: 8,
+          difficulty: 3,
+          estimatedMinutes: 22,
+        },
+      ],
+    },
+    {
+      slug: 'attacking-play',
+      title: 'Attacking the King',
+      description: 'Sacrifices and pawn storms to hunt down the enemy king',
+      level: 'advanced',
+      order: 2,
+      icon: 'Flame',
+      lessons: [
+        {
+          slug: 'greek-gift',
+          title: 'The Greek Gift Sacrifice',
+          description: 'The classic Bxh7+ bishop sacrifice against a castled king',
+          content: `# The Greek Gift Sacrifice
+
+The most famous attacking pattern in chess: sacrifice a bishop on **h7** (or h2 for Black) to rip open the castled king.
+
+## The Idea
+With a bishop on d3, a knight ready for g5, and the queen able to reach the h-file, White crashes through:
+
+\`\`\`chess
+mode: animate
+fen: r1bq1rk1/ppp2ppp/2n2n2/3p4/3P4/2NB1N2/PPP2PPP/R1BQ1RK1 w - - 0 1
+moves: Bxh7+ Kxh7 Ng5+ Kg8 Qh5
+autoplay: true
+caption: Bxh7+! drags the king out, Ng5+ leaps in, and Qh5 threatens the unstoppable Qh7#.
+\`\`\`
+
+## The Three Ingredients
+1. A **bishop** aimed at h7 (on the b1–h7 diagonal)
+2. A **knight** that can jump to g5 with check
+3. A **queen** with a fast route to the h-file (often via h5 or d1–h5)
+
+## When It Works
+- Black's **h7 is defended only by the king**
+- Black has no knight on f6 to cover h5/h7
+- White can bring up enough force before Black consolidates
+
+## When to Hold Back
+If Black can answer ...Kg6 safely, or has ...Nf6 covering the key squares, the sacrifice may fizzle. **Calculate to mate or a clear material gain before committing.**`,
+          order: 1,
+          difficulty: 5,
+          estimatedMinutes: 25,
+        },
+        {
+          slug: 'pawn-storms',
+          title: 'Pawn Storms',
+          description: 'March your pawns at the enemy king to tear open lines',
+          content: `# Pawn Storms
+
+When the kings have castled on **opposite sides**, the game becomes a race: throw your pawns at the enemy king while keeping your own safe.
+
+## The Concept
+- Pawns in front of *your* king should usually stay put (they're the shelter)
+- Pawns in front of the *enemy* king are your battering ram — push them forward to **open files** for your rooks and queen
+
+## Opposite-Side Castling
+This is the classic pawn-storm scenario:
+- You castle queenside, opponent castles kingside (or vice versa)
+- Both sides hurl their pawns at the other's king — **speed is everything**
+- Whoever opens lines and lands the attack first usually wins
+
+## Keys to a Successful Storm
+1. **Don't worry about your own structure** near the enemy king — you want to open it, even by sacrifice
+2. **Open at least one file** for a rook; a closed storm achieves nothing
+3. **Count the race** — if both attacks crash through, the faster one wins, so calculate tempo carefully
+
+## Same-Side Castling Caution
+With kings on the same side, storming your own king's pawns is dangerous — it exposes *you*. Pawn storms are mainly a tool when the kings live on opposite wings.`,
+          order: 2,
+          difficulty: 5,
+          estimatedMinutes: 22,
         },
       ],
     },
