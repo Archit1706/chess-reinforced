@@ -22,7 +22,9 @@ export function AuthButtons() {
           </Button>
         </SignInButton>
         <SignUpButton mode="modal">
-          <Button size="sm">Sign up</Button>
+          <Button size="sm" className="hidden sm:inline-flex">
+            Sign up
+          </Button>
         </SignUpButton>
       </SignedOut>
       <SignedIn>

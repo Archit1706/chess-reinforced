@@ -5,6 +5,7 @@ import { Chessboard } from 'react-chessboard';
 import { Chess, Square } from 'chess.js';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useContainerWidth } from '@/hooks/useContainerWidth';
 import { Play, Pause, RotateCcw, ChevronLeft, ChevronRight, Hand } from 'lucide-react';
 import { framesFromMoves } from './lessonDemos';
 
@@ -99,6 +100,8 @@ function AnimatedBoard({
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(autoPlay && frames.length > 1);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [boardRef, containerWidth] = useContainerWidth<HTMLElement>();
+  const width = containerWidth > 0 ? Math.min(boardWidth, containerWidth) : boardWidth;
 
   useEffect(() => {
     if (!playing) return;
@@ -116,10 +119,14 @@ function AnimatedBoard({
   const single = frames.length <= 1;
 
   return (
-    <figure className={cn('not-prose my-4 inline-block', className)}>
+    <figure
+      ref={boardRef}
+      className={cn('not-prose my-4 w-full mx-auto', className)}
+      style={{ maxWidth: boardWidth }}
+    >
       <Chessboard
         position={frames[index]}
-        boardWidth={boardWidth}
+        boardWidth={width}
         boardOrientation={orientation}
         arePiecesDraggable={false}
         animationDuration={400}
@@ -170,6 +177,8 @@ function InteractiveBoard({
   const game = useMemo(() => new Chess(startFen), [startFen]);
   const [fen, setFen] = useState(startFen);
   const [moveStyles, setMoveStyles] = useState<Record<string, React.CSSProperties>>({});
+  const [boardRef, containerWidth] = useContainerWidth<HTMLElement>();
+  const width = containerWidth > 0 ? Math.min(boardWidth, containerWidth) : boardWidth;
 
   const clearHints = useCallback(() => setMoveStyles({}), []);
 
@@ -214,10 +223,14 @@ function InteractiveBoard({
   }, [game, startFen, clearHints]);
 
   return (
-    <figure className={cn('not-prose my-4 inline-block', className)}>
+    <figure
+      ref={boardRef}
+      className={cn('not-prose my-4 w-full mx-auto', className)}
+      style={{ maxWidth: boardWidth }}
+    >
       <Chessboard
         position={fen}
-        boardWidth={boardWidth}
+        boardWidth={width}
         boardOrientation={orientation}
         onPieceDrop={onDrop}
         onPieceDragBegin={(_piece, square) => showLegalMoves(square as Square)}

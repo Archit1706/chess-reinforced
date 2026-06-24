@@ -224,9 +224,9 @@ export default function PlayPage() {
         {/* Main board area */}
         <div className="space-y-4">
           {/* Board header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <h1 className="text-2xl font-bold">Play vs Computer</h1>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="text-xl sm:text-2xl font-bold">Play vs Computer</h1>
               {mode === 'vsComputer' && (
                 <Badge variant="secondary">
                   <Bot className="h-3 w-3 mr-1" />
@@ -236,26 +236,26 @@ export default function PlayPage() {
             </div>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" onClick={handleExportPgn}>
-                <Download className="h-4 w-4 mr-2" />
-                Export PGN
+                <Download className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Export PGN</span>
               </Button>
               <Button size="sm" onClick={() => setShowNewGameDialog(true)}>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                New Game
+                <RefreshCw className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">New Game</span>
               </Button>
             </div>
           </div>
 
           {/* Board with evaluation bar */}
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-stretch">
             {showEvaluation && (
               <EvaluationBar
                 evaluation={evaluation || 0}
                 orientation="vertical"
-                className="h-[560px]"
+                className="self-stretch"
               />
             )}
-            <div className="relative">
+            <div className="relative flex-1 min-w-0">
               <ChessBoard boardWidth={560} />
 
               {/* Thinking indicator */}
@@ -294,7 +294,7 @@ export default function PlayPage() {
           </div>
 
           {/* Game controls */}
-          <div className="flex items-center justify-between bg-muted/50 p-2 rounded-lg">
+          <div className="flex flex-wrap items-center justify-between gap-2 bg-muted/50 p-2 rounded-lg">
             <GameControls showExportImport onExport={handleExportPgn} />
 
             <div className="flex items-center gap-3">

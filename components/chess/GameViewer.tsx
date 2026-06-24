@@ -5,6 +5,7 @@ import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useContainerWidth } from '@/hooks/useContainerWidth';
 import { ChevronLeft, ChevronRight, SkipBack, SkipForward, AlertTriangle } from 'lucide-react';
 
 interface GameViewerProps {
@@ -39,6 +40,9 @@ export function GameViewer({ pgn, orientation = 'white', boardWidth = 480, class
   }, [pgn]);
 
   const [ply, setPly] = useState(0);
+  const [boardRef, boardContainerWidth] = useContainerWidth<HTMLDivElement>();
+  const resolvedWidth =
+    boardContainerWidth > 0 ? Math.min(boardWidth, boardContainerWidth) : boardWidth;
 
   const goFirst = useCallback(() => setPly(0), []);
   const goPrev = useCallback(() => setPly((p) => Math.max(0, p - 1)), []);
@@ -73,16 +77,18 @@ export function GameViewer({ pgn, orientation = 'white', boardWidth = 480, class
   }
 
   return (
-    <div className={cn('grid gap-4 lg:grid-cols-[auto_220px]', className)}>
+    <div className={cn('grid gap-4 lg:grid-cols-[1fr_220px]', className)}>
       <div className="space-y-3">
-        <Chessboard
-          position={fens[ply]}
-          boardWidth={boardWidth}
-          boardOrientation={orientation}
-          arePiecesDraggable={false}
-          customDarkSquareStyle={{ backgroundColor: '#b58863' }}
-          customLightSquareStyle={{ backgroundColor: '#f0d9b5' }}
-        />
+        <div ref={boardRef} className="w-full overflow-hidden" style={{ maxWidth: boardWidth }}>
+          <Chessboard
+            position={fens[ply]}
+            boardWidth={resolvedWidth}
+            boardOrientation={orientation}
+            arePiecesDraggable={false}
+            customDarkSquareStyle={{ backgroundColor: '#b58863' }}
+            customLightSquareStyle={{ backgroundColor: '#f0d9b5' }}
+          />
+        </div>
         <div className="flex items-center justify-center gap-2">
           <Button variant="outline" size="icon" onClick={goFirst} disabled={ply === 0} aria-label="First move">
             <SkipBack className="h-4 w-4" />

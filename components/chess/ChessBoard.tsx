@@ -5,6 +5,7 @@ import { Chessboard } from 'react-chessboard';
 import { Square, PieceSymbol } from 'chess.js';
 import { useGameStore } from '@/store/game-store';
 import { useUIStore } from '@/store/ui-store';
+import { useContainerWidth } from '@/hooks/useContainerWidth';
 import { cn } from '@/lib/utils';
 
 // Define promotion piece option type (react-chessboard uses "wQ", "wR", etc.)
@@ -225,12 +226,22 @@ export function ChessBoard({
     // Future: handle arrow drawing
   }, []);
 
+  // Size the board to the available container width (capped by `boardWidth`),
+  // so it shrinks to fit on mobile instead of overflowing.
+  const [containerRef, containerWidth] = useContainerWidth<HTMLDivElement>();
+  const maxWidth = boardWidth || 560;
+  const resolvedWidth = containerWidth > 0 ? Math.min(maxWidth, containerWidth) : maxWidth;
+
   return (
-    <div className={cn('relative', className)}>
+    <div
+      ref={containerRef}
+      className={cn('relative w-full overflow-hidden', className)}
+      style={{ maxWidth }}
+    >
       <Chessboard
         id="chess-board"
         position={customFen || fen}
-        boardWidth={boardWidth || 560}
+        boardWidth={resolvedWidth}
         boardOrientation={config.orientation === 'w' ? 'white' : 'black'}
         animationDuration={animationDuration}
         arePiecesDraggable={interactive && !isGameOver}

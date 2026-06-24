@@ -256,7 +256,7 @@ export default function PuzzlesPage() {
           </div>
 
           <Tabs value={currentTab} onValueChange={setCurrentTab}>
-            <TabsList className="grid w-full grid-cols-4 max-w-xl">
+            <TabsList className="grid w-full grid-cols-4 max-w-xl text-xs sm:text-sm">
               <TabsTrigger value="daily">
                 <Calendar className="h-4 w-4 mr-2" />
                 Daily
