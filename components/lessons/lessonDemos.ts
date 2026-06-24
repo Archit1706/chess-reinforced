@@ -261,6 +261,51 @@ export const LESSON_DEMOS: Record<string, LessonDemo> = {
     caption: 'Bxh7+! drags the king out, Ng5+ leaps in, and Qh5 threatens Qh7 mate.',
     autoPlay: true,
   },
+  'the-windmill': {
+    mode: 'animate',
+    fen: '7k/ppp3Rp/8/8/8/8/1B3PPP/6K1 w - - 0 1',
+    moves: ['Rxc7+', 'Kg8', 'Rg7+', 'Kh8', 'Rxb7+', 'Kg8', 'Rg7+', 'Kh8', 'Rxa7+', 'Kg8', 'Rg7+', 'Kh8'],
+    caption: 'The see-saw: each time the rook leaves g7 the bishop checks, so it devours the 7th rank.',
+    autoPlay: true,
+  },
+  'kings-indian-defense': {
+    mode: 'animate',
+    moves: ['d4', 'Nf6', 'c4', 'g6', 'Nc3', 'Bg7', 'e4', 'd6', 'Nf3', 'O-O'],
+    caption: "The King's Indian: Black fianchettoes and castles, ready to hit the center with ...e5.",
+    autoPlay: true,
+  },
+  'scandinavian-defense': {
+    mode: 'animate',
+    moves: ['e4', 'd5', 'exd5', 'Qxd5', 'Nc3', 'Qa5', 'd4', 'Nf6'],
+    caption: 'The Scandinavian: Black recaptures on d5, and after Nc3 the queen retreats to a5.',
+    autoPlay: true,
+  },
+  'nimzo-indian-defense': {
+    mode: 'animate',
+    moves: ['d4', 'Nf6', 'c4', 'e6', 'Nc3', 'Bb4'],
+    caption: "The Nimzo-Indian: Black pins the c3-knight, ready to trade it and double White's pawns.",
+    autoPlay: true,
+  },
+  'lucena-position': {
+    mode: 'interactive',
+    fen: '1K6/1P6/8/8/8/8/r7/2R3k1 w - - 0 1',
+    caption: 'A Lucena setup: White wins by "building a bridge" with the rook to escape the checks.',
+  },
+  'philidor-position': {
+    mode: 'interactive',
+    fen: '8/8/4k3/8/4P3/r7/4K3/4R3 b - - 0 1',
+    caption: 'The Philidor draw: Black holds by keeping the rook on the third rank.',
+  },
+  'bishop-knight-mate': {
+    mode: 'interactive',
+    fen: '8/8/8/8/8/2N5/3BK3/7k w - - 0 1',
+    caption: 'K+B+N vs K: drive the lone king to a corner the bishop controls to mate.',
+  },
+  'wrong-bishop': {
+    mode: 'interactive',
+    fen: '8/8/8/8/8/6b1/5k1p/7K w - - 0 1',
+    caption: 'Wrong bishop: it cannot control h1, so the cornered king is stalemated — a draw.',
+  },
   'back-rank-mate': {
     mode: 'animate',
     fen: '6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1',

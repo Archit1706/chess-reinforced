@@ -1203,6 +1203,150 @@ Space is an asset, not a guarantee. Over-extend and those advanced pawns become 
       ],
     },
 
+    {
+      slug: 'advanced-tactics',
+      title: 'Advanced Tactics',
+      description: 'The combinational motifs that decide sharp middlegames',
+      level: 'intermediate',
+      order: 4,
+      icon: 'Zap',
+      lessons: [
+        {
+          slug: 'zwischenzug',
+          title: 'Zwischenzug (In-Between Move)',
+          description: 'Insert a forcing move before the "obvious" recapture',
+          content: `# Zwischenzug — the In-Between Move
+
+A *zwischenzug* (German for "in-between move") is a surprise interjection: instead of making the move your opponent expects — usually a recapture — you slip in a more forcing move first.
+
+## The Idea
+1. Your opponent plays a capture, expecting you to recapture automatically
+2. Instead you play an **even more forcing move** — usually a check or a bigger threat
+3. The opponent must answer it; *then* you carry out your original recapture, having gained something extra
+
+## Why It Works
+Recaptures feel automatic, so they are easy to assume. But a check or a mate threat is **more forcing** than a recapture — it jumps the queue. Squeezing one in can win a tempo, an extra pawn, or a whole piece.
+
+## How to Spot One
+Before you recapture, always ask: *"Do I have a check or a bigger threat first?"* The in-between move is one of the most overlooked resources in chess — and one of the most common ways strong players win material.
+
+## A Cousin: The Desperado
+When a piece is doomed anyway, it can grab material on its way out — a "desperado." That's a close relative of the zwischenzug, covered in its own lesson.`,
+          order: 1,
+          difficulty: 4,
+          estimatedMinutes: 15,
+        },
+        {
+          slug: 'the-windmill',
+          title: 'The Windmill',
+          description: 'A see-saw of discovered checks that strips the board bare',
+          content: `# The Windmill
+
+The windmill (or "see-saw") is one of the most spectacular tactics: a rook and bishop combine to deliver a **repeating cycle of discovered checks**, harvesting enemy material on every turn.
+
+## How It Works
+- A bishop aims at the enemy king along a long diagonal
+- A rook sits on that diagonal, blocking the check
+- The rook swings away **with check from the bishop**, grabs a piece, then returns **with a rook check**
+- The enemy king shuffles back and forth, helpless, while you gobble everything in reach
+
+\`\`\`chess
+mode: animate
+fen: 7k/ppp3Rp/8/8/8/8/1B3PPP/6K1 w - - 0 1
+moves: Rxc7+ Kg8 Rg7+ Kh8 Rxb7+ Kg8 Rg7+ Kh8 Rxa7+ Kg8 Rg7+ Kh8
+autoplay: true
+caption: The see-saw: each time the rook leaves g7 the bishop checks, so the rook devours the 7th rank.
+\`\`\`
+
+## The Famous Example
+The most celebrated windmill is **Carlos Torre vs. Emanuel Lasker, Moscow 1925**, where Torre's rook scythed through Black's position before returning to win the queen.
+
+## The Requirements
+1. A bishop with a clear diagonal to the enemy king
+2. A rook that can alternate between blocking that diagonal (with check) and capturing
+3. An enemy king with only one shuffle square to bounce between`,
+          order: 2,
+          difficulty: 5,
+          estimatedMinutes: 18,
+        },
+        {
+          slug: 'clearance-sacrifice',
+          title: 'Clearance Sacrifice',
+          description: 'Vacate a square or line — even by giving up material — to let another piece through',
+          content: `# Clearance Sacrifice
+
+Sometimes the piece in your way is *your own*. A **clearance sacrifice** gives up material to vacate a key square, file, or diagonal so another piece can deliver the decisive blow.
+
+## The Concept
+- You have a powerful threat — but one of your own pieces (or pawns) blocks the path
+- You **clear the obstruction**, often by sacrificing it with a forcing move
+- The line opens, and your follow-up wins
+
+## Two Flavors
+- **Line clearance:** open a rank, file, or diagonal for a queen, rook, or bishop
+- **Square clearance:** vacate a square so a knight or other piece can land on it with decisive effect
+
+## How to Find It
+When you see a crushing move that's *almost* possible — blocked only by your own unit — look for a forcing way to get that unit out of the way **with tempo**. The opponent must respond to the threat, and your real idea lands the next move.
+
+## The Key Principle
+A clearance sacrifice trades **material for time and access**. It only works if the opened line leads to something bigger than what you gave up — so calculate the follow-up to the end.`,
+          order: 3,
+          difficulty: 5,
+          estimatedMinutes: 15,
+        },
+        {
+          slug: 'interference',
+          title: 'Interference',
+          description: 'Cut the line between an enemy piece and what it defends',
+          content: `# Interference
+
+Interference (sometimes called *obstruction* or a *Novotny*) is the rare and beautiful idea of **planting a piece between an enemy piece and the square it guards** — breaking the defensive connection.
+
+## The Concept
+- An enemy piece defends a key square or another piece along a line
+- You interpose a unit **on that line**, often as a sacrifice
+- The defender is suddenly cut off, and the undefended target falls
+
+## The Novotny
+The classic version drops a piece on a square where **two** enemy line-pieces cross. Whichever one captures it, it blocks the other — so a single sacrifice severs two defenses at once.
+
+## Why It's Hard to Spot
+We instinctively look for captures and checks, not for **quiet interpositions** on empty squares. Interference often involves placing a piece *en prise* in the middle of the board, which looks absurd until you see the point.
+
+## How to Hunt for It
+Identify the enemy piece doing the defending and the **line** it works along. Then ask whether you can drop something onto that line to break the connection — even at the cost of material.`,
+          order: 4,
+          difficulty: 5,
+          estimatedMinutes: 15,
+        },
+        {
+          slug: 'desperado',
+          title: 'The Desperado',
+          description: 'A doomed piece sells itself as dearly as possible',
+          content: `# The Desperado
+
+A *desperado* is a piece that is **going to be lost anyway**, so it grabs as much material as it can — or forces a favorable trade — before it disappears.
+
+## Two Situations
+- **A trapped piece:** your piece can't escape capture, so it captures something on its way out, getting *value* for itself instead of nothing
+- **Mutual captures:** when several pieces hang at once, the side to move can have its doomed piece take an extra pawn or piece before the recaptures settle
+
+## The Mindset
+When you realize a piece is lost, don't just give it up. Ask: *"What can it take or accomplish before it dies?"* A knight that's about to be captured might snap off a central pawn; a rook caught in a trade might grab a defender first.
+
+## Defensive Desperado
+The idea also saves half-points: a piece about to be lost can sometimes force a **perpetual check** or a drawing simplification by throwing itself at the enemy king.
+
+## The Lesson
+No piece should die for free. Squeeze every last bit of value out of a doomed unit — that's the desperado.`,
+          order: 5,
+          difficulty: 4,
+          estimatedMinutes: 15,
+        },
+      ],
+    },
+
     // === ADVANCED MODULES ===
     {
       slug: 'popular-openings',
@@ -1478,6 +1622,104 @@ caption: The London System: the dark-squared bishop comes out early to f4 before
           difficulty: 3,
           estimatedMinutes: 22,
         },
+        {
+          slug: 'kings-indian-defense',
+          title: "King's Indian Defense",
+          description: 'Let White build a big center — then blow it up with a kingside attack',
+          content: `# The King's Indian Defense
+
+A fighting, hypermodern defense: Black lets White occupy the center, then strikes back with pieces and a ferocious kingside pawn storm.
+
+## Starting Moves
+1. d4 Nf6
+2. c4 g6
+3. Nc3 Bg7
+
+\`\`\`chess
+mode: animate
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+moves: d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O
+autoplay: true
+caption: The King's Indian: Black fianchettoes, castles, and prepares to challenge the center with ...e5.
+\`\`\`
+
+## The Plan
+- Black allows White a broad pawn center (d4 + e4) on purpose
+- The fianchettoed **g7-bishop** rakes the long diagonal
+- Black strikes with **...e5** (or ...c5); in the main lines the center locks and Black launches **...f5–f4–g5–g4**, storming White's king
+
+## The Trade-Off
+A double-edged race: White attacks on the **queenside**, Black on the **kingside**. It's not for the faint-hearted — but few openings give Black such rich winning chances.`,
+          order: 9,
+          difficulty: 4,
+          estimatedMinutes: 25,
+        },
+        {
+          slug: 'scandinavian-defense',
+          title: 'Scandinavian Defense',
+          description: 'Challenge the e4-pawn immediately with 1...d5',
+          content: `# The Scandinavian Defense
+
+Also called the Center Counter, the Scandinavian challenges White's e-pawn on move one — direct, easy to learn, and surprisingly solid.
+
+## Starting Moves
+1. e4 d5
+2. exd5 Qxd5
+3. Nc3 (gaining time on the queen)
+
+\`\`\`chess
+mode: animate
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+moves: e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6
+autoplay: true
+caption: The Scandinavian: Black recaptures on d5, and after Nc3 the queen retreats to a5.
+\`\`\`
+
+## The Ideas
+- Black gets a **clear, sturdy structure** with few opening traps to memorize
+- The early queen recapture costs a little time (White develops with tempo via Nc3), but the queen settles safely on a5 or d6
+- A reliable practical weapon, especially for players who want to sidestep heavy theory
+
+## Modern Lines
+- **3...Qa5** — the classic retreat
+- **3...Qd6** — flexible and increasingly popular
+- The **gambit** 2...Nf6 (delaying the recapture) leads to sharper play`,
+          order: 10,
+          difficulty: 3,
+          estimatedMinutes: 22,
+        },
+        {
+          slug: 'nimzo-indian-defense',
+          title: 'Nimzo-Indian Defense',
+          description: "Pin the knight and play against White's pawn structure",
+          content: `# The Nimzo-Indian Defense
+
+One of the most respected defenses to 1.d4. Black pins White's knight and is happy to trade the bishop for it, inflicting long-term structural damage.
+
+## Starting Moves
+1. d4 Nf6
+2. c4 e6
+3. Nc3 Bb4 (the pin that defines the opening)
+
+\`\`\`chess
+mode: animate
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+moves: d4 Nf6 c4 e6 Nc3 Bb4
+autoplay: true
+caption: The Nimzo-Indian: Black pins the c3-knight, ready to trade it and damage White's pawns.
+\`\`\`
+
+## The Strategy
+- By playing **...Bxc3**, Black gives up the bishop pair to **double White's c-pawns**, creating a lasting structural target
+- Black then blockades the doubled pawns and plays against them
+- It's a battle of **bishop pair vs. pawn structure** — a deeply strategic, world-championship-level opening
+
+## Why It's Respected
+The Nimzo is flexible, sound, and scores well at every level. Many champions have made it the cornerstone of their defense against 1.d4.`,
+          order: 11,
+          difficulty: 4,
+          estimatedMinutes: 25,
+        },
       ],
     },
     {
@@ -1551,6 +1793,131 @@ With kings on the same side, storming your own king's pawns is dangerous — it 
           order: 2,
           difficulty: 5,
           estimatedMinutes: 22,
+        },
+      ],
+    },
+    {
+      slug: 'advanced-endgames',
+      title: 'Advanced Endgames',
+      description: 'The precise techniques that win (and draw) tricky endings',
+      level: 'advanced',
+      order: 3,
+      icon: 'Castle',
+      lessons: [
+        {
+          slug: 'lucena-position',
+          title: 'The Lucena Position',
+          description: 'The fundamental winning method in rook-and-pawn endgames',
+          content: `# The Lucena Position
+
+The single most important winning technique in rook endgames. If you have a rook and a pawn on the 7th rank, your king in front of it, and the enemy king cut off — this is how you win.
+
+\`\`\`chess
+mode: interactive
+fen: 1K6/1P6/8/8/8/8/r7/2R3k1 w - - 0 1
+caption: A Lucena setup: White's king shelters the pawn while the rook prepares to escape the checks.
+\`\`\`
+
+## The Problem
+Your king stands in front of its own pawn, but the moment it steps aside to let the pawn queen, enemy rook checks drive it away. You need a way to **shield the king** from those checks.
+
+## Building a Bridge
+1. Advance your **rook to the fourth rank** (counting from your side), e.g. Rc4
+2. Step the king out toward the rook's file
+3. When the checks come, **interpose your rook** — the "bridge" — to block the check
+4. The king reaches safety and the pawn promotes
+
+## The Key Idea
+The rook on the fourth rank is the bridge: it cuts the distance the checking rook can harass you, then blocks the final check. Memorize this — it converts countless "drawn-looking" rook endings into wins.`,
+          order: 1,
+          difficulty: 5,
+          estimatedMinutes: 25,
+        },
+        {
+          slug: 'philidor-position',
+          title: 'The Philidor Position',
+          description: 'The fundamental drawing method when defending rook endgames',
+          content: `# The Philidor Position
+
+The defender's best friend. When your opponent has a rook and a pawn and you have only a rook, the Philidor technique holds the draw.
+
+\`\`\`chess
+mode: interactive
+fen: 8/8/4k3/8/4P3/r7/4K3/4R3 b - - 0 1
+caption: The Philidor draw: Black keeps the rook on the third rank to deny the enemy king a path forward.
+\`\`\`
+
+## The Technique (Two Phases)
+1. **Third-rank defense:** as long as the pawn has not yet reached its 6th rank, park your rook on **your third rank** (the rank in front of the pawn's advance). This stops the enemy king from supporting the pawn.
+2. **Switch to the rear:** the moment the pawn advances to your third rank, swing your rook to the **back rank** and check the enemy king from behind. With the king unable to hide from the checks, it's a draw.
+
+## Why It Works
+The attacking side wins only if its **king** can shepherd the pawn forward. The third-rank rook makes that impossible; once the pawn over-extends, the checks from behind are endless.
+
+## The Lesson
+Lucena wins, Philidor draws. Knowing which position you're heading for — and how to reach it — is what separates a held draw from a lost point.`,
+          order: 2,
+          difficulty: 5,
+          estimatedMinutes: 25,
+        },
+        {
+          slug: 'bishop-knight-mate',
+          title: 'Bishop & Knight Checkmate',
+          description: 'The hardest basic mate — driving the king to the right corner',
+          content: `# Bishop & Knight Checkmate
+
+King, bishop, and knight versus a lone king is a **forced win**, but the trickiest of the basic mates. The catch: you can only mate in a corner **the same color as your bishop**.
+
+\`\`\`chess
+mode: interactive
+fen: 8/8/8/8/8/2N5/3BK3/7k w - - 0 1
+caption: K+B+N vs K: drive the lone king toward a corner the bishop controls to deliver mate.
+\`\`\`
+
+## Why It's Hard
+- The mate **only** works in the two corners your bishop can reach
+- You must first drive the king to *any* edge, then herd it along to the **correct** corner
+- The clock matters: it can take up to 33 moves, and the fifty-move rule looms
+
+## The Method
+1. Force the enemy king to the edge of the board with king, bishop, and knight working together
+2. If it's heading for the wrong corner, use the famous **"W-maneuver"** with the knight to shepherd it across to the right one
+3. Coordinate all three pieces to deliver the final mate in the correct corner
+
+## The Practical Tip
+This mate is rare, but knowing it builds real piece-coordination skill. Practice the W-maneuver until the knight's path feels natural — it's the heart of the technique.`,
+          order: 3,
+          difficulty: 5,
+          estimatedMinutes: 25,
+        },
+        {
+          slug: 'wrong-bishop',
+          title: 'The Wrong Bishop',
+          description: 'When an extra bishop and a rook pawn still only draw',
+          content: `# The Wrong Bishop
+
+One of the great endgame surprises: a king, bishop, and **rook pawn** — material that *looks* winning — is only a **draw** if the bishop is the "wrong" one.
+
+\`\`\`chess
+mode: interactive
+fen: 8/8/8/8/8/6b1/5k1p/7K w - - 0 1
+caption: Wrong bishop: it can't control h1, so the cornered king is stalemated — a draw despite the extra piece.
+\`\`\`
+
+## The Rule
+With a rook pawn (a- or h-file), the **promotion square is in the corner**. If your bishop does **not** control the color of that corner square, you can never drive the enemy king out of it:
+- The defending king simply sits in the corner
+- Approaching with your own king delivers **stalemate**, not mate
+
+## The Telltale Check
+For an h-pawn promoting on h8 (a light square), you need a **light-squared bishop**. A dark-squared bishop is the "wrong bishop" and the position is drawn.
+
+## Why It Matters
+- As the stronger side: **avoid trading into a wrong-bishop ending** — keep a pawn elsewhere or steer for a different bishop
+- As the defender: when you're losing, **head for the wrong-bishop corner** — it's a lifeline that salvages a half point from a hopeless-looking game`,
+          order: 4,
+          difficulty: 5,
+          estimatedMinutes: 20,
         },
       ],
     },
