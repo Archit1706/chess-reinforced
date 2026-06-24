@@ -16,6 +16,9 @@ interface UserState {
   puzzlesSolvedToday: number;
   lessonsCompletedToday: number;
   gamesPlayedToday: number;
+
+  // Puzzle Rush best score per mode (localStorage; merged with server best).
+  puzzleRushBest: Record<string, number>;
 }
 
 interface UserActions {
@@ -31,6 +34,9 @@ interface UserActions {
   recordPuzzleSolved: (success: boolean) => void;
   recordLessonCompleted: () => void;
   recordGamePlayed: (result: 'win' | 'loss' | 'draw') => void;
+
+  // Puzzle Rush: record a finished run; returns the new local best for the mode.
+  recordPuzzleRushScore: (mode: string, score: number) => number;
 
   // Streak management
   updateStreak: () => void;
@@ -75,6 +81,7 @@ export const useUserStore = create<UserState & UserActions>()(
       puzzlesSolvedToday: 0,
       lessonsCompletedToday: 0,
       gamesPlayedToday: 0,
+      puzzleRushBest: {},
 
       setUser: (user) => set({ user }),
 
@@ -200,6 +207,15 @@ export const useUserStore = create<UserState & UserActions>()(
         void get().saveProgress();
       },
 
+      recordPuzzleRushScore: (mode, score) => {
+        const current = get().puzzleRushBest[mode] ?? 0;
+        const best = Math.max(current, score);
+        if (best !== current) {
+          set((state) => ({ puzzleRushBest: { ...state.puzzleRushBest, [mode]: best } }));
+        }
+        return best;
+      },
+
       updateStreak: () => {
         const { user } = get();
         if (!user) return;
@@ -270,6 +286,7 @@ export const useUserStore = create<UserState & UserActions>()(
         puzzlesSolvedToday: state.puzzlesSolvedToday,
         lessonsCompletedToday: state.lessonsCompletedToday,
         gamesPlayedToday: state.gamesPlayedToday,
+        puzzleRushBest: state.puzzleRushBest,
       }),
     }
   )

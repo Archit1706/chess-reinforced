@@ -47,6 +47,7 @@ model User {
   puzzleAttempts PuzzleAttempt[]
   puzzleReviews  PuzzleReview[]
   dailyActivity  DailyActivity[]
+  puzzleRushScores PuzzleRushScore[]
 
   @@index([username])
 }
@@ -248,6 +249,20 @@ model DailyActivity {
 
   @@unique([userId, date])
   @@index([userId, date])
+}
+
+// Puzzle Rush results (one row per completed run) for leaderboards/best-score.
+model PuzzleRushScore {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  mode      String   // '3min' | '5min' | 'survival'
+  score     Int
+
+  @@index([userId, mode, score])
 }
 
 // Famous games for study mode

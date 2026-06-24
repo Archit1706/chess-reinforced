@@ -16,6 +16,7 @@ import {
   recordPuzzleAttempt,
 } from '@/lib/puzzles/client';
 import { formatTheme } from '@/lib/puzzles/lichess';
+import { fetchRushBest, submitRushScore } from '@/lib/puzzle-rush/client';
 import type { NormalizedPuzzle } from '@/lib/puzzles/types';
 import {
   Flame,
@@ -35,9 +36,12 @@ import {
 
 // Rating bands so practice puzzles roughly track the user's level.
 const PRACTICE_BAND = 250;
+// Puzzle Rush duration (seconds) and its persistence key/mode.
+const RUSH_DURATION = 300;
+const RUSH_MODE = '5min' as const;
 
 export default function PuzzlesPage() {
-  const { user, recordPuzzleSolved, startSession } = useUserStore();
+  const { user, recordPuzzleSolved, recordPuzzleRushScore, startSession } = useUserStore();
   const [currentTab, setCurrentTab] = useState('daily');
 
   // Puzzle data (fetched from /api/puzzles, with client fallback).
@@ -62,6 +66,7 @@ export default function PuzzlesPage() {
   const [rushTime, setRushTime] = useState(300);
   const [rushScore, setRushScore] = useState(0);
   const [rushBestScore, setRushBestScore] = useState(0);
+  const [rushNewBest, setRushNewBest] = useState(false);
 
   // Per-puzzle timing for attempt logging.
   const puzzleStartRef = useRef<number>(Date.now());
@@ -112,9 +117,28 @@ export default function PuzzlesPage() {
     fetchThemes().then(setThemes);
     loadPractice(null);
     loadReviews();
+    // Seed the best score from the local store, then merge in the server best.
+    setRushBestScore(useUserStore.getState().puzzleRushBest[RUSH_MODE] ?? 0);
+    fetchRushBest().then((best) =>
+      setRushBestScore((prev) => Math.max(prev, best[RUSH_MODE] ?? 0))
+    );
     // Intentionally run once on mount.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Finish a rush: persist the score locally (instant) and to the server (synced).
+  const endRush = useCallback(
+    (finalScore: number) => {
+      setRushActive(false);
+      const localBest = recordPuzzleRushScore(RUSH_MODE, finalScore);
+      setRushNewBest(finalScore > 0 && finalScore >= localBest && finalScore > rushBestScore);
+      setRushBestScore((prev) => Math.max(prev, localBest));
+      void submitRushScore(RUSH_MODE, finalScore).then((serverBest) => {
+        if (serverBest != null) setRushBestScore((prev) => Math.max(prev, serverBest));
+      });
+    },
+    [recordPuzzleRushScore, rushBestScore]
+  );
 
   // Puzzle Rush timer.
   useEffect(() => {
@@ -122,11 +146,10 @@ export default function PuzzlesPage() {
     if (rushActive && rushTime > 0) {
       interval = setInterval(() => setRushTime((t) => t - 1), 1000);
     } else if (rushTime === 0 && rushActive) {
-      setRushActive(false);
-      setRushBestScore((best) => Math.max(best, rushScore));
+      endRush(rushScore);
     }
     return () => clearInterval(interval);
-  }, [rushActive, rushTime, rushScore]);
+  }, [rushActive, rushTime, rushScore, endRush]);
 
   const logAttempt = useCallback(
     (puzzle: NormalizedPuzzle | null, solved: boolean) => {
@@ -181,7 +204,8 @@ export default function PuzzlesPage() {
   const startRush = useCallback(async () => {
     seenRef.current.clear();
     setRushScore(0);
-    setRushTime(300);
+    setRushTime(RUSH_DURATION);
+    setRushNewBest(false);
     setRushActive(true);
     await loadRush();
   }, [loadRush]);
@@ -194,9 +218,8 @@ export default function PuzzlesPage() {
 
   const handleRushFailed = useCallback(() => {
     logAttempt(rushPuzzle, false);
-    setRushActive(false);
-    setRushBestScore((best) => Math.max(best, rushScore));
-  }, [rushPuzzle, logAttempt, rushScore]);
+    endRush(rushScore);
+  }, [rushPuzzle, logAttempt, endRush, rushScore]);
 
   // === Review (spaced repetition) ===
   const reviewPuzzle = reviewQueue[reviewIndex] ?? null;
@@ -413,14 +436,42 @@ export default function PuzzlesPage() {
                 <CardContent>
                   {!rushActive ? (
                     <div className="text-center py-12 space-y-6">
-                      <Zap className="h-16 w-16 mx-auto text-yellow-500" />
-                      <div>
-                        <h2 className="text-2xl font-bold mb-2">Puzzle Rush</h2>
-                        <p className="text-muted-foreground max-w-md mx-auto">
-                          You have 5 minutes to solve as many puzzles as possible. One wrong
-                          move and the game is over!
-                        </p>
-                      </div>
+                      {rushScore > 0 ? (
+                        <>
+                          {/* End-of-round summary */}
+                          <Trophy
+                            className={cn(
+                              'h-16 w-16 mx-auto',
+                              rushNewBest ? 'text-yellow-500' : 'text-muted-foreground'
+                            )}
+                          />
+                          <div>
+                            {rushNewBest && (
+                              <Badge className="mb-3 bg-yellow-500 text-white hover:bg-yellow-500">
+                                New best!
+                              </Badge>
+                            )}
+                            <h2 className="text-2xl font-bold mb-1">
+                              {rushTime === 0 ? "Time's up!" : 'Game over'}
+                            </h2>
+                            <p className="text-muted-foreground">
+                              You solved <span className="font-bold text-foreground">{rushScore}</span>{' '}
+                              {rushScore === 1 ? 'puzzle' : 'puzzles'}.
+                            </p>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <Zap className="h-16 w-16 mx-auto text-yellow-500" />
+                          <div>
+                            <h2 className="text-2xl font-bold mb-2">Puzzle Rush</h2>
+                            <p className="text-muted-foreground max-w-md mx-auto">
+                              You have 5 minutes to solve as many puzzles as possible. One wrong
+                              move and the game is over!
+                            </p>
+                          </div>
+                        </>
+                      )}
 
                       {rushBestScore > 0 && (
                         <div className="flex items-center justify-center gap-2">
@@ -431,7 +482,7 @@ export default function PuzzlesPage() {
 
                       <Button size="lg" onClick={startRush}>
                         <Play className="h-5 w-5 mr-2" />
-                        Start Rush
+                        {rushScore > 0 ? 'Play again' : 'Start Rush'}
                       </Button>
                     </div>
                   ) : rushPuzzle ? (
