@@ -127,12 +127,22 @@ locally before any keys exist.
   `animate` board (steps through legal FEN frames) and an `interactive` sandbox (drag legal moves,
   chess.js-validated). `LESSON_DEMOS` keys topic-matched demos by lesson slug at the UI layer (no
   DB/seed dependency); the lesson page also always renders a free practice sandbox.
+- **Lesson content style**: lessons are written to be *interactive, not book-like*. Each lesson's
+  markdown interleaves short prose with embedded **` ```chess `** blocks — `mode: animate` (a
+  worked example that auto-plays a move list) and `mode: interactive` (a "your move" sandbox). The
+  Markdown renderer parses these fenced blocks into live boards. There are 12 modules / 65+ lessons;
+  **every FEN and move sequence in `seed.ts` and `lessonDemos.ts` must be validated with chess.js**
+  before committing (illegal moves silently break the board). A scratch verifier that extracts all
+  ` ```chess ` blocks + `LESSON_DEMOS` and replays them (asserting `isCheckmate()` on `#` moves and
+  `isStalemate()` where claimed) is the standard check.
 - Pages: `app/lessons/page.tsx` (real modules + progress) and
   `app/lessons/[module]/[lesson]/page.tsx` (markdown + a persistent "mark complete" toggle that
   also feeds the streak via `recordLessonCompleted`).
 
 ### Famous games — wired (DB → API → client)
-Seeded `FamousGame` rows (e.g. the Immortal Game, Fischer's Game of the Century) power a study mode:
+Seeded `FamousGame` rows power a study mode (currently 5: Immortal Game, Game of the Century, Opera
+Game, Evergreen Game, Réti–Tartakower). To add more, append to the `famousGames` array in
+`seed.ts` — **validate each PGN with `chess.js` `loadPgn` first**.
 - **`lib/famous-games/repository.ts`** + **`app/api/famous-games`** (list) and
   **`app/api/famous-games/[id]`** (detail with PGN).
 - **`components/chess/GameViewer.tsx`** — a self-contained PGN replay board (parses with chess.js,
@@ -140,16 +150,52 @@ Seeded `FamousGame` rows (e.g. the Immortal Game, Fischer's Game of the Century)
 - Pages `app/study/page.tsx` (browse) and `app/study/[id]/page.tsx` (replay); reachable via the
   "Study" navbar item.
 
-### Rest of the database (`prisma/`) — still scaffolding
-`GameHistory` and `DailyActivity` are defined (and seeded) but **not yet wired to the UI**:
-individual games aren't persisted (only aggregate stats live in `user-store`). Use the puzzle /
-lesson / famous-games slices as the template.
+### Game history / My Games — wired (DB → API → client)
+The `GameHistory` model is now fully surfaced:
+- **`lib/games/{repository,client,types}.ts`** — `saveGame` (with a per-user cap), `getGames`,
+  `getGameById`, `deleteGame`; `deriveOutcome`/`normalizeColor` helpers (color stored as
+  `white`/`black`).
+- **`app/api/games` (GET list, POST save)** and **`app/api/games/[id]` (GET, DELETE)**.
+- The **play page** auto-saves each finished vs-computer game exactly once (guarded ref) with
+  opening/result/color/opponent ELO. Pages: `app/games/page.tsx` (list with win/loss/draw badges)
+  and `app/games/[id]/page.tsx` (GameViewer replay + on-demand Game Review + **Train Your Mistakes**).
+- **`components/chess/MistakeTrainer.tsx`** — turns the analysis of a saved game into "find the
+  better move" puzzles from the player's own blunders/mistakes (pure-derived, no DB). Falls back to
+  the local engine for the best move when Stockfish never loaded. `GameReview` exposes the analysis
+  via an `onAnalyzed` callback.
+
+### Puzzle Rush scores — wired (localStorage + DB)
+Best scores persist two ways so they survive reloads and sync across devices:
+- **`store/user-store.ts`** keeps a `puzzleRushBest` per mode in localStorage (instant, offline,
+  works before any migration).
+- **`PuzzleRushScore` model** + **`lib/puzzle-rush/{repository,client}.ts`** + **`app/api/puzzle-rush`**
+  (GET best, POST submit) sync server-side. The API degrades gracefully (returns zeros) if the table
+  hasn't been pushed yet, so the local best always works. The puzzles page merges local + server best.
+- The **daily puzzle** counts toward stats only **once per UTC day** — completion is persisted in
+  localStorage (`chess-daily-completed`) so a reload can't re-farm the solved count.
+
+### Dashboard heatmap & achievements
+`app/api/dashboard` → `lib/dashboard/repository.ts` aggregates per-user data. The **activity
+heatmap** (`components/dashboard/ActivityHeatmap.tsx`, a dependency-free CSS-grid calendar) is
+**derived from real logged data** — `PuzzleAttempt`, `GameHistory`, and completed `LessonProgress`
+over the last 17 weeks — rather than the `DailyActivity` table (which remains as scaffolding).
+Achievements are computed client-side from real `user.stats`.
+
+### Puzzle UX & in-game hints
+- **`PuzzleBoard`** flashes a correct move green (`SOLVE_REVEAL_MS`) before the "Solved!" panel, so
+  the winning move is visible instead of the board snapping away; feedback overlays show explicit
+  "Correct!" / "Try again" labels and an instruction line.
+- The **play page** has a **Hint** button: it computes the player's best move (full-strength
+  Stockfish when ready, else `getLocalBestMove`) and shows it as a green arrow via `ChessBoard`'s
+  `customArrows`; the hint clears on the next move and is disabled when it isn't the player's turn.
 
 ### UI structure
-- `app/` — pages: `play` (vs Stockfish), `puzzles` (rush/practice), `lessons`, `dashboard`,
-  `settings`. `app/layout.tsx` mounts `Navbar` + `ThemeProvider`.
+- `app/` — pages: `play` (vs Stockfish, with Hint + Game Review), `puzzles` (daily/practice/rush/
+  review), `lessons`, `games` (My Games + replay/review/mistake-trainer), `study` (famous games),
+  `dashboard`, `settings`. `app/layout.tsx` mounts `Navbar` + `ThemeProvider`.
 - `components/chess/` — board and game UI (`ChessBoard`, `PuzzleBoard`, `MoveHistory`,
-  `EvaluationBar`, `GameControls`, `GameInfo`); barrel-exported via `index.ts`.
+  `EvaluationBar`, `GameControls`, `GameInfo`, `GameReview`, `GameViewer`, `MistakeTrainer`);
+  barrel-exported via `index.ts`.
 - `components/ui/` — shadcn/ui-style primitives over Radix.
 - `types/` — domain types (`chess`, `lesson`, `user`); import via the `@/*` path alias (→ repo root).
 - `hooks/useKeyboardShortcuts.ts` — global board/navigation shortcuts (arrows, F flip, N new, etc.).

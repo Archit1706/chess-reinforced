@@ -5,42 +5,52 @@ A comprehensive chess learning platform built with Next.js, featuring interactiv
 ## Features
 
 ### Interactive Chess Board
-- Fully functional board with legal move validation
-- Visual highlighting for possible moves
-- Move history with algebraic notation
-- Undo/redo functionality
-- Board flip option
-- Drag and drop or click-to-move
+- Fully functional board with legal move validation (chess.js is the rules authority)
+- Visual highlighting for possible/last moves, drag-and-drop or click-to-move
+- Move history with algebraic notation, undo/redo, board flip
+- Custom arrows (used by the in-game **Hint** feature)
+- Fully responsive — boards resize to fit any screen
 
-### Structured Learning Path
-- **Beginner**: Piece movement, basic tactics (forks, pins, skewers), checkmate patterns
-- **Intermediate**: Opening principles, middle game strategy, endgame basics
-- **Advanced**: Popular openings (Italian, Sicilian, Queen's Gambit), positional play
+### Structured Learning Path — 12 modules, 65+ interactive lessons
+Lessons aren't walls of text: each one interleaves short explanations with
+**playable boards** — animated worked examples (```chess mode: animate`) and
+hands-on "your move" sandboxes (```chess mode: interactive`).
+- **Beginner**: piece movement (incl. rook/queen/king), basic tactics (forks, pins, skewers, discovered attacks, double attack, removing the defender, deflection), checkmate patterns (back-rank, two-rook, queen, smothered, Scholar's, Arabian), rules & special moves (castling, en passant, promotion, draws & stalemate), reading notation
+- **Intermediate**: opening principles, endgame basics (K+P, opposition, passed pawns, rook endings, two-bishop mate), middlegame strategy (pawn structure, open files, outposts, good/bad bishops, space), advanced tactics (zwischenzug, windmill, clearance, interference, desperado), strategic thinking (piece values & trading, prophylaxis, two weaknesses, improving your worst piece)
+- **Advanced**: popular openings (Italian, Ruy Lopez, Sicilian, French, Caro-Kann, Queen's Gambit, English, London, King's Indian, Scandinavian, Nimzo-Indian), attacking the king (Greek gift, pawn storms), advanced endgames (Lucena, Philidor, bishop & knight mate, the wrong bishop)
 
-### Daily Practice System
-- Daily chess puzzle with varying difficulty
-- Streak tracking for consistent practice
-- Puzzle Rush mode: solve as many puzzles as possible in 5 minutes
+### Play vs the Computer
+- Adjustable difficulty (ELO 800–2500) via Stockfish, with a pure-JS local engine fallback so the computer always moves (even if the Stockfish CDN is blocked)
+- **Hint** button: shows the best move as an on-board arrow (full-strength analysis)
+- **Game Review**: move-by-move accuracy, classification (blunder/mistake/…), and per-side accuracy
+- Finished games are auto-saved to **My Games** (replay, re-analyze, export PGN)
 
-### Built-in Chess Engine (Stockfish)
-- Computer opponent with adjustable difficulty (ELO 800-2500)
-- Real-time position analysis
-- Best move suggestions
-- Post-game analysis
+### Puzzles
+- **Daily puzzle** (deterministic per day) — counts toward your stats once per day
+- **Practice** puzzles adapted to your rating, filterable by theme
+- **Puzzle Rush**: timed gauntlet; best scores persist (localStorage + cross-device DB sync)
+- **Review** (spaced repetition): missed puzzles resurface on a Leitner schedule
+- Smooth solving UX — correct moves flash and settle before the "Solved!" panel
+- Powered by the open Lichess puzzle database (CC0)
+
+### Train Your Mistakes (blunder-to-puzzle)
+- After reviewing a saved game, your own blunders and mistakes become
+  "find the better move" puzzles, solved right on the board
+
+### Study Famous Games
+- Replay annotated classics (Immortal Game, Game of the Century, Opera Game,
+  Evergreen Game, Réti–Tartakower) with full move navigation
 
 ### Progress Tracking
-- User dashboard with statistics
-- ELO progression charts
-- Games played (wins/losses/draws)
-- Puzzles solved with success rate
-- Daily streak calendar
+- Dashboard with ELO, games played, puzzle accuracy, and streaks
+- **Activity calendar** — a GitHub-style heatmap built from real puzzle/game/lesson activity
+- Achievements unlocked from real stats
+- Charts for accuracy and win/loss/draw
 
-### Game Modes
-- Play vs Computer (with difficulty selection)
-- Puzzle Rush (timed puzzle solving)
-- Practice puzzles (unlimited)
-- Position practice
-- Study famous games
+### Auth (optional)
+- Clerk authentication, wired to **degrade gracefully** — without keys the app
+  runs in anonymous guest mode (state in localStorage). With keys, progress,
+  games, puzzle attempts, and scores persist server-side per account.
 
 ## Tech Stack
 
@@ -107,18 +117,26 @@ chess-reinforced/
 │   ├── dashboard/         # User progress
 │   └── api/               # API routes
 ├── components/
-│   ├── chess/             # Chess-specific components
-│   │   ├── ChessBoard.tsx
-│   │   ├── MoveHistory.tsx
-│   │   ├── EvaluationBar.tsx
-│   │   ├── GameControls.tsx
-│   │   └── PuzzleBoard.tsx
-│   ├── ui/                # Reusable UI components
-│   ├── layout/            # Layout components
+│   ├── chess/             # ChessBoard, MoveHistory, EvaluationBar, GameControls,
+│   │                      #   PuzzleBoard, GameReview, GameViewer, MistakeTrainer
+│   ├── lessons/           # Markdown renderer, LessonBoard, lessonDemos
+│   ├── dashboard/         # ActivityHeatmap
+│   ├── auth/              # AuthButtons, UserSync (Clerk, gated)
+│   ├── ui/                # Reusable UI primitives (Radix / shadcn-style)
+│   ├── layout/            # Navbar + layout
 │   └── providers/         # Context providers
 ├── lib/
-│   ├── chess.ts           # Chess utility functions
-│   ├── stockfish.ts       # Stockfish engine wrapper
+│   ├── chess.ts           # chess.js helpers (moves, FEN/PGN, openings)
+│   ├── stockfish.ts       # Stockfish Web Worker wrapper (singleton)
+│   ├── local-engine.ts    # Pure-JS fallback engine (negamax + alpha-beta)
+│   ├── analysis.ts        # Post-game review scoring
+│   ├── auth.ts            # Clerk server helpers (graceful degradation)
+│   ├── puzzles/           # Lichess parsing, repository, client
+│   ├── puzzle-rush/        # Best-score repository + client
+│   ├── games/             # Saved-games repository + client
+│   ├── lessons/           # Lesson repository + client
+│   ├── famous-games/      # Study-mode repository + client
+│   ├── dashboard/         # Dashboard aggregations (incl. heatmap)
 │   ├── db.ts              # Prisma client
 │   └── utils.ts           # General utilities
 ├── store/                 # Zustand stores
@@ -173,12 +191,15 @@ The Stockfish engine runs in a Web Worker for:
 ## Database Schema
 
 ### Main Entities
-- **User**: Player profile and statistics
-- **Module**: Learning modules (Beginner, Intermediate, Advanced)
-- **Lesson**: Individual lessons with content
-- **Puzzle**: Tactical puzzles with solutions
-- **GameHistory**: Saved games
-- **DailyActivity**: Streak tracking
+- **User**: profile + statistics (ELO, games, puzzle stats, streaks)
+- **Module / Lesson**: learning content; **LessonProgress** tracks per-user completion
+- **Puzzle**: tactical puzzles (solver-first form); **PuzzleAttempt** logs attempts
+- **PuzzleReview**: per-(user, puzzle) Leitner box + due date for spaced repetition
+- **PuzzleRushScore**: one row per completed Puzzle Rush run (best-score per mode)
+- **GameHistory**: saved games (PGN, result, opening, opponent) — powers My Games
+- **FamousGame**: annotated classics for study mode
+- **DailyActivity**: per-day activity counts (scaffolding; the dashboard heatmap is
+  derived directly from attempts/games/lessons)
 
 ## Configuration
 
@@ -201,19 +222,38 @@ Adjust in the Play page:
 
 ## API Routes
 
+All routes are Node-runtime, `force-dynamic`, and attribute data to the signed-in
+Clerk user when present, otherwise to the shared `guest` user.
+
 ### User Progress
-- `GET /api/user` - Get current user
-- `POST /api/user/progress` - Save progress
+- `GET /api/user` — current user (401 when signed out → store falls back to guest)
+- `POST /api/user/progress` — save aggregate stats
 
 ### Puzzles
-- `GET /api/puzzles/daily` - Get daily puzzle
-- `GET /api/puzzles/random` - Get random puzzle
-- `POST /api/puzzles/attempt` - Record attempt
+- `GET /api/puzzles/daily` — deterministic daily puzzle
+- `GET /api/puzzles/random` — random puzzle (rating/theme filters, exclusions)
+- `GET /api/puzzles/themes` — theme counts for the filter UI
+- `POST /api/puzzles/attempt` — log an attempt + update the spaced-repetition schedule
+- `GET /api/puzzles/review` — puzzles due for spaced-repetition review
+
+### Puzzle Rush
+- `GET /api/puzzle-rush` — best score per mode
+- `POST /api/puzzle-rush` — submit a finished run, returns the new best
+
+### Games (My Games)
+- `GET /api/games` — list the user's saved games
+- `POST /api/games` — persist a finished game
+- `GET /api/games/[id]` — a single game (with PGN)
+- `DELETE /api/games/[id]` — delete a saved game
 
 ### Lessons
-- `GET /api/lessons` - List all lessons
-- `GET /api/lessons/[id]` - Get lesson content
-- `POST /api/lessons/[id]/complete` - Mark complete
+- `GET /api/lessons` — modules + lessons with per-user completion
+- `GET /api/lessons/[lesson]` — lesson markdown content
+- `POST /api/lessons/[lesson]/complete` — toggle completion
+
+### Famous Games & Dashboard
+- `GET /api/famous-games` and `GET /api/famous-games/[id]` — study mode
+- `GET /api/dashboard` — aggregated stats, recent attempts, and the activity heatmap
 
 ## Development
 
