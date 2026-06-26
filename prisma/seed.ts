@@ -1978,35 +1978,45 @@ caption: White's queen is losing material soon. Throw it at the king with checks
           description: 'Classic opening aiming for center control',
           content: `# The Italian Game
 
-One of the oldest and most popular chess openings.
+The oldest opening in chess. White grabs the center and aims a bishop straight at **f7** — Black's most vulnerable square.
 
-## Main Line
-1. e4 e5
-2. Nf3 Nc6
-3. Bc4 (The Italian Game begins)
+## See the opening
 
-## Key Ideas for White
-- Pressure f7 (weakest square for Black)
-- Quick development and castling
-- Central control with d3 or d4
+\`\`\`chess
+mode: animate
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+moves: e4 e5 Nf3 Nc6 Bc4
+autoplay: true
+caption: 1.e4 e5  2.Nf3 Nc6  3.Bc4 — the Italian. White's bishop already eyes f7.
+\`\`\`
 
-## Main Variations
+## Why Bc4?
 
-### Giuoco Piano (Quiet Game)
-3...Bc5 - Both sides develop calmly
-4. c3 preparing d4
+\`\`\`chess
+mode: interactive
+fen: r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4
+caption: The bishop on c4 attacks f7 — defended only by the king. One careless move from Black and the f7 square cracks open.
+\`\`\`
 
-### Two Knights Defense
-3...Nf6 - More aggressive
-4. Ng5 attacks f7 immediately
+## Three flavors
 
-### Evans Gambit
-4. b4!? sacrificing a pawn for rapid development
+| Variation | Black's reply | Character |
+|---|---|---|
+| **Giuoco Piano** | 3...Bc5 | Calm, classical |
+| **Two Knights** | 3...Nf6 | Sharper — White can play 4.Ng5! |
+| **Evans Gambit** | (after 3...Bc5) 4.b4!? | White sacs a pawn for tempo |
 
-## Plans and Themes
-- The f7 square is often a target
-- Piece activity over material
-- Quick kingside attack possible`,
+## Try the Giuoco
+
+\`\`\`chess
+mode: animate
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+moves: e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d4
+autoplay: true
+caption: The Giuoco Piano main line — calm development, then White breaks with d4 to claim the center.
+\`\`\`
+
+**Italian rule of thumb:** any move that doesn't develop or attack f7 is a missed chance.`,
           order: 1,
           difficulty: 3,
           estimatedMinutes: 25,
@@ -2017,30 +2027,35 @@ One of the oldest and most popular chess openings.
           description: 'The "Spanish Torture" — one of the most respected openings in chess',
           content: `# The Ruy Lopez
 
-Named after a 16th-century Spanish priest, the Ruy Lopez remains a top choice at every level.
+Named after a 16th-century Spanish priest. Played at every level for 500 years — including most world championship matches. Nickname: **"Spanish Torture"**.
 
-## Main Line
-1. e4 e5
-2. Nf3 Nc6
-3. Bb5 (attacking the knight that defends e5)
+## Watch the squeeze
 
 \`\`\`chess
 mode: animate
 fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
 moves: e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O
 autoplay: true
-caption: The Ruy Lopez: White pressures the c6-knight and castles quickly.
+caption: The bishop pressures the c6-knight (which defends e5). White finishes development and starts a slow strategic squeeze.
 \`\`\`
 
-## Key Ideas for White
-- Pressure the e5-pawn by attacking its defender on c6
-- Build a strong pawn center with a later c3 and d4
-- Slow, strategic squeeze — hence the nickname "Spanish Torture"
+## The key idea — why 3.Bb5?
 
-## Common Variations
-- **Morphy Defense:** 3...a6, the main line
-- **Berlin Defense:** 3...Nf6, famously solid for Black
-- **Exchange Variation:** 4.Bxc6 trading to damage Black's pawns`,
+\`\`\`chess
+mode: interactive
+fen: r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3
+caption: The bishop pins the c6-knight indirectly. If Black plays carelessly, White could grab e5 by removing the c6-knight first.
+\`\`\`
+
+## The three main responses for Black
+
+- **Morphy** (3...a6) — kicks the bishop, lets it choose
+- **Berlin** (3...Nf6) — solid as concrete, drawn World Championship matches
+- **Exchange** (after 3...a6 4.Bxc6) — trade now, target Black's doubled pawns
+
+## Why play it as White?
+
+Slow, strategic, **rich middlegames**. The Ruy Lopez doesn't give knockouts — it gives you a tiny edge that grows for 40 moves. The world champion's choice.`,
           order: 2,
           difficulty: 4,
           estimatedMinutes: 25,
@@ -2051,28 +2066,38 @@ caption: The Ruy Lopez: White pressures the c6-knight and castles quickly.
           description: "Black's most aggressive and popular answer to 1.e4",
           content: `# The Sicilian Defense
 
-The Sicilian is the most popular and most combative response to 1.e4, scoring well for Black at all levels.
+Black's **most popular** answer to 1.e4 — and the most combative. Black plays for a win, not a draw.
 
-## Starting Moves
-1. e4 c5
+## The Open Sicilian
 
 \`\`\`chess
 mode: animate
 fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
 moves: e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3
 autoplay: true
-caption: The Open Sicilian: Black trades a flank pawn for a central one and free play.
+caption: Black trades a flank pawn (c5) for a center pawn (d4). Half-open c-file for rook play, sharp middlegames — exactly what Black wanted.
 \`\`\`
 
-## Why Play It
-- Black fights for the center **asymmetrically** with the c-pawn instead of ...e5
-- Leads to rich, imbalanced positions where Black plays for a win
-- The half-open c-file gives Black active rook play
+## The structural trade
 
-## Major Variations
-- **Najdorf** (5...a6) — flexible and razor-sharp, a favorite of world champions
-- **Dragon** (...g6) — Black fianchettoes and aims down the long diagonal
-- **Scheveningen, Classical, Taimanov** — solid central setups`,
+\`\`\`chess
+mode: interactive
+fen: rnbqkb1r/pp2pppp/3p1n2/8/3NP3/2N5/PPP2PPP/R1BQKB1R w KQkq - 2 5
+caption: Black has fewer central pawns BUT a half-open c-file pointing at White's queenside. Active piece play in exchange for some center.
+\`\`\`
+
+## Pick your flavor
+
+| Variation | Black's move | Style |
+|---|---|---|
+| **Najdorf** | 5...a6 | Razor-sharp, world-champion favorite |
+| **Dragon** | ...g6 | Fianchetto + ...Bg7 dragon-like |
+| **Classical** | ...Nc6 | Solid central setup |
+| **Taimanov** | ...e6 + ...Nc6 | Flexible, modern |
+
+## Why Sicilian players love it
+
+Asymmetry = imbalance = winning chances. If you want to play 1...e5 and slowly draw, choose a different defense. If you want to **fight**, this is your weapon.`,
           order: 3,
           difficulty: 4,
           estimatedMinutes: 25,
@@ -2083,27 +2108,43 @@ caption: The Open Sicilian: Black trades a flank pawn for a central one and free
           description: 'A classical queenside opening that fights for the center',
           content: `# The Queen's Gambit
 
-One of the oldest and most respected openings, offering a pawn to seize the center.
+The Netflix-famous opening. White offers a c-pawn to **deflect** Black's d5-pawn — winning control of the center, not really losing a pawn.
 
-## Starting Moves
-1. d4 d5
-2. c4
+## The opening move
 
 \`\`\`chess
 mode: animate
 fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
-moves: d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3
+moves: d4 d5 c4
 autoplay: true
-caption: The Queen's Gambit Declined: Black supports d5 with ...e6 and develops solidly.
+caption: 1.d4 d5  2.c4 — offering the c-pawn. The "gambit" is half-fake: White usually gets the pawn back.
 \`\`\`
 
-## It's Not a Real Gambit
-White offers the c4-pawn, but Black usually can't keep it safely — after ...dxc4, White regains the pawn with moves like e3 and Bxc4. The point is to **deflect** Black's d5-pawn and dominate the center.
+## Why it's not a real gambit
 
-## Main Replies for Black
-- **Queen's Gambit Declined** (2...e6) — solid and classical
-- **Slav Defense** (2...c6) — supports d5 while keeping the bishop free
-- **Queen's Gambit Accepted** (2...dxc4) — grabs the pawn, gives up the center temporarily`,
+\`\`\`chess
+mode: interactive
+fen: rnbqkbnr/ppp1pppp/8/3p4/2P5/8/PP1PPPPP/RNBQKBNR b KQkq c3 0 2
+caption: If Black plays ...dxc4 to keep the pawn, White just plays e3 and Bxc4 — back to equal. The point isn't the pawn; it's the central control.
+\`\`\`
+
+## The Queen's Gambit Declined (the main line)
+
+\`\`\`chess
+mode: animate
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+moves: d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3 O-O
+autoplay: true
+caption: ...e6 supports d5 and Black develops solidly. The QGD has been a championship-level opening for over a century.
+\`\`\`
+
+## Three ways Black can answer
+
+- **Declined** (2...e6) — solid, classical
+- **Slav** (2...c6) — defends d5 AND keeps the c8-bishop free
+- **Accepted** (2...dxc4) — grabs the pawn, gives up center
+
+A timeless, deeply strategic opening.`,
           order: 4,
           difficulty: 4,
           estimatedMinutes: 25,
@@ -2114,30 +2155,45 @@ White offers the c4-pawn, but Black usually can't keep it safely — after ...dx
           description: 'A solid, counterattacking answer to 1.e4',
           content: `# The French Defense
 
-A rock-solid choice for Black that invites White to build a big center — then attacks it.
+Solid as concrete. Black lets White build a big center — then **detonates** it with ...c5.
 
-## Starting Moves
-1. e4 e6
-2. d4 d5
+## The starting position
 
 \`\`\`chess
 mode: animate
 fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
-moves: e4 e6 d4 d5 Nc3 Bb4 e5 c5
+moves: e4 e6 d4 d5
 autoplay: true
-caption: The Winawer French: Black pins the knight and strikes the center with ...c5.
+caption: 1.e4 e6  2.d4 d5 — Black challenges the center immediately. White's e4 and Black's d5 stare each other down.
 \`\`\`
 
-## The Trade-Off
-- Black gets a **solid, durable** structure that's hard to break down
-- The downside: the **light-squared bishop** on c8 can become "bad," hemmed in by the e6-pawn
-- Black's standard plan is the pawn break **...c5**, hitting White's d4
+## The "French bishop" problem
 
-## Main Variations
-- **Advance** (3.e5) — White grabs space; Black undermines with ...c5 and ...f6
-- **Winawer** (3.Nc3 Bb4) — sharp and double-edged
-- **Tarrasch** (3.Nd2) — a flexible, low-risk try for White
-- **Exchange** (3.exd5) — symmetrical and quiet`,
+\`\`\`chess
+mode: interactive
+fen: rnbqkb1r/pp3ppp/4pn2/2pp4/3P4/2N1P3/PPP2PPP/R1BQKBNR w KQkq - 0 5
+caption: Black's c8-bishop is hemmed in by its own pawn on e6. This "bad French bishop" haunts every French game. Plans must free it.
+\`\`\`
+
+## The signature break — ...c5
+
+\`\`\`chess
+mode: animate
+fen: rnbqkb1r/ppp2ppp/4pn2/3p4/3PP3/2N5/PPP2PPP/R1BQKBNR b KQkq - 1 3
+moves: dxe4 Nxe4 c5
+caption: ...c5 strikes White's d4 — the pawn break that defines French strategy.
+\`\`\`
+
+## Pick a flavor
+
+| Variation | White plays | Style |
+|---|---|---|
+| **Advance** | 3.e5 | Space-grab; Black hits back with ...c5 |
+| **Winawer** | 3.Nc3 Bb4 | Sharp, doubled-pawn theme |
+| **Tarrasch** | 3.Nd2 | Flexible, low-risk |
+| **Exchange** | 3.exd5 | Symmetric, dull |
+
+The French isn't flashy — but it scores. Karpov made a career of it.`,
           order: 5,
           difficulty: 4,
           estimatedMinutes: 25,
@@ -2148,29 +2204,40 @@ caption: The Winawer French: Black pins the knight and strikes the center with .
           description: 'Solid like the French, but with a free light-squared bishop',
           content: `# The Caro-Kann Defense
 
-A favorite of positional players: as solid as the French, but Black develops the light-squared bishop *before* locking it in.
+As solid as the French — but Black **frees the light-squared bishop first**. Karpov's other favorite.
 
-## Starting Moves
-1. e4 c6
-2. d4 d5
+## Watch the main line
 
 \`\`\`chess
 mode: animate
 fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
 moves: e4 c6 d4 d5 Nc3 dxe4 Nxe4 Bf5
 autoplay: true
-caption: The Classical Caro-Kann: Black trades on e4 and develops the bishop actively to f5.
+caption: The Classical Caro-Kann: ...Bf5 frees the c8-bishop BEFORE locking it in with ...e6. Solid AND active.
 \`\`\`
 
-## Why Play It
-- A **sound, reliable** structure with few weaknesses
-- Unlike the French, the **c8-bishop gets out** to f5 or g4 before ...e6
-- Leads to slightly better endgames for Black thanks to a healthy pawn structure
+## French vs Caro-Kann
 
-## Main Variations
+\`\`\`chess
+mode: interactive
+fen: rnbqkb1r/pp2pppp/2p2n2/8/3P4/8/PPP2PPP/R1BQKBNR w KQkq - 0 5
+caption: Same idea as the French (solid, central) — but Black's bishop on c8 still has the c8-h3 diagonal open. That's the Caro-Kann's gift.
+\`\`\`
+
+## Why positional players love it
+
+- **Sound, reliable** structure — few targets for White
+- **Bishop gets out** to f5 or g4
+- **Better endgames** than the French
+- Patience pays off
+
+## Variations
+
 - **Classical** (4...Bf5) — the principled main line
-- **Advance** (3.e5) — White gains space; Black plays ...Bf5 and ...e6
-- **Exchange / Panov** (3.exd5) — can become a sharp IQP middlegame after c4`,
+- **Advance** (3.e5) — space-grabbing; Black plays ...Bf5 and prepares ...c5 or ...e6
+- **Panov-Botvinnik** (3.exd5 cxd5 4.c4) — sharp, isolated-pawn middlegames
+
+A workhorse defense. If you want positions where you grind for a win in the endgame, this is your tool.`,
           order: 6,
           difficulty: 4,
           estimatedMinutes: 25,
@@ -2181,28 +2248,42 @@ caption: The Classical Caro-Kann: Black trades on e4 and develops the bishop act
           description: 'A flexible flank opening that fights for the center from the side',
           content: `# The English Opening
 
-1.c4 — a flexible, strategic opening favored by players who like to control the center from the flank before committing pawns.
+**1.c4** — stake a claim on d5 from the side. Flexible, strategic, and a great way to dodge mainstream 1.e4 / 1.d4 theory.
 
-## Starting Move
-1. c4 (staking a claim on d5 from the side)
+## The Reversed Sicilian
 
 \`\`\`chess
 mode: animate
 fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
 moves: c4 e5 Nc3 Nf6 Nf3 Nc6 g3 d5 cxd5 Nxd5
 autoplay: true
-caption: A Reversed Sicilian: White plays the Sicilian setup a move up, fianchettoing on g3.
+caption: White plays a Sicilian setup with an extra tempo. Fianchetto on g3, then play down the long diagonal.
 \`\`\`
 
-## Why Play It
-- **Flexible** — it can transpose into many other openings (Queen's Gambit, Catalan, even Sicilian structures)
-- Avoids heavily-analyzed 1.e4 and 1.d4 main lines
-- Emphasizes **piece play and the long diagonal** after a kingside fianchetto
+## The signature move — g3
 
-## Common Setups
-- **Reversed Sicilian** (1...e5) — White plays the Sicilian a tempo up
-- **Symmetrical** (1...c5) — both sides mirror each other
-- **King's English** with g3, Bg2, and pressure down the long diagonal`,
+\`\`\`chess
+mode: interactive
+fen: r1bqkb1r/pppp1ppp/2n2n2/4p3/2P5/2N3P1/PP1PPP1P/R1BQKBNR w KQkq - 0 4
+caption: g3 + Bg2 is the English's calling card. The g2-bishop rakes the long h1-a8 diagonal toward Black's queenside.
+\`\`\`
+
+## Why play the English
+
+- **Flexible** — can transpose to Queen's Gambit, Catalan, even Sicilian structures
+- **Avoid theory** — 1.e4 and 1.d4 have huge databases; the English keeps your opponent thinking
+- **Strategic play** — long maneuvering, less tactical chaos
+
+## Setups you'll meet
+
+| Black's reply | Name |
+|---|---|
+| 1...e5 | Reversed Sicilian |
+| 1...c5 | Symmetrical English |
+| 1...Nf6 | King's Indian setups |
+| 1...e6 | Transposes to Queen's Gambit lines |
+
+The English is the **chameleon** of openings. Botvinnik and Kasparov played it for a reason.`,
           order: 7,
           difficulty: 4,
           estimatedMinutes: 22,
@@ -2213,27 +2294,42 @@ caption: A Reversed Sicilian: White plays the Sicilian setup a move up, fianchet
           description: 'An easy-to-learn setup you can play against almost anything',
           content: `# The London System
 
-A low-maintenance, solid system: White develops the same way against almost any Black setup, making it ideal for club players.
+The opening you can learn in one afternoon. White develops the **same way** against almost everything. Beloved by club players and increasingly by elites too.
 
-## The Setup
-1. d4 followed by Bf4, e3, Nf3, Bd3, c3, and Nbd2
+## The setup, every time
 
 \`\`\`chess
 mode: animate
 fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
-moves: d4 d5 Nf3 Nf6 Bf4 e6 e3 Bd6 Bg3
+moves: d4 d5 Nf3 Nf6 Bf4 e6 e3 Bd6 Bg3 O-O Bd3 c5 c3 Nc6 Nbd2
 autoplay: true
-caption: The London System: the dark-squared bishop comes out early to f4 before e3 locks it in.
+caption: The whole London System unfolds: Bf4, e3, Bd3, c3, Nbd2. Memorize the pattern and you have an opening for life.
 \`\`\`
 
-## Why It's Popular
-- **Easy to learn** — one harmonious setup against most defenses
-- The key move is getting the **dark-squared bishop outside the pawn chain** (to f4) before playing e3
-- Solid and hard to crack, with a typical plan of Ne5, f4, and a kingside push
+## The crucial trick — bishop OUT first
 
-## Things to Watch
-- Don't get *too* routine — Black can challenge with ...c5 and ...Qb6 hitting b2 and d4
-- It's safe but can be a little passive; learn the standard attacking plan with Ne5 to inject life`,
+\`\`\`chess
+mode: interactive
+fen: rnbqkbnr/ppp1pppp/8/3p4/3P4/5N2/PPP1PPPP/RNBQKB1R w KQkq - 0 3
+caption: Play Bf4 BEFORE e3! If you play e3 first, your dark bishop gets trapped behind its own pawns. The bishop's escape is the system's #1 rule.
+\`\`\`
+
+## The middlegame plan
+
+\`\`\`chess
+mode: animate
+fen: r1bq1rk1/pp3ppp/2nbpn2/3p4/3P4/2PBPN2/PP1N1PPP/R2Q1RK1 w - - 0 8
+moves: Ne5
+caption: Once developed, the standard plan: Ne5 lands a knight in the center, often followed by f4 and a kingside attack.
+\`\`\`
+
+## Why London is everywhere
+
+- **Easy to learn** — one setup against nearly every defense
+- **Solid** — hard for Black to crack
+- **Plays itself** — once you know the moves, low memory load
+
+Watch out for: ...c5 and ...Qb6 (hitting b2 and d4) — Black's standard counter. Otherwise, you're cruising.`,
           order: 8,
           difficulty: 3,
           estimatedMinutes: 22,
@@ -2244,28 +2340,39 @@ caption: The London System: the dark-squared bishop comes out early to f4 before
           description: 'Let White build a big center — then blow it up with a kingside attack',
           content: `# The King's Indian Defense
 
-A fighting, hypermodern defense: Black lets White occupy the center, then strikes back with pieces and a ferocious kingside pawn storm.
+A **fighting** defense. Black lets White build a huge center — then blows it up with a kingside pawn storm. Not for the faint-hearted.
 
-## Starting Moves
-1. d4 Nf6
-2. c4 g6
-3. Nc3 Bg7
+## See the setup
 
 \`\`\`chess
 mode: animate
 fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
 moves: d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O
 autoplay: true
-caption: The King's Indian: Black fianchettoes, castles, and prepares to challenge the center with ...e5.
+caption: Black fianchettoes the dark-squared bishop, castles, and prepares to fight the center from a distance.
 \`\`\`
 
-## The Plan
-- Black allows White a broad pawn center (d4 + e4) on purpose
-- The fianchettoed **g7-bishop** rakes the long diagonal
-- Black strikes with **...e5** (or ...c5); in the main lines the center locks and Black launches **...f5–f4–g5–g4**, storming White's king
+## The g7-bishop — Black's secret weapon
 
-## The Trade-Off
-A double-edged race: White attacks on the **queenside**, Black on the **kingside**. It's not for the faint-hearted — but few openings give Black such rich winning chances.`,
+\`\`\`chess
+mode: interactive
+fen: rnbqk2r/ppp1ppbp/3p1np1/8/2PPP3/2N5/PP3PPP/R1BQKBNR w KQ - 1 5
+caption: The Bg7 rakes the entire a1-h8 diagonal. It pressures White's center and stays in place all game.
+\`\`\`
+
+## The classic race
+
+\`\`\`chess
+mode: animate
+fen: rnbq1rk1/ppp1ppbp/3p1np1/8/2PPP3/2N2N2/PP3PPP/R1BQKB1R w KQ - 1 6
+moves: Be2 e5 d5 a5 O-O Na6 Ne1 Nd7
+autoplay: true
+caption: After ...e5, the center locks. Black starts ...f5-f4-g5-g4 storming the kingside while White attacks on the queenside. Race time.
+\`\`\`
+
+## The big bet
+
+The KID is a **bet that you'll attack the king faster than the opponent attacks your queen**. Win the race, win the game. The favorite opening of Fischer and Kasparov.`,
           order: 9,
           difficulty: 4,
           estimatedMinutes: 25,
@@ -2276,30 +2383,44 @@ A double-edged race: White attacks on the **queenside**, Black on the **kingside
           description: 'Challenge the e4-pawn immediately with 1...d5',
           content: `# The Scandinavian Defense
 
-Also called the Center Counter, the Scandinavian challenges White's e-pawn on move one — direct, easy to learn, and surprisingly solid.
+The most direct answer to 1.e4: **hit back with 1...d5 immediately**. No theory to memorize, no traps to fear.
 
-## Starting Moves
-1. e4 d5
-2. exd5 Qxd5
-3. Nc3 (gaining time on the queen)
+## The simplest defense in chess
 
 \`\`\`chess
 mode: animate
 fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
 moves: e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6
 autoplay: true
-caption: The Scandinavian: Black recaptures on d5, and after Nc3 the queen retreats to a5.
+caption: 1...d5! After exd5 Qxd5, the queen retreats to a5 and Black gets a sound, easy-to-play position.
 \`\`\`
 
-## The Ideas
-- Black gets a **clear, sturdy structure** with few opening traps to memorize
-- The early queen recapture costs a little time (White develops with tempo via Nc3), but the queen settles safely on a5 or d6
-- A reliable practical weapon, especially for players who want to sidestep heavy theory
+## The bishop you free
 
-## Modern Lines
-- **3...Qa5** — the classic retreat
-- **3...Qd6** — flexible and increasingly popular
-- The **gambit** 2...Nf6 (delaying the recapture) leads to sharper play`,
+\`\`\`chess
+mode: interactive
+fen: rnb1kbnr/ppp1pppp/8/q7/3P4/2N5/PPP2PPP/R1BQKBNR w KQkq - 2 4
+caption: The c8-bishop has open diagonals — unlike the French where it gets locked in. The Scandinavian's structural plus.
+\`\`\`
+
+## Two flavors
+
+- **3...Qa5** — classic retreat, well-tested
+- **3...Qd6** — modern and flexible, popular at all levels
+
+## A gambit version too
+
+\`\`\`chess
+mode: animate
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+moves: e4 d5 exd5 Nf6
+autoplay: true
+caption: The 2...Nf6 gambit — Black delays the recapture for faster development. Sharper, riskier.
+\`\`\`
+
+## Who should play it?
+
+Players who want a **reliable defense without memorizing 30 moves**. The Scandinavian rewards understanding over preparation.`,
           order: 10,
           difficulty: 3,
           estimatedMinutes: 22,
@@ -2310,28 +2431,44 @@ caption: The Scandinavian: Black recaptures on d5, and after Nc3 the queen retre
           description: "Pin the knight and play against White's pawn structure",
           content: `# The Nimzo-Indian Defense
 
-One of the most respected defenses to 1.d4. Black pins White's knight and is happy to trade the bishop for it, inflicting long-term structural damage.
+The deepest strategic battle in opening theory: **bishop pair vs damaged pawns**. Both sides get something, and the play decides which matters more.
 
-## Starting Moves
-1. d4 Nf6
-2. c4 e6
-3. Nc3 Bb4 (the pin that defines the opening)
+## The defining move
 
 \`\`\`chess
 mode: animate
 fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
 moves: d4 Nf6 c4 e6 Nc3 Bb4
 autoplay: true
-caption: The Nimzo-Indian: Black pins the c3-knight, ready to trade it and damage White's pawns.
+caption: 3...Bb4 — the Nimzo. Pinning the knight, ready to trade it for the bishop and damage White's structure.
 \`\`\`
 
-## The Strategy
-- By playing **...Bxc3**, Black gives up the bishop pair to **double White's c-pawns**, creating a lasting structural target
-- Black then blockades the doubled pawns and plays against them
-- It's a battle of **bishop pair vs. pawn structure** — a deeply strategic, world-championship-level opening
+## The trade-off in one position
 
-## Why It's Respected
-The Nimzo is flexible, sound, and scores well at every level. Many champions have made it the cornerstone of their defense against 1.d4.`,
+\`\`\`chess
+mode: interactive
+fen: rnbqk2r/pppp1ppp/4pn2/8/2PP4/2P5/P3PPPP/R1BQKBNR b KQkq - 0 4
+caption: After ...Bxc3 bxc3, White has doubled c-pawns (weakness) BUT the bishop pair (strength). Black blockades the pawns and plays for the long game.
+\`\`\`
+
+## Why champions love it
+
+- **Flexible** — Black isn't committed to any one pawn structure
+- **Sound** — extremely solid against 1.d4
+- **Active** — clear plans for both sides; rarely boring
+- **Deep** — every move matters; perfect for strong players
+
+## A sample main line
+
+\`\`\`chess
+mode: animate
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+moves: d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Bd3 d5 Nf3 c5
+autoplay: true
+caption: Black castles, strikes with ...d5 and ...c5. A model Nimzo middlegame.
+\`\`\`
+
+If you ever wondered how Karpov, Petrosian, and Kasparov built winning systems against 1.d4 — it usually started here.`,
           order: 11,
           difficulty: 4,
           estimatedMinutes: 25,
@@ -2352,31 +2489,37 @@ The Nimzo is flexible, sound, and scores well at every level. Many champions hav
           description: 'The classic Bxh7+ bishop sacrifice against a castled king',
           content: `# The Greek Gift Sacrifice
 
-The most famous attacking pattern in chess: sacrifice a bishop on **h7** (or h2 for Black) to rip open the castled king.
+The most famous attacking pattern in chess: **Bxh7+!** — a bishop sacrifice that rips open the castled king.
 
-## The Idea
-With a bishop on d3, a knight ready for g5, and the queen able to reach the h-file, White crashes through:
+## Watch the gift unwrap
 
 \`\`\`chess
 mode: animate
 fen: r1bq1rk1/ppp2ppp/2n2n2/3p4/3P4/2NB1N2/PPP2PPP/R1BQ1RK1 w - - 0 1
 moves: Bxh7+ Kxh7 Ng5+ Kg8 Qh5
 autoplay: true
-caption: Bxh7+! drags the king out, Ng5+ leaps in, and Qh5 threatens the unstoppable Qh7#.
+caption: Bxh7+! drags the king out. Ng5+ leaps in. Qh5 threatens unstoppable Qh7 mate.
 \`\`\`
 
-## The Three Ingredients
-1. A **bishop** aimed at h7 (on the b1–h7 diagonal)
-2. A **knight** that can jump to g5 with check
-3. A **queen** with a fast route to the h-file (often via h5 or d1–h5)
+## The three ingredients
 
-## When It Works
-- Black's **h7 is defended only by the king**
-- Black has no knight on f6 to cover h5/h7
-- White can bring up enough force before Black consolidates
+\`\`\`chess
+mode: interactive
+fen: r1bq1rk1/ppp2ppp/2n2n2/3p4/3P4/2NB1N2/PPP2PPP/R1BQ1RK1 w - - 0 1
+caption: SETUP CHECKLIST — (1) bishop on d3 aimed at h7 ✓ (2) knight ready to leap to g5 ✓ (3) queen with a fast route to h5 or h7 ✓. All three present? The Greek Gift is on.
+\`\`\`
 
-## When to Hold Back
-If Black can answer ...Kg6 safely, or has ...Nf6 covering the key squares, the sacrifice may fizzle. **Calculate to mate or a clear material gain before committing.**`,
+## When NOT to play it
+
+- Black has a **knight on f6** (it covers h5 and h7 — the attack stalls)
+- The king can safely run to **g6** with shelter
+- You can't deliver enough force to mate or win major material
+
+**Calculate to a clear win before sacrificing.** Hope is not a strategy.
+
+## Try spotting it
+
+Whenever you see your bishop on d3, knight on f3, and Black has castled with no Nf6 — *check the Greek Gift*. It's worked thousands of times in real games.`,
           order: 1,
           difficulty: 5,
           estimatedMinutes: 25,
@@ -2387,25 +2530,35 @@ If Black can answer ...Kg6 safely, or has ...Nf6 covering the key squares, the s
           description: 'March your pawns at the enemy king to tear open lines',
           content: `# Pawn Storms
 
-When the kings have castled on **opposite sides**, the game becomes a race: throw your pawns at the enemy king while keeping your own safe.
+When the kings castle on **opposite sides**, the game becomes a race. Throw your pawns at the enemy king. Whoever opens lines first usually wins.
 
-## The Concept
-- Pawns in front of *your* king should usually stay put (they're the shelter)
-- Pawns in front of the *enemy* king are your battering ram — push them forward to **open files** for your rooks and queen
+## See the storm
 
-## Opposite-Side Castling
-This is the classic pawn-storm scenario:
-- You castle queenside, opponent castles kingside (or vice versa)
-- Both sides hurl their pawns at the other's king — **speed is everything**
-- Whoever opens lines and lands the attack first usually wins
+\`\`\`chess
+mode: animate
+fen: r1bq1rk1/pp2ppbp/2np1np1/8/3NP3/2N1B3/PPPQ1PPP/2KR1B1R w - - 0 1
+moves: h4 a6 h5 b5 hxg6 hxg6 g4
+autoplay: true
+caption: White castled queenside, Black kingside. White hurls the h- and g-pawns at Black's king. Speed beats safety here.
+\`\`\`
 
-## Keys to a Successful Storm
-1. **Don't worry about your own structure** near the enemy king — you want to open it, even by sacrifice
-2. **Open at least one file** for a rook; a closed storm achieves nothing
-3. **Count the race** — if both attacks crash through, the faster one wins, so calculate tempo carefully
+## Same-side castling? Be careful
 
-## Same-Side Castling Caution
-With kings on the same side, storming your own king's pawns is dangerous — it exposes *you*. Pawn storms are mainly a tool when the kings live on opposite wings.`,
+\`\`\`chess
+mode: interactive
+fen: r1bq1rk1/pp3ppp/2n2n2/3p4/3P4/2N2N2/PPP2PPP/R1BQ1RK1 w - - 0 1
+caption: Same side castling — storming your own kingside pawns would expose YOUR king too. Reserve pawn storms for opposite-side castling.
+\`\`\`
+
+## Three rules for a successful storm
+
+1. **Don't worry about your own structure** near the enemy king — even sacrifice pawns
+2. **Open at least one file** for a rook — a closed storm achieves nothing
+3. **Count the race** — calculate whose attack lands first. One tempo can win or lose
+
+## The key question every move
+
+*"Whose king will fall first?"* If you can't answer that confidently, slow down and bring more attackers. Speed wins, but only if you have enough force.`,
           order: 2,
           difficulty: 5,
           estimatedMinutes: 22,
@@ -2426,25 +2579,36 @@ With kings on the same side, storming your own king's pawns is dangerous — it 
           description: 'The fundamental winning method in rook-and-pawn endgames',
           content: `# The Lucena Position
 
-The single most important winning technique in rook endgames. If you have a rook and a pawn on the 7th rank, your king in front of it, and the enemy king cut off — this is how you win.
+The **most important winning technique** in rook endgames. Memorize it once and convert countless "drawn-looking" rook endings into wins.
+
+## The setup
 
 \`\`\`chess
 mode: interactive
 fen: 1K6/1P6/8/8/8/8/r7/2R3k1 w - - 0 1
-caption: A Lucena setup: White's king shelters the pawn while the rook prepares to escape the checks.
+caption: K + R + pawn on the 7th, king in front of it. Sounds winning — but if the king steps aside, the rook checks drive it back. We need a "bridge".
 \`\`\`
 
-## The Problem
-Your king stands in front of its own pawn, but the moment it steps aside to let the pawn queen, enemy rook checks drive it away. You need a way to **shield the king** from those checks.
+## Building the bridge
 
-## Building a Bridge
-1. Advance your **rook to the fourth rank** (counting from your side), e.g. Rc4
-2. Step the king out toward the rook's file
-3. When the checks come, **interpose your rook** — the "bridge" — to block the check
-4. The king reaches safety and the pawn promotes
+\`\`\`chess
+mode: interactive
+fen: 1K6/1P6/8/8/2R5/8/r7/6k1 w - - 0 1
+caption: Rook already on c4 = the bridge in place. Now the king walks out (Kc7, Kc6...), and when the enemy rook checks from the side, your rook blocks on the c-file. Pawn queens.
+\`\`\`
 
-## The Key Idea
-The rook on the fourth rank is the bridge: it cuts the distance the checking rook can harass you, then blocks the final check. Memorize this — it converts countless "drawn-looking" rook endings into wins.`,
+## The technique in four steps
+
+1. **Rook to your 4th rank** (e.g. Rc4 for a c-pawn)
+2. **King steps out** toward the rook's side
+3. When checked, **interpose your rook** as the bridge
+4. **Pawn queens** — you win
+
+## Why it works
+
+The rook on the 4th rank shortens the distance enemy checks can harass you. Then when the final check comes, your rook blocks it. The king escapes the gauntlet and the pawn promotes.
+
+**This is THE rook-endgame technique to know.** It comes up in dozens of games — turning many a "draw" into a win.`,
           order: 1,
           difficulty: 5,
           estimatedMinutes: 25,
@@ -2455,23 +2619,34 @@ The rook on the fourth rank is the bridge: it cuts the distance the checking roo
           description: 'The fundamental drawing method when defending rook endgames',
           content: `# The Philidor Position
 
-The defender's best friend. When your opponent has a rook and a pawn and you have only a rook, the Philidor technique holds the draw.
+The **defender's best friend** in rook endgames. If your opponent has a rook AND a pawn and you have only a rook, Philidor holds the draw.
+
+## See the defense
 
 \`\`\`chess
 mode: interactive
 fen: 8/8/4k3/8/4P3/r7/4K3/4R3 b - - 0 1
-caption: The Philidor draw: Black keeps the rook on the third rank to deny the enemy king a path forward.
+caption: Black's rook camps on its 3rd rank (a3 here). The white king CAN'T advance — every square ahead is covered by the Black rook.
 \`\`\`
 
-## The Technique (Two Phases)
-1. **Third-rank defense:** as long as the pawn has not yet reached its 6th rank, park your rook on **your third rank** (the rank in front of the pawn's advance). This stops the enemy king from supporting the pawn.
-2. **Switch to the rear:** the moment the pawn advances to your third rank, swing your rook to the **back rank** and check the enemy king from behind. With the king unable to hide from the checks, it's a draw.
+## Two-phase technique
 
-## Why It Works
-The attacking side wins only if its **king** can shepherd the pawn forward. The third-rank rook makes that impossible; once the pawn over-extends, the checks from behind are endless.
+**Phase 1 — Third-rank defense.** While the white pawn is on e4 or e5, keep your rook on your 3rd rank. The enemy king can't squeeze past.
 
-## The Lesson
-Lucena wins, Philidor draws. Knowing which position you're heading for — and how to reach it — is what separates a held draw from a lost point.`,
+**Phase 2 — Rear checks.** The moment the pawn pushes to your 3rd rank (e3 here, or e6 for the other side), **swing your rook to the back rank** and start checking from behind. The king has no shelter.
+
+## Why it works
+
+The attacker wins only if the **king** can shepherd the pawn forward. The 3rd-rank rook blocks that. When the pawn over-extends to escape, your rook's checks from behind never end. **Draw.**
+
+## Lucena vs Philidor — know which you're in
+
+| Position | Result |
+|---|---|
+| Your king IN FRONT of the pawn | Lucena = win |
+| Your king KEPT OUT, defender's rook on its 3rd rank | Philidor = draw |
+
+This pair of positions defines who wins or loses rook endgames. Learn both and you'll save and convert half a point a week.`,
           order: 2,
           difficulty: 5,
           estimatedMinutes: 25,
@@ -2482,26 +2657,35 @@ Lucena wins, Philidor draws. Knowing which position you're heading for — and h
           description: 'The hardest basic mate — driving the king to the right corner',
           content: `# Bishop & Knight Checkmate
 
-King, bishop, and knight versus a lone king is a **forced win**, but the trickiest of the basic mates. The catch: you can only mate in a corner **the same color as your bishop**.
+The **trickiest** of the basic mates. K + B + N vs K is forced — but you can only mate in **a corner the same color as your bishop**.
+
+## The starting position
 
 \`\`\`chess
 mode: interactive
 fen: 8/8/8/8/8/2N5/3BK3/7k w - - 0 1
-caption: K+B+N vs K: drive the lone king toward a corner the bishop controls to deliver mate.
+caption: Your dark-squared bishop means you can ONLY mate in a dark corner (a1 or h8). Black's king is already near h1 — wrong corner. You must drive it across the board.
 \`\`\`
 
-## Why It's Hard
-- The mate **only** works in the two corners your bishop can reach
-- You must first drive the king to *any* edge, then herd it along to the **correct** corner
-- The clock matters: it can take up to 33 moves, and the fifty-move rule looms
+## The W-maneuver — guiding the king
 
-## The Method
-1. Force the enemy king to the edge of the board with king, bishop, and knight working together
-2. If it's heading for the wrong corner, use the famous **"W-maneuver"** with the knight to shepherd it across to the right one
-3. Coordinate all three pieces to deliver the final mate in the correct corner
+The hardest part: getting the king from the wrong corner to the right one. The knight does most of the herding via a famous **W-shaped path**.
 
-## The Practical Tip
-This mate is rare, but knowing it builds real piece-coordination skill. Practice the W-maneuver until the knight's path feels natural — it's the heart of the technique.`,
+\`\`\`chess
+mode: interactive
+fen: 8/8/8/2k5/8/6N1/3BK3/8 w - - 0 1
+caption: Coordinate king + bishop + knight to herd the enemy king toward the correct corner. The knight zig-zags in a W-shape to control the squares the bishop can't.
+\`\`\`
+
+## Three rules to survive
+
+1. **Bishop and king herd**; the knight closes the door
+2. **Move all three pieces** — don't leave one behind
+3. Watch the **50-move rule** — this mate can take 30+ moves
+
+## Why bother learning it?
+
+This is the mate of legends — the one that separates club players from real endgame artists. Even if you never play it, **practicing the coordination teaches you how three pieces work together**, which pays off in every game.`,
           order: 3,
           difficulty: 5,
           estimatedMinutes: 25,
@@ -2512,25 +2696,42 @@ This mate is rare, but knowing it builds real piece-coordination skill. Practice
           description: 'When an extra bishop and a rook pawn still only draw',
           content: `# The Wrong Bishop
 
-One of the great endgame surprises: a king, bishop, and **rook pawn** — material that *looks* winning — is only a **draw** if the bishop is the "wrong" one.
+One of chess's great surprises: **K + B + rook pawn** — material that *looks* winning — is a draw if the bishop is the wrong color.
+
+## See the impossible draw
 
 \`\`\`chess
 mode: interactive
 fen: 8/8/8/8/8/6b1/5k1p/7K w - - 0 1
-caption: Wrong bishop: it can't control h1, so the cornered king is stalemated — a draw despite the extra piece.
+caption: White's king is trapped in the corner. Black has an EXTRA PIECE. But Black's bishop is DARK; h1 is LIGHT. Bishop can never touch h1 — King sits forever — DRAW.
 \`\`\`
 
-## The Rule
-With a rook pawn (a- or h-file), the **promotion square is in the corner**. If your bishop does **not** control the color of that corner square, you can never drive the enemy king out of it:
-- The defending king simply sits in the corner
-- Approaching with your own king delivers **stalemate**, not mate
+## The rule
 
-## The Telltale Check
-For an h-pawn promoting on h8 (a light square), you need a **light-squared bishop**. A dark-squared bishop is the "wrong bishop" and the position is drawn.
+With a rook pawn (a- or h-file), the promotion square sits in the **corner**. If your bishop doesn't match that corner's color, **you can never drive the enemy king away**.
 
-## Why It Matters
-- As the stronger side: **avoid trading into a wrong-bishop ending** — keep a pawn elsewhere or steer for a different bishop
-- As the defender: when you're losing, **head for the wrong-bishop corner** — it's a lifeline that salvages a half point from a hopeless-looking game`,
+| Pawn | Promotion square | Need this bishop |
+|---|---|---|
+| h-pawn | h8 (light) | Light-squared |
+| h-pawn | h1 (light, Black side) | Light-squared |
+| a-pawn | a8 (dark) | Dark-squared |
+| a-pawn | a1 (dark, Black side) | Dark-squared |
+
+## How to use this knowledge
+
+**As the stronger side:** *avoid* trading into a wrong-bishop ending. Keep an extra pawn somewhere; preserve the right bishop.
+
+**As the defender:** when losing, **race for the wrong-bishop corner**. It's a lifeline that saves countless lost-looking games.
+
+## See it as a defender
+
+\`\`\`chess
+mode: interactive
+fen: 7k/8/8/8/8/8/6PP/4K1B1 w - - 0 1
+caption: White has K + B + 2 rook pawns. If only one pawn remained on h-file and the bishop is dark — drawn! Black just heads for h8 and sits there.
+\`\`\`
+
+This is the rule that saves more half-points than any other. Memorize it.`,
           order: 4,
           difficulty: 5,
           estimatedMinutes: 20,
