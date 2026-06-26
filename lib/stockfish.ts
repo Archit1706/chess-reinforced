@@ -1,11 +1,17 @@
 /**
  * Stockfish Chess Engine Integration
  *
- * This module provides a wrapper around the Stockfish WASM engine for:
- * - Move analysis and evaluation
- * - Best move calculation
- * - Playing against the computer
- * - Post-game analysis
+ * Wraps the Stockfish WASM engine (loaded in a Web Worker from a CDN) for move
+ * calculation, evaluation, playing, and post-game analysis.
+ *
+ * Robustness model:
+ * - Engine searches are **serialized** through a single-slot mutex, so two
+ *   overlapping callers (e.g. auto-analyze + a computer move) never clobber each
+ *   other's results or UCI options.
+ * - Every search and the init handshake has a **hard timeout**, so a blocked
+ *   CDN, a dead worker, or a missing `bestmove` can never leak a pending promise
+ *   or hang the UI — callers always get a result (possibly empty) and fall back.
+ * - `onerror`/`terminate` settle the in-flight search instead of orphaning it.
  */
 
 import type { MoveAnalysis, PositionAnalysis, StockfishSettings } from '@/types/chess';
@@ -19,6 +25,12 @@ const DEFAULT_SETTINGS: StockfishSettings = {
   threads: 1,
   hashSize: 16,
 };
+
+// Max time to wait for the engine to report ready before giving up.
+const INIT_TIMEOUT_MS = 8000;
+// Hard backstop for a single search; callers also apply their own (shorter)
+// races, so this only bounds pathological hangs.
+const SEARCH_TIMEOUT_MS = 8000;
 
 // Stockfish engine state
 interface EngineState {
@@ -36,48 +48,71 @@ let engineState: EngineState = {
   settings: { ...DEFAULT_SETTINGS },
 };
 
-// Pending callbacks for async operations
-type ResolverFn = (value: any) => void;
-let pendingResolvers: Map<string, ResolverFn> = new Map();
-let messageId = 0;
+interface SearchResult {
+  bestMove: string;
+  analysis: MoveAnalysis[];
+}
+
+// The single in-flight search's settler (set while a `go` is outstanding).
+let activeResolver: ((result: SearchResult) => void) | null = null;
+// Accumulated analysis info for the current search.
+let currentAnalysis: MoveAnalysis[] = [];
+// Serializes engine access so only one search runs at a time.
+let engineLock: Promise<unknown> = Promise.resolve();
+// De-dupes concurrent init calls.
+let initPromise: Promise<boolean> | null = null;
+
+/** Run `fn` once the engine is free, then release it for the next caller. */
+function runExclusive<T>(fn: () => Promise<T>): Promise<T> {
+  const run = engineLock.then(fn, fn);
+  // Keep the chain alive even if a search rejects (it never should).
+  engineLock = run.then(
+    () => undefined,
+    () => undefined
+  );
+  return run;
+}
 
 /**
- * Initialize the Stockfish engine
- * Must be called before using any engine functions
+ * Initialize the Stockfish engine. Idempotent and concurrency-safe: parallel
+ * callers share one worker and one init promise. Resolves `false` (never throws)
+ * when the engine can't be created or doesn't become ready in time.
  */
 export async function initEngine(): Promise<boolean> {
-  if (!isClient()) {
-    return false;
-  }
+  if (!isClient()) return false;
+  if (engineState.worker && engineState.ready) return true;
+  if (initPromise) return initPromise;
 
-  if (engineState.worker && engineState.ready) {
-    return true;
-  }
+  initPromise = new Promise<boolean>((resolve) => {
+    let settled = false;
+    const finish = (ok: boolean) => {
+      if (settled) return;
+      settled = true;
+      resolve(ok);
+      // Allow a later re-init if this attempt failed.
+      if (!ok) initPromise = null;
+    };
 
-  return new Promise((resolve) => {
     try {
-      // Create a new Web Worker for Stockfish
-      // We'll use the stockfish.js library from CDN
+      // Web Worker that loads Stockfish 16 (NNUE) from the CDN and relays UCI I/O.
       const workerCode = `
         let stockfish = null;
-
-        // Load Stockfish from CDN
-        importScripts('https://unpkg.com/stockfish@16.0.0/src/stockfish-nnue-16.js');
-
-        // Initialize when Stockfish is ready
-        Stockfish().then(sf => {
-          stockfish = sf;
-          postMessage({ type: 'ready' });
-
-          // Listen for UCI output
-          stockfish.addMessageListener(line => {
-            postMessage({ type: 'output', data: line });
+        try {
+          importScripts('https://unpkg.com/stockfish@16.0.0/src/stockfish-nnue-16.js');
+          Stockfish().then(function (sf) {
+            stockfish = sf;
+            postMessage({ type: 'ready' });
+            stockfish.addMessageListener(function (line) {
+              postMessage({ type: 'output', data: line });
+            });
+          }).catch(function (err) {
+            postMessage({ type: 'error', data: String(err) });
           });
-        });
-
-        // Handle commands from main thread
-        onmessage = function(e) {
-          if (stockfish && e.data.command) {
+        } catch (err) {
+          postMessage({ type: 'error', data: String(err) });
+        }
+        onmessage = function (e) {
+          if (stockfish && e.data && e.data.command) {
             stockfish.postMessage(e.data.command);
           }
         };
@@ -85,49 +120,76 @@ export async function initEngine(): Promise<boolean> {
 
       const blob = new Blob([workerCode], { type: 'application/javascript' });
       const workerUrl = URL.createObjectURL(blob);
-      engineState.worker = new Worker(workerUrl);
-
-      engineState.worker.onmessage = (e) => {
-        handleEngineMessage(e.data);
+      let urlRevoked = false;
+      const revoke = () => {
+        if (urlRevoked) return;
+        urlRevoked = true;
+        URL.revokeObjectURL(workerUrl);
       };
 
-      engineState.worker.onerror = (error) => {
-        console.error('Stockfish worker error:', error);
-        engineState.ready = false;
-        resolve(false);
-      };
+      const worker = new Worker(workerUrl);
+      engineState.worker = worker;
 
-      // Wait for ready message
-      const checkReady = () => {
+      worker.onmessage = (e) => {
+        revoke(); // safe to release the blob URL once the worker is running
+        const data = e.data as { type?: string; data?: string };
+        if (data?.type === 'error') {
+          console.error('Stockfish failed to load:', data.data);
+          engineState.ready = false;
+          finish(false);
+          return;
+        }
+        handleEngineMessage(data);
         if (engineState.ready) {
-          // Initialize UCI and configure engine
-          sendCommand('uci');
-          sendCommand('setoption name UCI_LimitStrength value true');
-          sendCommand(`setoption name UCI_Elo value ${engineState.settings.elo}`);
-          sendCommand(`setoption name MultiPV value ${engineState.settings.multiPv}`);
-          sendCommand(`setoption name Hash value ${engineState.settings.hashSize}`);
-          sendCommand('isready');
-          resolve(true);
-        } else {
-          setTimeout(checkReady, 100);
+          // Configure once the engine first reports ready.
+          configureEngine();
+          finish(true);
         }
       };
 
-      setTimeout(checkReady, 100);
+      worker.onerror = (error) => {
+        console.error('Stockfish worker error:', error);
+        revoke();
+        engineState.ready = false;
+        // Settle any in-flight search so it doesn't hang.
+        settleActiveSearch({ bestMove: '', analysis: [] });
+        finish(false);
+      };
 
-      // Cleanup URL
-      URL.revokeObjectURL(workerUrl);
+      // Hard cap: if the worker never reports ready, give up and fall back.
+      setTimeout(() => {
+        if (!engineState.ready) finish(false);
+      }, INIT_TIMEOUT_MS);
     } catch (error) {
       console.error('Failed to initialize Stockfish:', error);
-      resolve(false);
+      finish(false);
     }
   });
+
+  return initPromise;
 }
 
-/**
- * Handle messages from the Stockfish worker
- */
-function handleEngineMessage(message: { type: string; data?: string }) {
+/** Send the standard UCI configuration (called once the engine is ready). */
+function configureEngine() {
+  sendCommand('uci');
+  sendCommand('setoption name UCI_LimitStrength value true');
+  sendCommand(`setoption name UCI_Elo value ${engineState.settings.elo}`);
+  sendCommand(`setoption name MultiPV value ${engineState.settings.multiPv}`);
+  sendCommand(`setoption name Hash value ${engineState.settings.hashSize}`);
+  sendCommand('isready');
+}
+
+/** Resolve the in-flight search (if any) and reset per-search state. */
+function settleActiveSearch(result: SearchResult) {
+  const resolver = activeResolver;
+  activeResolver = null;
+  currentAnalysis = [];
+  engineState.analyzing = false;
+  if (resolver) resolver(result);
+}
+
+/** Handle messages from the Stockfish worker. */
+function handleEngineMessage(message: { type?: string; data?: string }) {
   if (message.type === 'ready') {
     engineState.ready = true;
     return;
@@ -135,8 +197,6 @@ function handleEngineMessage(message: { type: string; data?: string }) {
 
   if (message.type === 'output' && message.data) {
     const line = message.data;
-
-    // Parse UCI output
     if (line.startsWith('bestmove')) {
       handleBestMove(line);
     } else if (line.startsWith('info')) {
@@ -147,86 +207,52 @@ function handleEngineMessage(message: { type: string; data?: string }) {
   }
 }
 
-// Accumulated analysis info for current search
-let currentAnalysis: MoveAnalysis[] = [];
-
-/**
- * Handle 'info' lines from engine (evaluation data)
- */
+/** Handle 'info' lines from the engine (evaluation data). */
 function handleInfo(line: string) {
-  // Parse depth
   const depthMatch = line.match(/depth (\d+)/);
-  const depth = depthMatch ? parseInt(depthMatch[1]) : 0;
+  const depth = depthMatch ? toInt(depthMatch[1], 0) : 0;
 
-  // Parse score
   let evaluation = 0;
   let mate: number | undefined;
 
   const mateMatch = line.match(/score mate (-?\d+)/);
   if (mateMatch) {
-    mate = parseInt(mateMatch[1]);
+    mate = toInt(mateMatch[1], 0);
   } else {
     const cpMatch = line.match(/score cp (-?\d+)/);
-    if (cpMatch) {
-      evaluation = parseInt(cpMatch[1]);
-    }
+    if (cpMatch) evaluation = toInt(cpMatch[1], 0);
   }
 
-  // Parse PV (principal variation)
-  const pvMatch = line.match(/pv (.+)$/);
-  const pv = pvMatch ? pvMatch[1].split(' ') : [];
+  const pvMatch = line.match(/ pv (.+)$/);
+  const pv = pvMatch ? pvMatch[1].split(' ').filter(Boolean) : [];
 
-  // Parse MultiPV line number
   const multiPvMatch = line.match(/multipv (\d+)/);
-  const multiPvIndex = multiPvMatch ? parseInt(multiPvMatch[1]) - 1 : 0;
+  const multiPvIndex = multiPvMatch ? Math.max(0, toInt(multiPvMatch[1], 1) - 1) : 0;
 
   if (pv.length > 0) {
-    const analysis: MoveAnalysis = {
-      move: pv[0],
-      evaluation,
-      depth,
-      pv,
-      mate,
-    };
-
-    // Update or add to current analysis
-    currentAnalysis[multiPvIndex] = analysis;
+    currentAnalysis[multiPvIndex] = { move: pv[0], evaluation, depth, pv, mate };
   }
 }
 
-/**
- * Handle 'bestmove' from engine
- */
+/** Handle 'bestmove' from the engine — settles the in-flight search. */
 function handleBestMove(line: string) {
   const match = line.match(/bestmove (\S+)/);
   const bestMove = match ? match[1] : '';
-
-  // Resolve pending best move request
-  const resolver = pendingResolvers.get('bestmove');
-  if (resolver) {
-    resolver({
-      bestMove,
-      analysis: [...currentAnalysis],
-    });
-    pendingResolvers.delete('bestmove');
-  }
-
-  currentAnalysis = [];
-  engineState.analyzing = false;
+  settleActiveSearch({ bestMove, analysis: [...currentAnalysis] });
 }
 
-/**
- * Send a UCI command to the engine
- */
+/** Parse an int defensively, returning `fallback` on NaN. */
+function toInt(value: string, fallback: number): number {
+  const n = parseInt(value, 10);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+/** Send a UCI command to the engine. */
 function sendCommand(command: string) {
-  if (engineState.worker) {
-    engineState.worker.postMessage({ command });
-  }
+  engineState.worker?.postMessage({ command });
 }
 
-/**
- * Update engine settings
- */
+/** Update engine settings (and apply live ones if ready). */
 export function setEngineSettings(settings: Partial<StockfishSettings>) {
   engineState.settings = { ...engineState.settings, ...settings };
 
@@ -244,56 +270,73 @@ export function setEngineSettings(settings: Partial<StockfishSettings>) {
 }
 
 /**
- * Get the best move for a position
+ * Core search primitive — serialized and timeout-bounded. Optionally sets a
+ * temporary MultiPV for the duration of the search (restored afterwards).
  */
+function search(fen: string, opts: { depth?: number; multiPv?: number }): Promise<SearchResult> {
+  return runExclusive(
+    () =>
+      new Promise<SearchResult>((resolve) => {
+        if (!engineState.ready || !engineState.worker) {
+          resolve({ bestMove: '', analysis: [] });
+          return;
+        }
+
+        const tempMultiPv = opts.multiPv != null && opts.multiPv !== engineState.settings.multiPv;
+        let timer: ReturnType<typeof setTimeout>;
+
+        // Wrap settle so we restore MultiPV and clear the timeout exactly once.
+        activeResolver = (result: SearchResult) => {
+          clearTimeout(timer);
+          if (tempMultiPv) {
+            sendCommand(`setoption name MultiPV value ${engineState.settings.multiPv}`);
+          }
+          resolve(result);
+        };
+
+        currentAnalysis = [];
+        engineState.analyzing = true;
+
+        if (tempMultiPv) {
+          sendCommand(`setoption name MultiPV value ${opts.multiPv}`);
+        }
+        sendCommand(`position fen ${fen}`);
+        sendCommand(`go depth ${opts.depth || engineState.settings.depth}`);
+
+        // Backstop: force a stop and settle with whatever we have.
+        timer = setTimeout(() => {
+          sendCommand('stop');
+          const best = currentAnalysis[0]?.move ?? '';
+          settleActiveSearch({ bestMove: best, analysis: [...currentAnalysis] });
+        }, SEARCH_TIMEOUT_MS);
+      })
+  );
+}
+
+/** Get the best move for a position. Resolves `{ bestMove: '' }` on failure. */
 export async function getBestMove(
   fen: string,
   depth?: number
 ): Promise<{ bestMove: string; analysis: MoveAnalysis[] }> {
-  if (!engineState.ready) {
-    await initEngine();
-  }
-
-  return new Promise((resolve) => {
-    pendingResolvers.set('bestmove', resolve);
-
-    currentAnalysis = [];
-    engineState.analyzing = true;
-
-    sendCommand(`position fen ${fen}`);
-    sendCommand(`go depth ${depth || engineState.settings.depth}`);
-  });
+  if (!engineState.ready) await initEngine();
+  return search(fen, { depth });
 }
 
-/**
- * Analyze a position and get evaluation
- */
+/** Analyze a position and return a structured evaluation. */
 export async function analyzePosition(
   fen: string,
   depth?: number,
   multiPv?: number
 ): Promise<PositionAnalysis> {
-  if (!engineState.ready) {
-    await initEngine();
-  }
+  if (!engineState.ready) await initEngine();
 
-  // Temporarily set MultiPV if specified
-  if (multiPv && multiPv !== engineState.settings.multiPv) {
-    sendCommand(`setoption name MultiPV value ${multiPv}`);
-  }
-
-  const result = await getBestMove(fen, depth);
-
-  // Restore MultiPV
-  if (multiPv && multiPv !== engineState.settings.multiPv) {
-    sendCommand(`setoption name MultiPV value ${engineState.settings.multiPv}`);
-  }
+  const result = await search(fen, { depth, multiPv });
 
   const topAnalysis = result.analysis[0] || {
     move: result.bestMove,
     evaluation: 0,
     depth: depth || engineState.settings.depth,
-    pv: [result.bestMove],
+    pv: result.bestMove ? [result.bestMove] : [],
   };
 
   return {
@@ -307,17 +350,13 @@ export async function analyzePosition(
   };
 }
 
-/**
- * Get the computer's move at the current ELO setting
- */
+/** Get the computer's move at the current ELO setting. */
 export async function getComputerMove(fen: string): Promise<string> {
   const result = await getBestMove(fen);
   return result.bestMove;
 }
 
-/**
- * Stop the current analysis
- */
+/** Stop the current analysis. */
 export function stopAnalysis() {
   if (engineState.analyzing) {
     sendCommand('stop');
@@ -325,11 +364,10 @@ export function stopAnalysis() {
   }
 }
 
-/**
- * Set the engine playing strength (ELO)
- */
+/** Set the engine playing strength (ELO). */
 export function setElo(elo: number) {
-  const clampedElo = Math.max(800, Math.min(3000, elo));
+  const safeElo = Number.isFinite(elo) ? elo : DEFAULT_SETTINGS.elo;
+  const clampedElo = Math.max(800, Math.min(3000, Math.round(safeElo)));
   setEngineSettings({ elo: clampedElo });
 }
 
@@ -347,37 +385,29 @@ export function setLimitStrength(enabled: boolean) {
   }
 }
 
-/**
- * Get current engine settings
- */
+/** Get current engine settings. */
 export function getEngineSettings(): StockfishSettings {
   return { ...engineState.settings };
 }
 
-/**
- * Check if the engine is ready
- */
+/** Check if the engine is ready. */
 export function isEngineReady(): boolean {
   return engineState.ready;
 }
 
-/**
- * Check if the engine is currently analyzing
- */
+/** Check if the engine is currently analyzing. */
 export function isAnalyzing(): boolean {
   return engineState.analyzing;
 }
 
-/**
- * Terminate the engine worker
- */
+/** Terminate the engine worker and settle any in-flight search. */
 export function terminateEngine() {
   if (engineState.worker) {
     engineState.worker.terminate();
     engineState.worker = null;
     engineState.ready = false;
     engineState.analyzing = false;
-    pendingResolvers.clear();
-    currentAnalysis = [];
+    initPromise = null;
+    settleActiveSearch({ bestMove: '', analysis: [] });
   }
 }
