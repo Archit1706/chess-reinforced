@@ -1077,29 +1077,39 @@ Now you can read the moves above any board. Welcome to the club.`,
           description: 'Why the center is crucial and how to control it',
           content: `# Control the Center
 
-The center (d4, d5, e4, e5) is the most important area of the board.
+The four squares **d4, d5, e4, e5** are the most important real estate on the board. Whoever owns them dominates the game.
 
-## Why the Center Matters
-- Pieces in the center control more squares
-- Central control enables attack on either flank
-- Knights in the center reach 8 squares vs 2 on edges
+## Why the center?
 
-## Methods of Control
+\`\`\`chess
+mode: interactive
+fen: 4k3/8/8/8/4N3/8/8/4K3 w - - 0 1
+caption: A knight on e4 reaches 8 squares. A knight in the corner reaches 2. The center multiplies your pieces' power.
+\`\`\`
 
-### Direct Control
-Place pawns on e4/d4 or e5/d5.
-- Classical approach: occupy with pawns
-- Provides stable foundation for pieces
+## Classical: occupy it with pawns
 
-### Indirect Control
-Attack the center without occupying it.
-- Hypermodern approach: control from a distance
-- Fianchetto bishops to pressure central squares
+\`\`\`chess
+mode: animate
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+moves: e4 e5 d4 exd4 Nf3
+autoplay: true
+caption: Pawns on d4 + e4 stake a flag in the center; pieces support and reclaim.
+\`\`\`
 
-## Opening Moves
-- 1.e4 and 1.d4 are the most popular
-- Both stake a claim in the center immediately
-- Black should respond by fighting for central control`,
+## Hypermodern: attack it from afar
+
+\`\`\`chess
+mode: animate
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+moves: Nf3 Nf6 g3 g6 Bg2 Bg7
+autoplay: true
+caption: Don't occupy — control. The fianchettoed bishops on g2/g7 rake the center from the wings.
+\`\`\`
+
+## In one sentence
+
+**Fight for the center every move.** Either by putting a pawn there or by attacking it with a piece. Players who control d4/d5/e4/e5 win games.`,
           order: 1,
           difficulty: 2,
           estimatedMinutes: 15,
@@ -1110,24 +1120,38 @@ Attack the center without occupying it.
           description: 'Get your knights and bishops into the game quickly',
           content: `# Develop Your Pieces
 
-Development means bringing your pieces from their starting squares into active positions. In the opening, **time is everything**.
+The opening race has one rule: **get your pieces off the back rank before your opponent does.**
 
-## The Golden Rules
-- **Knights before bishops** — knights have fewer good squares, so commit them first
-- **One move per piece** — don't move the same piece twice in the opening without a reason
-- **Don't bring the queen out early** — it gets chased and you lose tempo
-- **Castle early** to connect your rooks and tuck the king away
+## A textbook opening
 
 \`\`\`chess
 mode: animate
 fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
 moves: e4 e5 Nf3 Nc6 Bc4 Bc5 O-O Nf6
 autoplay: true
-caption: Knights and bishops come out, then White castles — textbook development.
+caption: Knight, knight, bishop, bishop, castle. Eight moves, total development.
 \`\`\`
 
-## Count Your Tempi
-Every move that doesn't develop a piece or fight for the center is a move your opponent can use to get ahead. A lead in development can be turned into an attack before the opponent is ready.`,
+## The four golden rules
+
+1. **Knights before bishops** — knights have fewer good squares; commit them first
+2. **One move per piece** in the opening (unless you have a reason)
+3. **Don't bring the queen out early** — see the next lesson
+4. **Castle by move 10** — usually by move 7
+
+## Spot the bad opening
+
+\`\`\`chess
+mode: animate
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+moves: e4 e5 Bc4 Bc5 Nf3 Nc6 Bxf7+ Kxf7 Ng5+
+autoplay: true
+caption: Watch White waste pieces on tricks instead of developing. Don't be this player.
+\`\`\`
+
+## Tempo is everything
+
+Every move you spend NOT developing is a move your opponent uses to get ahead. **Count your tempi**: how many pieces have I developed vs. my opponent? If you're behind by two, you're losing.`,
           order: 2,
           difficulty: 2,
           estimatedMinutes: 15,
@@ -1136,23 +1160,45 @@ Every move that doesn't develop a piece or fight for the center is a move your o
           slug: 'king-safety',
           title: 'King Safety and Castling',
           description: 'Tuck your king away before launching into the middlegame',
-          content: `# King Safety and Castling
+          content: `# King Safety & Castling
 
-A king caught in the center is a king in danger. Castling is your fastest route to safety.
+A king in the center is a king in danger. **Castle by move 10** — it's the most important rule in the opening.
 
-## Why Castle
-- Moves the king to the side, away from the open central files
-- Brings a rook toward the center where it belongs
-- Usually completed within the first 6–10 moves
+## Why a centralized king dies
 
-## Kingside vs Queenside
-- **Kingside (O-O):** quick and safe, the most common choice
-- **Queenside (O-O-O):** brings the rook to an active file faster, but the king is slightly more exposed on c1/c8
+\`\`\`chess
+mode: animate
+fen: rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1
+moves: f4 exf4 Nf3 g5 Bc4 g4 O-O
+autoplay: true
+caption: White castles just in time. An uncastled king in the center? Disaster waits.
+\`\`\`
 
-## Keep the Shelter Intact
-- Avoid pushing the pawns in front of your castled king without a reason
-- Watch for sacrifices that rip open your pawn shield
-- If the center is closed, you can sometimes delay castling — but never forget about your king`,
+## Try it — castle quickly
+
+\`\`\`chess
+mode: interactive
+fen: rnbqkbnr/pppp1ppp/8/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 2 3
+caption: All set — drag the king two squares to the right (O-O) and tuck it away.
+\`\`\`
+
+## Keep your pawn shield intact
+
+\`\`\`chess
+mode: interactive
+fen: r1bq1rk1/ppp1nppp/2n5/3pp3/3P4/2P1PN2/PP3PPP/RNBQ1RK1 w - - 0 1
+caption: f-, g-, h-pawns in front of the king = shelter. Don't push them without a very good reason.
+\`\`\`
+
+## Kingside vs queenside
+
+| O-O (short) | O-O-O (long) |
+|---|---|
+| Safer, simpler | More aggressive |
+| Most common | Activates a-rook fast |
+| Pick this 90% of the time | Pick this for sharp attacks |
+
+The chess saying: *"Castle if you can, when you can."*`,
           order: 3,
           difficulty: 2,
           estimatedMinutes: 15,
@@ -1163,26 +1209,37 @@ A king caught in the center is a king in danger. Castling is your fastest route 
           description: 'Why an early queen sortie hands your opponent free development',
           content: `# Don't Bring the Queen Out Too Early
 
-It's tempting to unleash your most powerful piece immediately — but in the opening, an early queen is a **liability**.
+The queen is your strongest piece — and your most valuable target. Move it before your other pieces and you'll **lose move after move** running away from it.
 
-## The Problem
-Because the queen is so valuable, it must flee from any minor piece that attacks it. Your opponent develops knights and bishops **with tempo** — gaining time by hitting the queen — while you waste moves running away.
+## Watch the disaster unfold
 
 \`\`\`chess
 mode: animate
 fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
 moves: e4 e5 Qh5 Nc6 Bc4 g6 Qf3 Nf6
 autoplay: true
-caption: White's early queen is chased by ...g6 and Black develops freely while White shuffles.
+caption: White moves the queen TWICE in the first four moves. Black develops with tempo — each move attacks the queen AND develops a piece.
 \`\`\`
 
-## The Principle
-- Develop **knights and bishops first**, then castle
-- Bring the queen out only when it has a safe, active square
-- Count tempi: every move spent saving the queen is a move your opponent spends developing
+## The math of tempo
 
-## The Exception
-A few openings deploy the queen early for a concrete reason (like the Scandinavian's ...Qxd5). Even then, the queen must have a plan to reach safety without losing time.`,
+By move 4, White has moved one piece three times. Black has developed three different pieces. **White is three tempi behind.** Black plays the opening for free.
+
+## The right way
+
+\`\`\`chess
+mode: animate
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+moves: e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d4 exd4 cxd4 Bb4+
+autoplay: true
+caption: White develops everything first. The queen stays home until there's a safe, active square for it.
+\`\`\`
+
+## The principle, simply
+
+**Knights → Bishops → Castle → Queen.** Wait your turn, queen.
+
+(There are exceptions — the Scandinavian's ...Qxd5 is famous — but as a beginner, follow the rule.)`,
           order: 4,
           difficulty: 2,
           estimatedMinutes: 12,
@@ -1193,22 +1250,44 @@ A few openings deploy the queen early for a concrete reason (like the Scandinavi
           description: 'Recognize the quick tricks that catch unprepared players',
           content: `# Common Opening Traps
 
-A trap is a move that sets a hidden threat, hoping the opponent walks into it. Knowing the famous ones means you'll **spring them — and never fall for them**.
+A trap is a move that **looks** like a mistake — but if the opponent grabs the bait, they lose. Learn the famous ones so you can spring them (and never fall in).
 
-## The Légal Trap
-A queen sacrifice that leads to a smothered-style mate when Black pins the f3-knight with ...Bg4 and then grabs material too greedily.
+## The Fried Liver — punishing a greedy knight
 
-## The Fried Liver Attack
-After 1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 d5 5.exd5 Nxd5?!, White plays **6.Nxf7!?**, dragging the king out for a fierce attack.
+\`\`\`chess
+mode: animate
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+moves: e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nxd5 Nxf7
+autoplay: true
+caption: 6.Nxf7!? — the Fried Liver. White sacrifices a knight to drag the king out for a brutal attack.
+\`\`\`
 
-## The Englund Gambit Trap
-A swindle for Black after 1.d4 e5 that punishes a greedy White who grabs too many pawns and gets mated on the back rank.
+## The Englund Gambit Trap — Black mates White
 
-## How to Avoid Traps
-1. **Develop soundly** — most traps punish greed or neglected development
-2. Before grabbing a free pawn or piece, ask **"why is this offered?"**
-3. Watch your **f2/f7** square and your back rank
-4. When something looks too good to be true in the opening, look twice`,
+\`\`\`chess
+mode: animate
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+moves: d4 e5 dxe5 Nc6 Nf3 Qe7 Bf4 Qb4+ Bd2 Qxb2 Bc3 Bb4
+autoplay: true
+caption: Englund Gambit Trap — White grabs every offered pawn and walks into ...Bxc3+ and material loss.
+\`\`\`
+
+## How to NEVER fall into a trap
+
+1. **Develop soundly** — most traps punish neglected development or greed
+2. Before grabbing a free pawn, ask: *"Why is this being offered?"*
+3. Watch your **f2 / f7** square and your back rank
+4. If something looks too good to be true in the opening, **look twice**
+
+## Try it yourself
+
+\`\`\`chess
+mode: interactive
+fen: rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1
+caption: Greed kills. With normal moves you build a fine position; with traps, you bet the whole game on a single move.
+\`\`\`
+
+Solid development beats every trap. Always.`,
           order: 5,
           difficulty: 3,
           estimatedMinutes: 15,
@@ -1229,25 +1308,40 @@ A swindle for Black after 1.d4 e5 that punishes a greedy White who grabs too man
           description: 'Win or draw with just a pawn advantage',
           content: `# King and Pawn vs King
 
-The most fundamental endgame - every player must master it.
+The most important endgame in chess. Get it wrong and **a winning pawn** turns into a draw.
 
-## Key Concepts
+## See the win
 
-### The Rule of the Square
-If the defending king can step into the "square" of the pawn, it can catch it.
-- Draw the square from pawn to promotion square
-- If king is inside or can enter, it catches the pawn
+\`\`\`chess
+mode: animate
+fen: 4k3/8/8/8/8/8/4P3/4K3 w - - 0 1
+moves: e4 Kd7 Ke2 Ke6 Ke3 Ke5
+autoplay: true
+caption: Walk the king forward to support its pawn. Then push together — the king clears the path.
+\`\`\`
 
-### Opposition
-When kings face each other with one square between.
-- The player NOT to move has the opposition
-- Critical for pushing the pawn to promotion
+## The Rule of the Square — does the king catch the pawn?
 
-### Key Squares
-For each pawn, there are "key squares" the attacking king must reach.
-- If king reaches key squares, the pawn promotes
-- Central pawns: 3 key squares two ranks ahead
-- Rook pawns: often draw because king gets trapped`,
+\`\`\`chess
+mode: interactive
+fen: 8/8/8/8/k7/8/4P3/4K3 w - - 0 1
+caption: Imagine a square from the e2-pawn to e8 and back to a8. If the black king can step INTO this square, it catches the pawn. Here? It's too far.
+\`\`\`
+
+## Opposition — the silent king duel
+
+\`\`\`chess
+mode: interactive
+fen: 4k3/8/4K3/8/4P3/8/8/8 b - - 0 1
+caption: Kings facing off with one square between = opposition. Black is to move and must give way. White will promote.
+\`\`\`
+
+## The two rules to memorize
+
+1. **King in front of the pawn** beats king behind it
+2. **The player NOT to move** has the opposition
+
+Master these and you'll win every K+P vs K endgame from a winning position.`,
           order: 1,
           difficulty: 3,
           estimatedMinutes: 20,
@@ -1258,19 +1352,46 @@ For each pawn, there are "key squares" the attacking king must reach.
           description: 'The most common endgame — learn the key drawing and winning ideas',
           content: `# Rook Endgames
 
-Rook endgames are the most common of all endgames. "All rook endings are drawn" is an exaggeration — but they are famously resilient.
+The **most common** endgame in chess. Knowing the basics will save you half-points every week.
 
-## The Lucena Position (Winning)
-The fundamental **winning** technique when you have a rook and pawn vs rook and your king is in front of the pawn. The method is called **building a bridge**: use your rook to shield the king from checks so the pawn can promote.
+## Rooks belong behind passed pawns
 
-## The Philidor Position (Drawing)
-The fundamental **drawing** technique for the defender. Keep your rook on the third rank (from your side) to stop the enemy king from advancing; once the pawn is pushed, swing your rook behind to check from the rear.
+\`\`\`chess
+mode: interactive
+fen: 8/8/3k4/3P4/8/8/r7/3RK3 w - - 0 1
+caption: The famous Tarrasch rule: rooks BEHIND passed pawns (yours or theirs). Here Black's rook is correctly behind White's pawn.
+\`\`\`
 
-## Practical Rules of Thumb
-- **Rooks belong behind passed pawns** — yours and your opponent's
-- **Keep the rook active** — a passive rook tied to defense usually loses
-- **Cut off the enemy king** along a file or rank to limit its help
-- An **active rook** is often worth more than a pawn`,
+## An active rook is worth a pawn
+
+\`\`\`chess
+mode: interactive
+fen: 6k1/p4p1p/6p1/8/8/2R5/PP4PP/6K1 w - - 0 1
+caption: White's rook is FREE — attacking pawns and roaming. A rook tied to passive defense usually loses.
+\`\`\`
+
+## Cut off the enemy king
+
+\`\`\`chess
+mode: animate
+fen: 4k3/8/8/8/8/8/4P3/R3K3 w - - 0 1
+moves: Ra5
+caption: Ra5 puts the rook on the 5th rank, cutting off the enemy king from advancing. Now your pawn is safe to march.
+\`\`\`
+
+## The two positions to know
+
+1. **Lucena** — fundamental WIN with rook + pawn vs rook (see Advanced Endgames)
+2. **Philidor** — fundamental DRAW with just a rook (see Advanced Endgames)
+
+## Rules of thumb
+
+- Rooks behind passed pawns
+- Keep your rook **active**
+- Cut off the enemy king
+- An open rook on the 7th rank is worth fighting for
+
+Rook endings are the bread and butter of practical chess. Spend an hour on them and you'll climb 100 rating points.`,
           order: 2,
           difficulty: 4,
           estimatedMinutes: 25,
@@ -1281,27 +1402,41 @@ The fundamental **drawing** technique for the defender. Keep your rook on the th
           description: 'The king battle that decides countless pawn endgames',
           content: `# The Opposition
 
-In king-and-pawn endgames, the kings fight a silent duel. The key weapon is **the opposition**.
+The most important silent battle in chess: two kings facing off, **forcing each other to give way**.
 
-## What It Is
-The kings stand on the same file (or rank) with **one square between them**. Whoever does **not** have to move "has the opposition" — the other king must give way.
+## What it looks like
 
 \`\`\`chess
 mode: interactive
-fen: 4k3/8/4K3/8/8/8/8/8 w - - 0 1
-caption: The kings face off with one square between them. Whoever must move has to step aside.
+fen: 4k3/8/4K3/8/8/8/8/8 b - - 0 1
+caption: Direct opposition: kings on same file, one square apart. Black is to move and MUST step aside — White wins the duel.
 \`\`\`
 
-## Why It Matters
-The side with the opposition can force the enemy king backward, clearing a path for a pawn to advance toward promotion. Losing the opposition often means losing the game — or only drawing a winning position.
+The rule: **whoever does NOT have to move has the opposition.**
 
-## Types of Opposition
-- **Direct opposition:** kings one square apart on the same line
-- **Distant opposition:** an odd number of squares apart on the same line — the same battle, fought from afar
-- **Diagonal opposition:** the kings oppose along a diagonal
+## Distant opposition
 
-## The Practical Rule
-To win with a pawn, get your **king in front of the pawn** with the opposition. Then you can shoulder the enemy king aside and escort the pawn home.`,
+\`\`\`chess
+mode: interactive
+fen: 4k3/8/8/8/8/8/8/4K3 b - - 0 1
+caption: Kings on same file, an ODD number of squares apart (here 7). Same battle, fought from afar.
+\`\`\`
+
+## Why it decides games
+
+In king-and-pawn endgames, the side with the opposition can **push the enemy king backward** — clearing a path for the pawn to promote. Lose the opposition and a winning position turns into a draw.
+
+## The practical recipe
+
+\`\`\`chess
+mode: animate
+fen: 8/3k4/8/3K4/3P4/8/8/8 b - - 0 1
+moves: Kd8 Kc6 Kc8 d5
+autoplay: true
+caption: White has the opposition. Black must give way. White's king escorts the d-pawn forward.
+\`\`\`
+
+Opposition is the chess version of a staring contest — and yes, you can win or lose entire games on it.`,
           order: 3,
           difficulty: 3,
           estimatedMinutes: 18,
@@ -1312,28 +1447,47 @@ To win with a pawn, get your **king in front of the pawn** with the opposition. 
           description: 'The runaway pawns that decide endgames',
           content: `# Passed Pawns
 
-A **passed pawn** is one with no enemy pawns in front of it on its own file or the adjacent files — nothing can stop it from advancing except enemy pieces.
+A pawn with **no enemy pawns blocking it** on its file or the two files next to it. Nothing can stop it from promoting except enemy pieces.
+
+## Watch it crown
 
 \`\`\`chess
 mode: animate
 fen: 8/2P5/8/8/8/8/k7/2K5 w - - 0 1
 moves: c8=Q
 autoplay: true
-caption: Nothing can catch the c-pawn — it marches in and promotes to a queen.
+caption: One step. One new queen. Passed pawns are unstoppable.
 \`\`\`
 
-## Why They're Powerful
-- They tie down enemy pieces, which must babysit the promotion square
-- In the endgame, a passed pawn is often worth more than its single-pawn value
-- A **protected passed pawn** (defended by another pawn) is especially strong
+## "Passed pawns must be pushed!"
 
-## Famous Advice
-- *"Passed pawns must be pushed!"* — advance them to cramp the enemy
-- *"Rooks belong behind passed pawns"* — both yours and your opponent's
-- An **outside passed pawn** (far from the kings) is a winning trump: it lures the enemy king away while yours feasts elsewhere
+\`\`\`chess
+mode: interactive
+fen: 8/4P3/8/8/8/8/k7/4K3 w - - 0 1
+caption: Your move — push the pawn. Don't wait, don't defend, don't dawdle. Push.
+\`\`\`
 
-## The Rule of the Square
-To know if a lone king can catch a passed pawn, picture the square from the pawn to its promotion square. If the king can step inside that square, it stops the pawn; if not, the pawn queens.`,
+## A protected passed pawn is a fortress
+
+\`\`\`chess
+mode: interactive
+fen: 8/8/3P4/4P3/8/8/k7/4K3 w - - 0 1
+caption: The d6-pawn is passed AND protected by the e5-pawn. Almost unstoppable.
+\`\`\`
+
+## The outside passer
+
+A passed pawn on the **a or h file** is a winning weapon: it lures the enemy king to the wrong corner while yours feasts on the other side.
+
+## The Rule of the Square — can the king catch it?
+
+\`\`\`chess
+mode: interactive
+fen: 8/4P3/8/8/k7/8/8/4K3 w - - 0 1
+caption: Picture a square from the e7-pawn to e8 to b8 and back. If Black's king can step INSIDE that square, it catches the pawn. Here? Too slow.
+\`\`\`
+
+A passed pawn is hope incarnate. **Push it.**`,
           order: 4,
           difficulty: 3,
           estimatedMinutes: 18,
@@ -1344,25 +1498,36 @@ To know if a lone king can catch a passed pawn, picture the square from the pawn
           description: 'Force mate in the corner with the bishop pair and your king',
           content: `# Two-Bishop Checkmate
 
-King and **two bishops** versus a lone king is a forced win. The bishops sweep parallel diagonals to herd the king into a corner.
+K + 2 bishops vs lone king is a **forced win**. The bishops sweep parallel diagonals and the king herds the prey into a corner.
 
-## The Technique
-1. Use the bishops to build a **barrier** of diagonals the king cannot cross
-2. Bring your king up to take away escape squares
-3. Drive the enemy king to **any corner** (unlike the bishop-and-knight mate, any corner works)
-4. Deliver mate with one bishop checking and the other (plus your king) sealing the escape
+## See the kill
 
 \`\`\`chess
 mode: animate
 fen: 7k/8/6K1/3B4/8/8/8/2B5 w - - 0 1
 moves: Bb2#
-caption: Bb2 checks along the long diagonal; the d5-bishop covers g8 and the king seals the rest — mate.
+caption: Two bishops on parallel diagonals + your king nearby = mate. Bb2 finishes the job.
 \`\`\`
 
-## Key Tips
-- Keep the bishops **side by side** on adjacent diagonals to form a moving wall
-- The king does the herding; the bishops do the cutting
-- Watch for stalemate as the enemy king nears the corner — leave it a square until the mating move`,
+## Three things to remember
+
+1. **Any corner works** (unlike B+N mate where only specific corners do)
+2. **Bishops side-by-side** form a moving wall the king can't cross
+3. **Your king herds**, the bishops cut
+
+## Try the squeeze
+
+\`\`\`chess
+mode: interactive
+fen: 6k1/8/6K1/8/3B4/8/3B4/8 w - - 0 1
+caption: The black king is one square from the corner. Move a bishop to push it toward h8 where you can mate.
+\`\`\`
+
+## Avoid stalemate
+
+As the king nears the corner, **leave it one square** until you're ready to deliver mate. Pushing one move too soon turns a win into a draw.
+
+This mate is rare in practice, but knowing it teaches you how to coordinate pieces — a skill that pays off in every endgame.`,
           order: 5,
           difficulty: 4,
           estimatedMinutes: 20,
