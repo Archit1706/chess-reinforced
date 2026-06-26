@@ -52,25 +52,25 @@ export async function getCurrentUserDTO(): Promise<User | null> {
   return row ? mapUserToDTO(row) : null;
 }
 
-/** Columns a client is allowed to write via the progress endpoint. */
-const WRITABLE_STAT_FIELDS = [
-  'estimatedElo',
-  'gamesPlayed',
-  'gamesWon',
-  'gamesLost',
-  'gamesDraw',
-  'puzzlesSolved',
-  'puzzlesFailed',
-  'puzzleStreak',
-  'bestPuzzleStreak',
-  'currentStreak',
-  'longestStreak',
-] as const;
+/** Columns a client is allowed to write via the progress endpoint, with bounds. */
+const WRITABLE_STAT_FIELDS: { name: keyof UserStats; min: number; max: number }[] = [
+  { name: 'estimatedElo', min: 100, max: 3500 },
+  { name: 'gamesPlayed', min: 0, max: 1_000_000 },
+  { name: 'gamesWon', min: 0, max: 1_000_000 },
+  { name: 'gamesLost', min: 0, max: 1_000_000 },
+  { name: 'gamesDraw', min: 0, max: 1_000_000 },
+  { name: 'puzzlesSolved', min: 0, max: 1_000_000 },
+  { name: 'puzzlesFailed', min: 0, max: 1_000_000 },
+  { name: 'puzzleStreak', min: 0, max: 100_000 },
+  { name: 'bestPuzzleStreak', min: 0, max: 100_000 },
+  { name: 'currentStreak', min: 0, max: 100_000 },
+  { name: 'longestStreak', min: 0, max: 100_000 },
+];
 
 /**
  * Persist the signed-in user's stats. Accepts a partial stats object; only the
- * whitelisted, integer-valued fields are written. Returns the updated DTO, or
- * null when there is no authenticated user.
+ * whitelisted, integer-valued fields are written, each clamped to a sane range.
+ * Returns the updated DTO, or null when there is no authenticated user.
  */
 export async function saveCurrentUserStats(
   partial: Partial<UserStats>
@@ -79,10 +79,10 @@ export async function saveCurrentUserStats(
   if (!current) return null;
 
   const data: Record<string, number | Date> = {};
-  for (const field of WRITABLE_STAT_FIELDS) {
-    const value = partial[field];
+  for (const { name, min, max } of WRITABLE_STAT_FIELDS) {
+    const value = partial[name];
     if (typeof value === 'number' && Number.isFinite(value)) {
-      data[field] = Math.round(value);
+      data[name] = Math.max(min, Math.min(max, Math.round(value)));
     }
   }
   // Always advance activity time on a save.

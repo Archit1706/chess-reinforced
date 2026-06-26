@@ -32,6 +32,11 @@ export function getClerkUserId(): string | null {
 /**
  * Fetch (or lazily provision) the Prisma `User` row for the signed-in Clerk
  * user. Returns null when there is no authenticated user.
+ *
+ * Concurrency-safe: two parallel first requests (e.g. dev HMR or quick refresh
+ * after sign-in) used to race the find/create pair and 500 on the duplicate
+ * `clerkId`. We now re-query on the unique-constraint error so the second
+ * caller simply picks up the row the first caller just created.
  */
 export async function getOrCreateCurrentUser(): Promise<User | null> {
   const clerkId = getClerkUserId();
@@ -50,19 +55,30 @@ export async function getOrCreateCurrentUser(): Promise<User | null> {
     [cu?.firstName, cu?.lastName].filter(Boolean).join(' ') || baseUsername;
   const imageUrl = cu?.imageUrl ?? null;
 
-  // `username` is unique; retry once with a suffix on collision.
+  // `username` and `clerkId` are both unique. On collision, fall back: if a
+  // concurrent request already created the row, find and return it; otherwise
+  // retry with a username suffix.
   try {
     return await prisma.user.create({
       data: { clerkId, username: baseUsername, displayName, imageUrl },
     });
-  } catch {
-    return await prisma.user.create({
-      data: {
-        clerkId,
-        username: `${baseUsername}_${clerkId.slice(-6)}`,
-        displayName,
-        imageUrl,
-      },
-    });
+  } catch (firstError) {
+    const raced = await prisma.user.findUnique({ where: { clerkId } });
+    if (raced) return raced;
+    try {
+      return await prisma.user.create({
+        data: {
+          clerkId,
+          username: `${baseUsername}_${clerkId.slice(-6)}`,
+          displayName,
+          imageUrl,
+        },
+      });
+    } catch (secondError) {
+      // Final guard: another concurrent caller may have won between attempts.
+      const finalRaced = await prisma.user.findUnique({ where: { clerkId } });
+      if (finalRaced) return finalRaced;
+      throw secondError;
+    }
   }
 }

@@ -88,6 +88,9 @@ export async function importFromStream(
   const result: ImportResult = { parsed: 0, skipped: 0, inserted: 0 };
 
   if (opts.reset) {
+    // Order matters: drop child rows referencing Puzzle first, otherwise the
+    // final delete fails (no ON DELETE CASCADE declared in the schema).
+    await prisma.puzzleReview.deleteMany({});
     await prisma.puzzleAttempt.deleteMany({});
     await prisma.puzzle.deleteMany({});
     if (log) console.error('Cleared existing puzzles.');

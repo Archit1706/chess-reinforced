@@ -179,6 +179,7 @@ model PuzzleAttempt {
 
   @@index([userId, puzzleId])
   @@index([createdAt])
+  @@index([userId, createdAt])
 }
 
 // Track lesson completion
@@ -202,6 +203,7 @@ model LessonProgress {
 
   @@unique([userId, lessonId])
   @@index([userId])
+  @@index([userId, completedAt])
 }
 
 // Game history for played games
