@@ -34,7 +34,9 @@ import {
   BarChart3,
   Play,
   Pause,
+  Lightbulb,
 } from 'lucide-react';
+import type { Square } from 'chess.js';
 import { cn } from '@/lib/utils';
 import { getComputerMove, setElo, initEngine, isEngineReady, analyzePosition } from '@/lib/stockfish';
 import { getLocalBestMove } from '@/lib/local-engine';
@@ -89,8 +91,13 @@ export default function PlayPage() {
   const [showReview, setShowReview] = useState(false);
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<string | null>(null);
+  // Hint arrow (best move for the player), shown on demand during a game.
+  const [hintArrow, setHintArrow] = useState<[Square, Square] | null>(null);
+  const [hintLoading, setHintLoading] = useState(false);
   // Guard so a finished game is persisted to history exactly once.
   const savedGameRef = useRef(false);
+
+  const playerToMove = mode === 'vsComputer' && !isGameOver && turn === playerColor;
 
   // Initialize engine and session. Default to playing the computer so the
   // opponent responds immediately (instead of landing in free/both-sides mode).
@@ -212,6 +219,41 @@ export default function PlayPage() {
     }
   };
 
+  // Clear any shown hint whenever the position changes (a move was made).
+  useEffect(() => {
+    setHintArrow(null);
+  }, [fen]);
+
+  // Suggest the player's best move as an arrow. Prefers full-strength Stockfish
+  // (the playing engine is ELO-limited), falling back to the local engine.
+  const getHint = async () => {
+    if (!playerToMove || isThinking || hintLoading) return;
+    setHintLoading(true);
+    try {
+      let uci: string | null = null;
+      if (isEngineReady()) {
+        uci = await Promise.race<string | null>([
+          analyzePosition(fen, 15, 1).then((r) => r.bestMove),
+          new Promise<null>((resolve) => setTimeout(() => resolve(null), 2500)),
+        ]);
+      }
+      if (!uci) uci = getLocalBestMove(fen, 2200);
+      if (uci) {
+        const { from, to } = parseUciMove(uci);
+        setHintArrow([from as Square, to as Square]);
+      }
+    } catch (error) {
+      console.error('Hint failed:', error);
+      const fallback = getLocalBestMove(fen, 2200);
+      if (fallback) {
+        const { from, to } = parseUciMove(fallback);
+        setHintArrow([from as Square, to as Square]);
+      }
+    } finally {
+      setHintLoading(false);
+    }
+  };
+
   const analyzeCurrentPosition = async () => {
     try {
       const analysis = await analyzePosition(fen, 15, 1);
@@ -293,7 +335,10 @@ export default function PlayPage() {
               />
             )}
             <div className="relative flex-1 min-w-0">
-              <ChessBoard boardWidth={560} />
+              <ChessBoard
+                boardWidth={560}
+                customArrows={hintArrow ? [[hintArrow[0], hintArrow[1], 'rgb(34, 197, 94)']] : undefined}
+              />
 
               {/* Thinking indicator */}
               {isThinking && (
@@ -335,6 +380,18 @@ export default function PlayPage() {
             <GameControls showExportImport onExport={handleExportPgn} />
 
             <div className="flex items-center gap-3">
+              {/* Hint — suggest the best move for the player */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={getHint}
+                disabled={!playerToMove || isThinking || hintLoading}
+                title={playerToMove ? 'Show the best move' : "Wait for your turn"}
+              >
+                <Lightbulb className="h-4 w-4 mr-2" />
+                {hintLoading ? 'Thinking…' : 'Hint'}
+              </Button>
+
               {/* Game Review */}
               <Button
                 variant="outline"

@@ -39,6 +39,9 @@ const PRACTICE_BAND = 250;
 // Puzzle Rush duration (seconds) and its persistence key/mode.
 const RUSH_DURATION = 300;
 const RUSH_MODE = '5min' as const;
+// Persist daily-puzzle completion per UTC day so it can't be re-counted on reload.
+const DAILY_DONE_KEY = 'chess-daily-completed';
+const utcDayKey = () => new Date().toISOString().slice(0, 10);
 
 export default function PuzzlesPage() {
   const { user, recordPuzzleSolved, recordPuzzleRushScore, startSession } = useUserStore();
@@ -113,6 +116,12 @@ export default function PuzzlesPage() {
   // Initial load: session, daily puzzle, theme list, first practice puzzle, reviews.
   useEffect(() => {
     startSession();
+    // Restore "daily done" if today's puzzle was already solved (persists across reloads).
+    try {
+      if (localStorage.getItem(DAILY_DONE_KEY) === utcDayKey()) setDailyCompleted(true);
+    } catch {
+      /* ignore storage errors */
+    }
     fetchDailyPuzzle().then(setDailyPuzzle);
     fetchThemes().then(setThemes);
     loadPractice(null);
@@ -163,9 +172,16 @@ export default function PuzzlesPage() {
 
   // === Daily ===
   const handleDailySolved = useCallback(() => {
+    // Count the daily only once per UTC day — guard against re-farming via reload/retry.
+    if (dailyCompleted) return;
     logAttempt(dailyPuzzle, true);
     setDailyCompleted(true);
-  }, [dailyPuzzle, logAttempt]);
+    try {
+      localStorage.setItem(DAILY_DONE_KEY, utcDayKey());
+    } catch {
+      /* ignore storage errors */
+    }
+  }, [dailyPuzzle, logAttempt, dailyCompleted]);
 
   const handleDailyFailed = useCallback(() => {
     logAttempt(dailyPuzzle, false);

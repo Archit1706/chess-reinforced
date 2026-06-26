@@ -31,6 +31,12 @@ interface PuzzleBoardProps {
 
 type PuzzleState = 'playing' | 'correct' | 'incorrect' | 'solved';
 
+// How long the winning move stays on the board (green flash) before the
+// "Solved!" panel appears — so the move is visible, not snapped away instantly.
+const SOLVE_REVEAL_MS = 700;
+// How long the opponent's in-between reply waits, so the user can follow it.
+const OPPONENT_REPLY_MS = 450;
+
 /**
  * Interactive puzzle board component
  * Validates user moves against the solution and provides feedback
@@ -95,8 +101,13 @@ export function PuzzleBoard({
 
           // Check if puzzle is complete
           if (moveIndex >= moves.length - 1) {
-            setPuzzleState('solved');
-            onSolved?.();
+            // Flash the winning move green first, THEN reveal the solved panel,
+            // so the user sees their move land instead of the board vanishing.
+            setPuzzleState('correct');
+            setTimeout(() => {
+              setPuzzleState('solved');
+              onSolved?.();
+            }, SOLVE_REVEAL_MS);
           } else {
             // Show correct feedback briefly
             setPuzzleState('correct');
@@ -117,13 +128,16 @@ export function PuzzleBoard({
 
                 // Check if that was the last move
                 if (moveIndex + 2 >= moves.length) {
-                  setPuzzleState('solved');
-                  onSolved?.();
+                  setPuzzleState('correct');
+                  setTimeout(() => {
+                    setPuzzleState('solved');
+                    onSolved?.();
+                  }, SOLVE_REVEAL_MS);
                 } else {
                   setPuzzleState('playing');
                 }
               }
-            }, 500);
+            }, OPPONENT_REPLY_MS);
           }
 
           return true;
@@ -224,6 +238,14 @@ export function PuzzleBoard({
         </Badge>
       </div>
 
+      {/* Explicit instruction so the goal is always clear */}
+      {puzzleState === 'playing' && (
+        <p className="text-sm text-muted-foreground -mt-2">
+          Find the best move for {playerColor === 'w' ? 'White' : 'Black'}
+          {moves.length > 2 ? ' — there’s more than one move to find.' : '.'}
+        </p>
+      )}
+
       {/* Chess board with feedback overlay */}
       <div className="relative">
         <ChessBoard
@@ -246,18 +268,20 @@ export function PuzzleBoard({
           <div
             className={cn(
               'absolute inset-0 flex items-center justify-center pointer-events-none',
-              'animate-in fade-in duration-200'
+              'animate-in fade-in zoom-in-95 duration-200'
             )}
             style={getFeedbackStyles()}
           >
             {puzzleState === 'correct' && (
-              <div className="bg-green-500 text-white p-4 rounded-full">
-                <Check className="h-8 w-8" />
+              <div className="flex items-center gap-2 bg-green-500 text-white px-5 py-3 rounded-full shadow-lg">
+                <Check className="h-7 w-7" />
+                <span className="text-lg font-bold">Correct!</span>
               </div>
             )}
             {puzzleState === 'incorrect' && (
-              <div className="bg-red-500 text-white p-4 rounded-full">
-                <X className="h-8 w-8" />
+              <div className="flex items-center gap-2 bg-red-500 text-white px-5 py-3 rounded-full shadow-lg">
+                <X className="h-7 w-7" />
+                <span className="text-lg font-bold">Try again</span>
               </div>
             )}
           </div>
