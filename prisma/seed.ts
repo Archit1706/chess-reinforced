@@ -27,30 +27,42 @@ async function main() {
           description: 'Learn pawn movement, capturing, en passant, and promotion',
           content: `# The Pawn
 
-The pawn is the most numerous piece on the board, with each player starting with 8 pawns.
+Pawns are little, but they decide most games. Each side starts with eight of them.
 
-## Basic Movement
-- Pawns move **forward only** (toward the opponent's side)
-- They move **one square** at a time
-- On their first move, pawns can optionally move **two squares**
+## Push it
 
-## Capturing
-- Pawns capture **diagonally**, one square forward
-- They cannot capture pieces directly in front of them
+\`\`\`chess
+mode: interactive
+fen: 4k3/8/8/8/8/8/4P3/4K3 w - - 0 1
+caption: Your move — push the e-pawn one square (or two, from its starting rank).
+\`\`\`
+
+A pawn moves **only forward**, one square at a time. From its starting row it can choose **one square or two** — but never after that.
+
+## Capture diagonally
 
 \`\`\`chess
 mode: interactive
 fen: 4k3/8/8/3p4/4P3/8/8/4K3 w - - 0 1
-caption: Your move — capture diagonally with exd5.
+caption: Your move — capture the d5-pawn with exd5.
 \`\`\`
 
-## Special Rules
+Pawns *move* straight but *capture* on the diagonal. The piece directly in front of a pawn is safe from it.
 
-### En Passant
-When an opponent's pawn moves two squares and lands beside your pawn, you can capture it "in passing" as if it had only moved one square.
+## Reach the end → promote
 
-### Promotion
-When a pawn reaches the opposite end of the board, it must be promoted to a queen, rook, bishop, or knight.`,
+\`\`\`chess
+mode: animate
+fen: 4k3/P7/8/8/8/8/8/4K3 w - - 0 1
+moves: a8=Q
+caption: A pawn that reaches the last rank turns into a queen (or rook, bishop, knight).
+\`\`\`
+
+## En passant
+
+If an opponent's pawn jumps two squares and lands beside yours, you may capture it **in passing** — on the next move only — as if it had moved one square.
+
+That's the whole pawn. Small steps, diagonal bite, and a queen waiting at the finish line.`,
           order: 1,
           difficulty: 1,
           estimatedMinutes: 10,
@@ -61,21 +73,39 @@ When a pawn reaches the opposite end of the board, it must be promoted to a quee
           description: 'Master the unique L-shaped movement of the knight',
           content: `# The Knight
 
-The knight has the most unique movement pattern in chess.
+The trickster of the board: it jumps, it twists, and beginners *always* forget where it can go.
 
-## Movement Pattern
-- Moves in an **L-shape**: 2 squares in one direction, then 1 square perpendicular
-- Can also be thought of as 1 square then 2 squares perpendicular
-- **Jumps over pieces** - the only piece that can do this!
+## Try the L-shape
 
-## Key Characteristics
-- Always lands on the opposite color square
-- Cannot be blocked by other pieces
-- Excellent for forks (attacking two pieces at once)
+\`\`\`chess
+mode: interactive
+fen: 4k3/8/8/3N4/8/8/8/4K3 w - - 0 1
+caption: Drag the knight. Two squares one way, one perpendicular — eight possible landings.
+\`\`\`
 
-## Tips
-- Knights are strongest in the center of the board
-- A knight on the rim is dim (less effective on edges)`,
+## It jumps over pieces
+
+\`\`\`chess
+mode: interactive
+fen: 4k3/8/8/8/2pPp3/2PNP3/2PPP3/4K3 w - - 0 1
+caption: Hemmed in by pawns? Doesn't matter — the knight is the only piece that hops.
+\`\`\`
+
+## Center vs corner
+
+A knight on **d4 or e5** reaches eight squares. A knight on **a1** reaches just two. *"A knight on the rim is dim"* — keep them in the middle.
+
+## See the fork
+
+\`\`\`chess
+mode: animate
+fen: 4q1k1/8/8/8/4N3/8/8/6K1 w - - 0 1
+moves: Nf6+ Kh8 Nxe8
+autoplay: true
+caption: Nf6+ checks the king AND attacks the queen — a knight fork.
+\`\`\`
+
+Knights are the slow, sneaky cousins of long-range pieces. Their gift is the **fork**: two attacks at once, with nothing able to block.`,
           order: 2,
           difficulty: 1,
           estimatedMinutes: 10,
@@ -86,20 +116,39 @@ The knight has the most unique movement pattern in chess.
           description: 'Understand diagonal movement and bishop pairs',
           content: `# The Bishop
 
-Bishops are long-range pieces that control diagonals.
+Long-range diagonal snipers. Quiet on a blocked board, devastating in the open.
 
-## Movement
-- Moves **diagonally** any number of squares
-- Cannot jump over pieces
-- Each bishop stays on its starting color throughout the game
+## Slide it
 
-## The Bishop Pair
-- Having both bishops (light and dark squared) is an advantage
-- Together they can control all squares on the board
+\`\`\`chess
+mode: interactive
+fen: 4k3/8/8/3B4/8/8/8/4K3 w - - 0 1
+caption: Drag the bishop — any distance, but only on diagonals.
+\`\`\`
 
-## Strategy
-- Bishops thrive in open positions with clear diagonals
-- Fianchetto: Developing bishop to b2/g2 or b7/g7 for long-range influence`,
+A bishop **stays on its color forever**. The d5-bishop above is a light-squared bishop, and it will only ever stand on a light square.
+
+## Pairs are powerful
+
+A light-squared bishop covers half the board, a dark-squared bishop covers the other half. Together, **the bishop pair** can attack every square — a long-term edge worth caring about.
+
+## Open lines = bishop heaven
+
+\`\`\`chess
+mode: interactive
+fen: 4k3/p6p/1p4p1/8/3B4/8/P1P3PP/4K3 w - - 0 1
+caption: Try the bishop here — clear diagonals turn it into a monster.
+\`\`\`
+
+## Watch out for blockers
+
+\`\`\`chess
+mode: interactive
+fen: 4k3/8/8/3p4/4P3/8/8/B3K3 w - - 0 1
+caption: The a1-bishop's diagonal is blocked by White's own e4-pawn. Bishops can't jump.
+\`\`\`
+
+When you trade a bishop, ask: *will my remaining bishop have open diagonals, or will my pawns block it?* Good bishops win games; bad bishops watch from the sidelines.`,
           order: 3,
           difficulty: 1,
           estimatedMinutes: 8,
@@ -110,20 +159,38 @@ Bishops are long-range pieces that control diagonals.
           description: 'Master straight-line movement and the power of connected rooks',
           content: `# The Rook
 
-Rooks are powerful long-range pieces worth about five pawns.
+Heavy artillery on rails — worth about five pawns and ferocious on open lines.
 
-## Movement
-- Moves in **straight lines** — horizontally and vertically
-- Any number of squares, but **cannot jump** over pieces
-- Captures by landing on an enemy piece
+## Straight lines, any distance
 
-## Where Rooks Belong
-- **Open files** (columns with no pawns) are a rook's highway
-- A rook on the **7th rank** attacks the enemy's pawns and traps the king
-- **Connected rooks** (defending each other on a rank) are very strong
+\`\`\`chess
+mode: interactive
+fen: 4k3/8/8/3R4/8/8/8/4K3 w - - 0 1
+caption: Drag the rook — up, down, left, right, as far as it can see.
+\`\`\`
 
-## Castling
-The rook takes part in castling — the only move where two pieces move at once. The king slides two squares toward a rook, and the rook jumps to the king's other side, tucking the king to safety.`,
+## Open files are highways
+
+\`\`\`chess
+mode: interactive
+fen: 3rk3/pp3ppp/8/8/8/8/PP3PPP/3R1K2 w - - 0 1
+caption: The d-file is wide open — whoever owns it controls the position.
+\`\`\`
+
+## Find the 7th-rank rook
+
+\`\`\`chess
+mode: animate
+fen: 4k3/pp3ppp/8/8/8/8/PP3PPP/3RK3 w - - 0 1
+moves: Rd7
+caption: Rd7 lands on the 7th rank — now your rook attacks an entire row of pawns.
+\`\`\`
+
+## Castling involves the rook
+
+The king slides two squares toward a rook, and the rook leaps over to the king's other side. The only move where **two pieces move at once**.
+
+A rook in the opening is shy and clumsy. A rook in the endgame, on an open file, is the boss of the board.`,
           order: 4,
           difficulty: 1,
           estimatedMinutes: 8,
@@ -134,20 +201,37 @@ The rook takes part in castling — the only move where two pieces move at once.
           description: 'Command the board with the most powerful piece',
           content: `# The Queen
 
-The queen is the most powerful piece, combining the moves of a rook and a bishop.
+The most powerful piece on the board — a rook and a bishop fused into one. Worth about **nine pawns**.
 
-## Movement
-- Moves in **straight lines and diagonals**
-- Any number of squares in any of the eight directions
-- Cannot jump over pieces
+## Eight directions at once
 
-## Using the Queen Well
-- Worth about **nine pawns** — never trade it cheaply
-- **Don't bring it out too early** — opponents develop pieces while chasing it, gaining time
-- Devastating in the attack once your other pieces are developed
+\`\`\`chess
+mode: interactive
+fen: 4k3/8/8/3Q4/8/8/8/4K3 w - - 0 1
+caption: Drag the queen — straight, diagonal, anywhere, any distance.
+\`\`\`
 
-## A Word of Caution
-Because the queen is so valuable, it makes a poor blockader and a tempting target. Keep it active but safe from forks and pins.`,
+## Resist the urge to attack early
+
+\`\`\`chess
+mode: animate
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+moves: e4 e5 Qh5 Nc6 Bc4 g6 Qf3 Nf6
+autoplay: true
+caption: Watch: an early queen gets chased by ...g6 and ...Nf6 — and White wastes moves.
+\`\`\`
+
+Bring the queen out **after** your knights and bishops. Otherwise the opponent develops by harassing your most valuable piece.
+
+## Late-game terror
+
+\`\`\`chess
+mode: interactive
+fen: 6k1/5ppp/8/8/8/8/5PPP/3Q2K1 w - - 0 1
+caption: Once the board opens up, the queen rakes across files, ranks, and diagonals.
+\`\`\`
+
+Treat your queen like a sports car: amazing once the road is clear, but don't drive it into traffic on move three.`,
           order: 5,
           difficulty: 1,
           estimatedMinutes: 8,
@@ -158,19 +242,38 @@ Because the queen is so valuable, it makes a poor blockader and a tempting targe
           description: 'Protect your king and activate it in the endgame',
           content: `# The King
 
-The king is the piece you cannot afford to lose — checkmate ends the game.
+The whole game revolves around this one piece. Lose it, and you lose — full stop.
 
-## Movement
-- Moves **one square** in any direction
-- Cannot move into check (a square attacked by an enemy piece)
-- Two kings can never stand on adjacent squares
+## One square in any direction
 
-## The King in Two Phases
-- **Opening and middlegame:** keep the king safe, usually by castling behind a wall of pawns
-- **Endgame:** with fewer pieces around, the king becomes a **fighting piece** — march it toward the center to support pawns and attack
+\`\`\`chess
+mode: interactive
+fen: 4k3/8/8/3K4/8/8/8/8 w - - 0 1
+caption: Drag the king — one square, any direction.
+\`\`\`
 
-## Castling Rights
-You may castle only if neither the king nor that rook has moved, the squares between are empty, and the king is not in check or passing through an attacked square.`,
+Two kings can **never** stand on adjacent squares (a king can't move next to its enemy counterpart).
+
+## Castle early
+
+\`\`\`chess
+mode: animate
+fen: rnbqk2r/ppppbppp/5n2/4p3/2B1P3/3P1N2/PPP2PPP/RNBQK2R w KQkq - 4 5
+moves: O-O
+caption: One move tucks the king to safety and brings a rook toward the center.
+\`\`\`
+
+In the opening, your king is a target. **Get it to the corner** behind a wall of pawns, fast.
+
+## In the endgame, march!
+
+\`\`\`chess
+mode: interactive
+fen: 8/8/8/4k3/4P3/4K3/8/8 w - - 0 1
+caption: With few pieces left, the king becomes a fighter — push it toward the center.
+\`\`\`
+
+The king has two lives: a frightened civilian in the opening, a brave general in the endgame.`,
           order: 6,
           difficulty: 1,
           estimatedMinutes: 8,
@@ -191,35 +294,46 @@ You may castle only if neither the king nor that rook has moved, the squares bet
           description: 'Attack two pieces at once with a single piece',
           content: `# Forks
 
-A fork is when one piece attacks two or more enemy pieces simultaneously.
+**One piece. Two targets. One of them falls.** The fork is the single most common way to win material in chess.
 
-## Types of Forks
-
-### Knight Forks
-Knights are the best forking pieces because they can't be blocked.
-- The "family fork" attacks king and queen
-- Royal fork: attacking king, queen, and rook
+## The classic knight fork
 
 \`\`\`chess
 mode: animate
 fen: 4q1k1/8/8/8/4N3/8/8/6K1 w - - 0 1
 moves: Nf6+ Kh8 Nxe8
 autoplay: true
-caption: Nf6+ forks the king and queen, then the knight grabs the queen.
+caption: Nf6+ hits the king AND the queen. The king must move — and the queen drops.
 \`\`\`
 
-### Pawn Forks
-Pawns can fork pieces on adjacent diagonals.
-- Particularly powerful when forking major pieces
+Knights are the **best forkers** because nothing can block them.
 
-### Queen Forks
-The queen can fork in any direction.
-- Often combined with check for maximum effect
+## Your turn — find the knight fork
 
-## How to Find Forks
-1. Look for enemy pieces on the same color squares (knight forks)
-2. Look for pieces that are undefended
-3. Check if you can give check while attacking another piece`,
+\`\`\`chess
+mode: interactive
+fen: 4r1k1/8/8/3N4/8/8/8/4K3 w - - 0 1
+caption: Move the knight to a square that attacks both the king and the rook.
+\`\`\`
+
+(Hint: which knight square checks the king while also covering e8?)
+
+## Pawn forks are sneaky too
+
+\`\`\`chess
+mode: animate
+fen: 4k3/8/8/2n1b3/3P4/8/8/4K3 w - - 0 1
+moves: d5
+caption: One little pawn push — d5 — attacks both the knight on c6 and the bishop on e6.
+\`\`\`
+
+## The hunter's checklist
+
+1. Spot **two undefended enemy pieces**
+2. Look for a square that hits both
+3. **Check + attack** is the deadliest combo — the king MUST move
+
+Once you start hunting forks, you'll see them everywhere.`,
           order: 1,
           difficulty: 2,
           estimatedMinutes: 15,
@@ -230,25 +344,44 @@ The queen can fork in any direction.
           description: 'Immobilize pieces by attacking through them',
           content: `# Pins
 
-A pin occurs when a piece cannot move without exposing a more valuable piece behind it.
+A pin **freezes** an enemy piece — it can't move without exposing something more valuable behind it.
 
-## Types of Pins
+## See the pin
 
-### Absolute Pin
-The piece behind is the king - the pinned piece **cannot legally move**.
+\`\`\`chess
+mode: animate
+fen: rnbqkbnr/pppp1ppp/8/4p3/4P3/2N5/PPPP1PPP/R1BQKBNR w KQkq - 0 1
+moves: Bb5 Nc6
+caption: After Bb5, the knight on c6 is pinned to the king — it can't move.
+\`\`\`
 
-### Relative Pin
-The piece behind is valuable but not the king - moving is legal but costly.
+That's an **absolute pin**: the king is behind, so the law of chess forbids the pinned piece from moving at all.
 
-## Creating Pins
-- Bishops, rooks, and queens can create pins
-- Look for pieces on the same line as the enemy king
-- Use pins to immobilize defenders
+## Pile up on the pinned piece
 
-## Exploiting Pins
-1. Attack the pinned piece with pawns or other pieces
-2. Add more attackers than they have defenders
-3. Win material when the pinned piece cannot move`,
+\`\`\`chess
+mode: interactive
+fen: r2qkbnr/ppp2ppp/2np4/1B2p1B1/4P3/2N5/PPPP1PPP/R2QK1NR w KQkq - 0 1
+caption: The c6-knight is pinned and overloaded. White plays Nd5 — adding another attacker to win the piece.
+\`\`\`
+
+Once a piece is pinned, **attack it** with more pieces than it has defenders. The pin is the immobilizer; the pile-up is the winner.
+
+## Try a pin yourself
+
+\`\`\`chess
+mode: interactive
+fen: r3k2r/ppp2ppp/8/8/8/8/PPP2PPP/R2QK2R w KQkq - 0 1
+caption: Play Qd8 — pinning the king to the back rank (a relative pin). Black can't run.
+\`\`\`
+
+## The pin checklist
+
+- **Absolute pin** — king behind. Pinned piece literally cannot move.
+- **Relative pin** — valuable piece behind. Moving is legal but costly.
+- **Long pieces only** (bishops, rooks, queens) can pin.
+
+Look down every line that points at the enemy king or queen. Pins live there.`,
           order: 2,
           difficulty: 2,
           estimatedMinutes: 15,
@@ -259,29 +392,39 @@ The piece behind is valuable but not the king - moving is legal but costly.
           description: 'Force a valuable piece to move and win the one behind it',
           content: `# Skewers
 
-A skewer is a pin in reverse: a **more valuable** piece is attacked and forced to move, exposing a **less valuable** piece behind it.
+A pin in **reverse**: the valuable piece is in *front*. You poke it, it runs, and you grab whatever was hiding behind.
 
-## How It Works
-- Line up your rook, bishop, or queen against two enemy pieces
-- The front piece is the more valuable one (often the king or queen)
-- When it moves out of danger, you capture the piece behind
+## The classic rook skewer
 
 \`\`\`chess
 mode: animate
 fen: 1q6/8/8/1k6/8/8/6K1/7R w - - 0 1
 moves: Rb1+ Kc5 Rxb8
 autoplay: true
-caption: Rb1+ checks the king through the b-file; when it steps aside, Rxb8 wins the queen.
+caption: Rb1+ checks. The king has to move — and you swallow the queen on b8.
 \`\`\`
 
-## Skewer vs Pin
-- **Pin:** the valuable piece is *behind* and cannot move
-- **Skewer:** the valuable piece is *in front* and must move
+## Pin vs skewer in one picture
 
-## Finding Skewers
-1. Look for enemy king and queen (or queen and rook) on the same line
-2. Deliver a check or threat that forces the front piece to move
-3. Capture the piece that was hiding behind it`,
+| Pin | Skewer |
+|---|---|
+| Valuable piece **behind** | Valuable piece **in front** |
+| Pinned piece can't move | Front piece *must* move |
+| Locks pieces in place | Forces them off |
+
+## Spot the skewer
+
+\`\`\`chess
+mode: interactive
+fen: 6k1/8/8/8/8/2r5/4B3/4K3 w - - 0 1
+caption: Move the bishop to skewer the king and the c3-rook.
+\`\`\`
+
+(Look for a diagonal that goes through the king and onto the rook.)
+
+## Hunt for them
+
+Every time you see the enemy king or queen on a long open line, ask: *"What's behind it? Can I check through to that piece?"* That's the skewer in one question.`,
           order: 3,
           difficulty: 2,
           estimatedMinutes: 12,
@@ -292,18 +435,34 @@ caption: Rb1+ checks the king through the b-file; when it steps aside, Rxb8 wins
           description: 'Unleash a hidden attack by moving a piece out of the way',
           content: `# Discovered Attacks
 
-A discovered attack happens when you move one piece and **reveal** an attack from the piece behind it.
+You move **one** piece — and the piece behind it suddenly attacks too. **Two attacks for the price of one move.**
 
-## The Mechanism
-- A "front" piece sits in front of a long-range piece (rook, bishop, or queen)
-- When the front piece moves, it unmasks the attack
-- The front piece can also make its **own** threat as it moves — a double whammy
+## See it unmask
 
-## Discovered Check
-The strongest version: the unmasked attack is a **check**. The opponent must respond to the check, so the front piece can grab material with impunity.
+\`\`\`chess
+mode: animate
+fen: 3q2k1/5n2/8/3B4/8/8/8/3R2K1 w - - 0 1
+moves: Bxf7+ Kxf7 Rxd8
+caption: Bxf7+ moves the bishop AND unmasks the rook on the d-file. Take the queen next move.
+\`\`\`
 
-## Why They're Deadly
-Two pieces attack at once, but the opponent can usually only deal with one threat. Discovered attacks win material more often than almost any other tactic.`,
+The bishop made its own threat (the check) while clearing a line for the rook. The opponent can only stop **one** threat.
+
+## Discovered check is brutal
+
+When the unmasked attacker is giving check, the opponent **must** answer the check — so the moving piece can grab anything it likes.
+
+## Hunt for the pattern
+
+Look for **your own piece** sitting in front of one of your rooks, bishops, or queens. If moving it makes a threat or check while opening a deadly line behind, you've found a discovered attack.
+
+\`\`\`chess
+mode: interactive
+fen: 4k3/8/8/3n4/3R4/8/8/4K3 w - - 0 1
+caption: Imagine moving the d4-rook — but wait, your own knight blocks the file too. Discovered attacks need a piece you can move OUT of the line.
+\`\`\`
+
+When you find one in your own games, it usually wins.`,
           order: 4,
           difficulty: 3,
           estimatedMinutes: 15,
@@ -314,26 +473,33 @@ Two pieces attack at once, but the opponent can usually only deal with one threa
           description: 'Create two threats at once so the opponent cannot parry both',
           content: `# The Double Attack
 
-The double attack is the engine behind almost every tactic: make **two threats in one move** and your opponent can only answer one.
+Chess is a one-move-at-a-time game. **Two threats** in one move = opponent can answer only one = you win material.
 
-## Fork vs Double Attack
-A fork is one piece attacking two targets. A **double attack** is broader — the two threats can come from different ideas (a capture and a checkmate, a check and an attack on a loose piece).
+## Queen in action
 
 \`\`\`chess
 mode: animate
 fen: r5k1/6pp/8/8/8/8/5PPP/3Q2K1 w - - 0 1
 moves: Qd5+ Kh8 Qxa8+
 autoplay: true
-caption: Qd5+ checks the king and eyes the a8-rook on the same diagonal; after Kh8, Qxa8+ wins it.
+caption: Qd5+ checks the king AND attacks the rook on a8. The king moves; the rook falls.
 \`\`\`
 
-## How to Spot Them
-1. Hunt for **undefended (loose) pieces** — "loose pieces drop off"
-2. Look for a square from which you hit two things at once
-3. Checks are the most forcing double attacks — the opponent *must* respond
+## Loose pieces drop off
 
-## Why It Wins
-Chess is a one-move-at-a-time game. Two simultaneous threats overload that single tempo, and material falls.`,
+The most reliable double-attack target is an **undefended piece** — one with no friendly guard. Every move, scan the enemy position: are any of their pieces hanging loose?
+
+\`\`\`chess
+mode: interactive
+fen: 2r3k1/5ppp/8/8/8/8/5PPP/3Q2K1 w - - 0 1
+caption: The c8-rook is loose. Find a queen move that checks AND attacks it.
+\`\`\`
+
+## Fork vs double attack
+
+A **fork** is double attack with one piece in particular. A double attack is the broader idea: two threats, anywhere on the board, by any means.
+
+The mantra: **"What hangs? What can hit it AND something else?"** Ask it every move.`,
           order: 5,
           difficulty: 2,
           estimatedMinutes: 12,
@@ -344,27 +510,37 @@ Chess is a one-move-at-a-time game. Two simultaneous threats overload that singl
           description: 'Capture or chase away the piece that holds the position together',
           content: `# Removing the Defender
 
-Sometimes a piece is safe only because **one defender** guards it. Eliminate that defender and the target falls. This idea is also called *removing the guard*.
+Some enemy pieces are safe only because **one** friend guards them. Take out the guard, and the target falls.
 
-## The Method
-1. Identify a valuable piece (or key square) that is defended exactly once
-2. Capture, trade, or chase away that single defender
-3. Take the now-undefended target
+## Watch the defender vanish
 
 \`\`\`chess
 mode: animate
 fen: 6k1/3b1ppp/5n2/8/Q7/8/1B3PPP/6K1 w - - 0 1
 moves: Bxf6 gxf6 Qxd7
 autoplay: true
-caption: The f6-knight is the only guard of the d7-bishop; Bxf6 removes it, and Qxd7 collects the piece.
+caption: The d7-bishop is only defended by the knight on f6. Bxf6 removes the guard — then Qxd7 wins the bishop.
 \`\`\`
 
-## Common Targets
-- A piece defending the square in front of the king
-- The lone defender of a back-rank
-- A knight that guards a key central square
+## The mindset shift
 
-Always ask: *"What is this piece doing?"* If the answer is "defending," consider taking it.`,
+Most players ask: *"Can I take that piece?"* Better players also ask: *"What is that piece **doing**?"* If the answer is "defending something I want," consider trading or taking the defender.
+
+## A defender of the king
+
+\`\`\`chess
+mode: interactive
+fen: 6k1/5pp1/7p/8/8/8/5P1P/3R2K1 w - - 0 1
+caption: Black's king has only two pawn defenders. If you could trade off f7, the back rank opens up.
+\`\`\`
+
+## Three classic targets
+
+- A pawn guarding the square in front of the king
+- The lone piece holding a key central square
+- The defender of a back-rank pawn shelter
+
+Every piece has a job. Steal the worker and the work falls apart.`,
           order: 6,
           difficulty: 3,
           estimatedMinutes: 15,
@@ -375,21 +551,34 @@ Always ask: *"What is this piece doing?"* If the answer is "defending," consider
           description: 'Lure an enemy piece to the wrong square — or away from the right one',
           content: `# Deflection & Decoy
 
-Two sides of the same coin: both tactics use force to put an enemy piece where *you* want it.
+You don't always need to take a piece — sometimes you **push it where you want it**, with a threat it can't ignore.
 
-## Deflection
-**Drive a piece away** from an important duty. A defender that is forced to move can no longer defend — often you sacrifice material to pull it off its job.
+## Deflection — push it AWAY
 
-## Decoy (Attraction)
-**Lure a piece onto a bad square**, usually with a sacrifice, so you can hit it with a fork, pin, or check. The classic decoy drags the enemy king into a mating net.
+\`\`\`chess
+mode: animate
+fen: 6k1/5p1p/8/8/8/8/r5PP/R5K1 w - - 0 1
+moves: Rxa2
+caption: A direct trade of rooks — the same idea in miniature. Real deflections often sacrifice MORE to pull a key defender off its job.
+\`\`\`
 
-## The Common Thread
-Both rely on **forcing moves** — checks, captures, and threats the opponent cannot ignore. The piece is compelled to go where it does not want to be.
+A defender pulled away can't defend. Often you give up material to deflect it — because the **follow-up** wins much more.
 
-## How to Find Them
-1. Notice a defender doing an essential job (guarding a mate square or a piece)
-2. Look for a check or capture that forces it to abandon that job
-3. Calculate the follow-up that exploits the gap`,
+## Decoy — drag it TO a bad square
+
+The mirror image: lure an enemy piece onto a square where it can be forked, pinned, or mated. Classic decoys drag the king into the open with a sacrifice.
+
+\`\`\`chess
+mode: interactive
+fen: 6k1/5ppp/8/8/8/8/5PPP/R6K w - - 0 1
+caption: Picture sacrificing the rook with Ra8+ — the king is forced to recapture onto a vulnerable square where your remaining attackers can pounce.
+\`\`\`
+
+## The shared trick
+
+Both use **forcing moves** — checks, captures, big threats — to *make* an enemy piece move where it doesn't want to.
+
+When you see a defender doing critical work, your next thought should be: *can I check or capture in a way that rips it off the job?*`,
           order: 7,
           difficulty: 3,
           estimatedMinutes: 15,
@@ -410,22 +599,37 @@ Both rely on **forcing moves** — checks, captures, and threats the opponent ca
           description: 'Checkmate on the first or eighth rank',
           content: `# Back Rank Mate
 
-The back rank mate is one of the most common checkmate patterns.
+The king behind a wall of pawns — looks safe, *isn't*. A rook or queen on the back rank delivers checkmate, and the pawns block every escape.
 
-## The Pattern
-- The enemy king is trapped on the back rank (1st or 8th rank)
-- Usually blocked by its own pawns
-- A rook or queen delivers checkmate
+## See the trap snap shut
 
-## How It Happens
-1. King hasn't castled or is back on the first rank
-2. No escape squares because of own pawns
-3. Rook or queen sweeps in for checkmate
+\`\`\`chess
+mode: animate
+fen: 6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1
+moves: Ra8#
+caption: One move — Ra8 — checkmate. The pawns on f7, g7, h7 block every flight square.
+\`\`\`
 
-## Prevention
-- Create a "luft" (escape square) by moving a pawn
-- h3 or g3 (or h6/g6 for Black) gives the king breathing room
-- Keep a rook on the back rank for defense`,
+## Your turn — find the mate
+
+\`\`\`chess
+mode: interactive
+fen: 6k1/5ppp/8/8/8/8/5PPP/2Q3K1 w - - 0 1
+caption: Play Qc8 — mate. Same idea with a queen instead of a rook.
+\`\`\`
+
+## Make "luft" before it's too late
+
+A tiny pawn move — **h3** or **g3** — gives your king an escape hatch. Without it, you're one tempo from disaster.
+
+\`\`\`chess
+mode: animate
+fen: 6k1/5pp1/7p/8/8/8/8/R5K1 w - - 0 1
+moves: Ra8+ Kh7
+caption: Now Ra8 is just check, not mate — the king escapes to h7 thanks to ...h6.
+\`\`\`
+
+**Always check your back rank.** It's the #1 way casual games end in disaster.`,
           order: 1,
           difficulty: 2,
           estimatedMinutes: 12,
@@ -436,24 +640,34 @@ The back rank mate is one of the most common checkmate patterns.
           description: 'The "lawnmower" mate that drives the king off the board',
           content: `# Two-Rook Checkmate
 
-Also called the **ladder** or **lawnmower** mate, this is the easiest mate to learn with two heavy pieces.
+The **ladder mate** (or "lawnmower") — two rooks marching the lonely king to the edge of the board.
 
-## The Technique
-1. Place one rook to cut off the rank (or file) the king is on
-2. Use the second rook to check the king, forcing it back a rank
-3. The king retreats; "climb the ladder" by alternating rooks rank by rank
-4. Drive the king to the edge, then deliver checkmate
+## Watch them climb
 
 \`\`\`chess
 mode: animate
 fen: 4k3/8/8/8/8/8/R7/1R5K w - - 0 1
 moves: Ra7 Kd8 Rb8#
 autoplay: true
-caption: One rook seals the 7th rank, the other delivers mate on the 8th.
+caption: One rook seals the 7th rank. The other checks on the 8th — mate.
 \`\`\`
 
-## Key Tip
-If the king ever moves *toward* your rooks, simply slide the threatened rook far away along its rank — never give up the rook, and keep climbing.`,
+## The recipe
+
+1. **Trap the king on a rank** with one rook (cutting off retreat)
+2. **Check with the other rook** one rank further, forcing the king back
+3. **Climb the ladder** — alternate rooks, one rank at a time
+4. Mate on the edge
+
+## Watch out — and dodge!
+
+\`\`\`chess
+mode: interactive
+fen: 8/R7/8/3k4/8/8/1R6/7K w - - 0 1
+caption: If the king ever marches toward your rook, slide that rook FAR away along its rank. Never get close enough to be captured.
+\`\`\`
+
+That's the whole technique. It's the cleanest mate in chess — practice it once and you'll never lose a K+2R vs K endgame.`,
           order: 2,
           difficulty: 2,
           estimatedMinutes: 12,
@@ -462,24 +676,34 @@ If the king ever moves *toward* your rooks, simply slide the threatened rook far
           slug: 'queen-king-mate',
           title: 'Queen and King Checkmate',
           description: 'Corner the lone king with your queen and king working together',
-          content: `# Queen and King vs King
+          content: `# Queen and King Checkmate
 
-With a queen and king against a lone king, mate is quick — but you must avoid stalemate.
+K+Q vs K is a forced mate in under ten moves — **if** you avoid stalemate.
 
-## The Plan
-1. Use the queen to **fence the king** toward an edge, staying a knight's-move away
-2. Bring your **own king** up to support — the queen alone cannot mate
-3. Deliver checkmate with the king guarding the queen
+## See the finish
 
 \`\`\`chess
 mode: animate
 fen: 4k3/8/3K4/8/8/8/8/4Q3 w - - 0 1
 moves: Qe7#
-caption: With the king on e6 guarding, Qe7 is checkmate.
+caption: White king on d6 covers d7, e7, f7. Black king has nowhere to go. Mate.
 \`\`\`
 
-## Avoiding Stalemate
-The danger is trapping the king with **no legal moves but no check**. Always check that the enemy king keeps a free square until the moment of mate. When in doubt, bring your king closer rather than grabbing with the queen.`,
+## The plan in three steps
+
+1. **Fence** the enemy king with your queen, staying a knight's-move away (so it can't capture)
+2. **Walk your king up** — the queen alone can never mate
+3. **Mate on the edge** with the king guarding the queen
+
+## Beware stalemate!
+
+\`\`\`chess
+mode: interactive
+fen: 7k/8/6K1/8/8/8/8/5Q2 w - - 0 1
+caption: Trap: Qf7?? leaves Black with no legal move but no check — STALEMATE, a draw. Always leave the king a square until the killing blow.
+\`\`\`
+
+The rule of thumb: **king first, queen second**. If you're tempted to deliver mate but your king isn't close enough, take another move to walk it up.`,
           order: 3,
           difficulty: 2,
           estimatedMinutes: 15,
@@ -490,23 +714,30 @@ The danger is trapping the king with **no legal moves but no check**. Always che
           description: 'The knight delivers mate while the king is trapped by its own pieces',
           content: `# Smothered Mate
 
-A beautiful pattern where the king is **smothered** by its own pieces and a lone knight delivers checkmate.
+The most beautiful pattern in chess: the king **buried alive** by its own pieces, finished off by a single knight.
 
-## The Classic Pattern (Philidor's Legacy)
-1. A knight checks the king in the corner
-2. The king's only escape is blocked by its own pieces
-3. Often a queen sacrifice forces a rook to block the last escape square
-4. The knight returns with checkmate
+## See the burial
 
 \`\`\`chess
 mode: animate
 fen: 6rk/6pp/8/6N1/8/8/8/6K1 w - - 0 1
 moves: Nf7#
-caption: Boxed in by its own rook and pawns, the king falls to the knight on f7.
+caption: Nf7 — check. The king can't escape (own rook on g8, own pawns on g7/h7). Mate.
 \`\`\`
 
-## Why It Works
-The knight is the only piece that can't be blocked, so when every escape square is occupied by friendly pieces, a single knight check is mate.`,
+## Why the knight is the only piece that can do this
+
+Every other check (rook, bishop, queen) can be blocked. **A knight check cannot be blocked.** So when every escape square is filled by friendly pieces, even one knight check ends the game.
+
+## Spot the pattern yourself
+
+\`\`\`chess
+mode: interactive
+fen: 5rk1/6pp/8/8/4N3/8/8/6K1 w - - 0 1
+caption: Where can the knight land to deliver a smothered-style attack? (Look for a square that gives check while the king is hemmed in by its own pieces.)
+\`\`\`
+
+The full Philidor's Legacy combination — Nf7+ Kh8, Nxh6+? No: queen sacrifice on g8 first, *then* the knight returns — is one of the most famous tactics in chess history.`,
           order: 4,
           difficulty: 3,
           estimatedMinutes: 12,
@@ -517,29 +748,34 @@ The knight is the only piece that can't be blocked, so when every escape square 
           description: 'The four-move mate beginners love — and how to stop it',
           content: `# Scholar's Mate
 
-The most famous beginner trap: a four-move checkmate aimed at the weak **f7** square.
+The most famous trap in chess — **four moves and you're dead**, all because f7 is defended only by the king.
 
-## The Attack
-1. e4 e5
-2. Bc4 (eyeing f7)
-3. Qh5 (threatening Qxf7#)
-4. Qxf7# if Black is careless
+## Watch it land
 
 \`\`\`chess
 mode: animate
 fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
 moves: e4 e5 Bc4 Nc6 Qh5 Nf6 Qxf7#
 autoplay: true
-caption: The queen and bishop gang up on f7 — and Nf6?? walks into Qxf7 mate.
+caption: Queen and bishop both eye f7. ...Nf6?? defends nothing, and Qxf7 is mate.
 \`\`\`
 
-## How to Defend
-- **...g6** chases the queen and defends
-- **...Qe7** guards f7
-- Develop knights toward the center: **...Nf6** is fine *only* if f7 is already covered
+## Defend it three ways
 
-## The Lesson
-Don't try to win by move four — a defender who knows this trap will repel the queen and gain time hunting it. But always watch your f7 (and f2) square: it's defended only by the king.`,
+\`\`\`chess
+mode: animate
+fen: r1bqkbnr/pppp1ppp/2n5/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 3 3
+moves: g6
+caption: ...g6! chases the queen and defends f7 in one move. The best reply.
+\`\`\`
+
+You can also play **...Qe7** (guards f7) or **...Qf6** — both stop mate immediately.
+
+## The real lesson
+
+Beginners hope for Scholar's Mate. Anyone who knows it shrugs it off and **harasses the queen** for the next ten moves, leaving the attacker behind in development.
+
+Don't try to win by move four. Watch your **f2** and **f7** squares — they're the weakest in the opening.`,
           order: 5,
           difficulty: 1,
           estimatedMinutes: 12,
@@ -550,22 +786,34 @@ Don't try to win by move four — a defender who knows this trap will repel the 
           description: 'A knight and rook combine to trap the king in the corner',
           content: `# Arabian Mate
 
-One of the oldest known mating patterns — a **knight and rook** working in perfect harmony against a cornered king.
+One of the **oldest** patterns in chess — a knight and rook combining like clockwork against a cornered king.
 
-## The Pattern
-- The enemy king is in the corner (e.g. h8)
-- A knight sits on **f6**, covering the g8 escape and guarding the rook
-- The rook delivers mate on **h7**, controlling the back rank and protected by the knight
+## The cage closes
 
 \`\`\`chess
 mode: animate
 fen: 7k/R7/5N2/8/8/8/8/K7 w - - 0 1
 moves: Rh7#
-caption: Rh7 is mate — the knight on f6 guards both the rook and the king's only flight square.
+caption: Rh7 — mate. The knight on f6 guards g8 (no escape) AND defends the rook on h7 (no capture).
 \`\`\`
 
-## Why It Works
-The rook covers h8 and g7; the knight covers g8 and defends the rook on h7, so the king cannot capture. With every square sealed, it's checkmate. This pattern shows up constantly in rook-and-knight endgames.`,
+## The geometry, once and forever
+
+- King in the corner (h8)
+- Knight on **f6** — covers g8 + defends the rook
+- Rook on **h7** — checks along the h-file + covers g7
+
+That's the Arabian. Once you know the shape, you'll spot mate-in-one chances in dozens of endgames.
+
+## Try it
+
+\`\`\`chess
+mode: interactive
+fen: 6k1/8/5N2/8/8/8/8/R6K w - - 0 1
+caption: The king is on g8 — almost in the corner. Push the rook to a8 to deliver an Arabian-style mate.
+\`\`\`
+
+(Hint: Ra8+ — the king must go to h7, and the knight will tighten the noose.)`,
           order: 6,
           difficulty: 3,
           estimatedMinutes: 12,
@@ -587,30 +835,43 @@ The rook covers h8 and g7; the knight covers g8 and defends the rook on h7, so t
           description: 'The only move where the king and a rook move together',
           content: `# Castling
 
-Castling is a special move that improves king safety and develops a rook in one go.
+The **only move where two pieces move at once** — and the fastest way to make your king safe.
 
-## How It Works
-- **Kingside (O-O):** the king moves two squares toward the h-rook, and that rook hops to the king's other side
-- **Queenside (O-O-O):** the same idea toward the a-rook; the king ends a little further from the corner
+## Castle kingside
 
 \`\`\`chess
 mode: animate
-fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
-moves: e4 e5 Bc4 Bc5 Nf3 Nf6 O-O O-O
+fen: rnbqk2r/pppp1ppp/5n2/2b1p3/2B1P3/3P1N2/PPP2PPP/RNBQK2R w KQkq - 0 5
+moves: O-O O-O
 autoplay: true
-caption: Both sides develop a bishop and knight, then castle kingside to safety.
+caption: Two short moves — O-O for both sides. King in the corner, rook on f1/f8, opening done.
 \`\`\`
 
-## The Five Rules
-You may castle **only** if:
-1. The king has not moved
-2. That rook has not moved
-3. There are no pieces between them
-4. The king is not currently in check
-5. The king does not pass through or land on an attacked square
+## Try it yourself
 
-## Why Castle
-A king in the center is exposed to checks and tactics. Castling tucks it behind a wall of pawns and connects your rooks.`,
+\`\`\`chess
+mode: interactive
+fen: rnbqk2r/pppp1ppp/5n2/2b1p3/2B1P3/3P1N2/PPP2PPP/RNBQ1RK1 b kq - 1 5
+caption: Your turn — castle kingside (O-O) by dragging the king two squares right.
+\`\`\`
+
+## The five rules of castling
+
+1. King hasn't moved ✓
+2. That rook hasn't moved ✓
+3. Squares between are empty ✓
+4. King isn't in check right now ✓
+5. King doesn't pass through (or land on) an attacked square ✓
+
+## Kingside vs queenside
+
+| O-O (kingside) | O-O-O (queenside) |
+|---|---|
+| Fast, simple, safer | Brings a-rook into action |
+| 2-square king move | 3-square king move |
+| Most common | Sharp, attacking |
+
+**When in doubt, castle.** A king in the center is a king in trouble.`,
           order: 1,
           difficulty: 1,
           estimatedMinutes: 10,
@@ -621,24 +882,36 @@ A king in the center is exposed to checks and tactics. Castling tucks it behind 
           description: 'The special pawn capture that surprises every beginner',
           content: `# En Passant
 
-*En passant* (French for "in passing") is a special pawn capture that exists to stop a pawn from sneaking past an enemy pawn by using its two-square first move.
+The weirdest, most misunderstood rule in chess. **Read it once, then try it.**
 
-## The Rule
-- It applies only when an enemy pawn moves **two squares** from its start and lands **beside** your pawn
-- On your **very next move**, you may capture it as if it had moved only one square
-- You capture by moving diagonally to the square the pawn skipped over
+## See it happen
 
 \`\`\`chess
 mode: animate
 fen: 4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1
 moves: exd6
-caption: Black's pawn just played ...d7-d5; White answers exd6, capturing in passing.
+caption: Black just played ...d7-d5, skipping past your e5-pawn. You capture "in passing" — exd6 — landing on d6, removing the d5-pawn.
 \`\`\`
 
-## Key Points
-- The chance to capture en passant lasts for **one move only** — use it or lose it
-- It can only be done by a pawn that has advanced to its fifth rank
-- The captured pawn is removed even though your pawn lands on an empty square`,
+Yes, your pawn lands on an **empty** square (d6) and removes a pawn from a **different** square (d5). That's the magic.
+
+## Try it yourself
+
+\`\`\`chess
+mode: interactive
+fen: 4k3/2p5/8/3P4/8/8/8/4K3 b - - 0 1
+caption: Play ...c5 (the two-square advance). White's d5-pawn can capture en passant with dxc6 on the very next move.
+\`\`\`
+
+## The three rules to remember
+
+1. The enemy pawn must move **two squares** (not one)
+2. It must land **right beside** your pawn
+3. You must capture **immediately** — on your very next move, or the chance is gone forever
+
+## Why this rule exists
+
+Without it, pawns could sneak past each other using their two-square jump. En passant restores fairness: your pawn still gets to attack as if the enemy had moved one square.`,
           order: 2,
           difficulty: 2,
           estimatedMinutes: 10,
@@ -649,27 +922,39 @@ caption: Black's pawn just played ...d7-d5; White answers exd6, capturing in pas
           description: 'Turn a humble pawn into a queen — or something cleverer',
           content: `# Pawn Promotion
 
-When a pawn reaches the far end of the board (the 8th rank for White, the 1st for Black), it **must** promote to another piece.
+A pawn that reaches the end of the board **transforms** — into a queen, rook, bishop, or knight. (Never a king. Never a pawn.)
 
-## The Rule
-- Promote to a **queen, rook, bishop, or knight** of your own color — never a king or a pawn
-- You may promote even if you already have that piece (two queens is legal!)
-- The new piece takes effect immediately
+## Watch the transformation
 
 \`\`\`chess
 mode: animate
 fen: 4k3/P7/8/8/8/8/8/4K3 w - - 0 1
 moves: a8=Q
-caption: The a-pawn reaches the back rank and becomes a brand-new queen.
+caption: One push, one new queen. A pawn became your most powerful piece.
 \`\`\`
 
-## Underpromotion
-Choosing a piece other than the queen is called **underpromotion**. It's rare but powerful:
-- **Knight** to deliver a check or fork the queen can't
-- **Rook or bishop** to avoid stalemating the enemy king
+## Do it yourself
 
-## Strategy
-A passed pawn — one with no enemy pawns able to stop it — is a long-term asset precisely because it threatens to promote.`,
+\`\`\`chess
+mode: interactive
+fen: 4k3/4P3/8/8/8/8/8/4K3 w - - 0 1
+caption: Push the e-pawn to e8 and choose a queen. (You can promote even if you already have one.)
+\`\`\`
+
+## Underpromotion — choosing NOT a queen
+
+Sometimes the queen is wrong. **Underpromote to a knight** when only a knight can give a key check or fork. **Underpromote to a rook** when promoting to a queen would stalemate the enemy king.
+
+\`\`\`chess
+mode: animate
+fen: 4k3/3P4/8/8/8/8/8/4K3 w - - 0 1
+moves: d8=N+
+caption: d8=N+ — underpromote to a knight, delivering check and forking the king. A queen on d8 wouldn't even give check!
+\`\`\`
+
+## The pawn that *will* promote = the pawn that decides
+
+A **passed pawn** (no enemy pawn can stop it) is worth a fortune in the endgame. Every move you make in a pawn endgame should ask: *whose pawn promotes first?*`,
           order: 3,
           difficulty: 1,
           estimatedMinutes: 10,
@@ -680,26 +965,39 @@ A passed pawn — one with no enemy pawns able to stop it — is a long-term ass
           description: 'The five ways a chess game can end in a draw',
           content: `# Draws & Stalemate
 
-Not every game ends in checkmate. Knowing the drawing rules can **save** a lost position — or cost you a won one.
+Not every game ends in mate. **Five ways** a game can end in a draw — and one of them will sabotage a winning position if you're not careful.
 
-## Stalemate
-If the player to move has **no legal move** but is **not in check**, the game is an immediate draw. This is the most common way a winning side throws away a point.
+## The killer: stalemate
 
 \`\`\`chess
 mode: animate
 fen: 7k/8/6K1/8/8/8/8/5Q2 w - - 0 1
 moves: Qf7
-caption: Careful! Qf7?? leaves the black king with no legal move and no check — stalemate, a draw.
+caption: Disaster! Qf7?? — Black has no legal move and is NOT in check. Stalemate. Draw.
 \`\`\`
 
-## The Other Four Draws
-- **Threefold repetition:** the same position occurs three times
-- **Fifty-move rule:** 50 moves by each side with no capture and no pawn move
-- **Insufficient material:** neither side has enough to mate (e.g. K vs K, or K+B vs K)
-- **Agreement:** both players simply agree to a draw
+**Stalemate** = player to move has no legal moves AND is not in check. The game is an instant draw. It's the most heartbreaking way to throw away a won game.
 
-## The Practical Lesson
-When you are winning, **give the enemy king a flight square** until you are ready to mate. When you are losing, hunt for stalemate tricks and perpetual checks.`,
+## Find the safe move
+
+\`\`\`chess
+mode: interactive
+fen: 7k/8/6K1/8/8/8/8/5Q2 w - - 0 1
+caption: Same position. Try Qf6 instead — Black still has a legal move (...Kg8 or ...Kh7). Bring your king up first, THEN mate.
+\`\`\`
+
+## The other four draws
+
+| Rule | When |
+|---|---|
+| Threefold repetition | Same position appears 3 times |
+| Fifty-move rule | 50 moves by each side without capture or pawn move |
+| Insufficient material | K vs K, K+B vs K, K+N vs K — no one can mate |
+| Agreement | Both players say "draw?" "draw." |
+
+## Survival tip
+
+**Losing? Hunt for stalemate.** Trap your king in a corner so the opponent runs out of safe checks. Many "lost" games are saved this way.`,
           order: 4,
           difficulty: 2,
           estimatedMinutes: 12,
@@ -720,27 +1018,43 @@ When you are winning, **give the enemy king a flight square** until you are read
           description: 'The universal language for recording chess moves',
           content: `# Algebraic Notation
 
-Every square on the board has a unique name, which lets us record any move precisely. This is **algebraic notation**, used worldwide.
+The universal language of chess. Once you know it, you can read **any** book, watch **any** stream, and review **any** game.
 
-## Naming the Squares
-- **Files** (columns) are letters **a–h**, left to right from White's view
-- **Ranks** (rows) are numbers **1–8**, from White's side upward
-- So the square in White's bottom-left corner is **a1**, and the top-right is **h8**
+## Every square has a name
 
-## Writing a Move
-- Pieces use a capital letter: **K**ing, **Q**ueen, **R**ook, **B**ishop, k**N**ight
-- Pawns have no letter — just the destination square (**e4**)
-- Give the piece and its destination: **Nf3** means "knight to f3"
+\`\`\`chess
+mode: interactive
+fen: 8/8/8/8/8/8/8/4K2k w - - 0 1
+caption: Files (columns) are a–h. Ranks (rows) are 1–8. White's king is on e1; Black's is on h1.
+\`\`\`
 
-## Special Symbols
-- **x** — capture (Bxe5)
-- **+** — check, **#** — checkmate
-- **O-O** — kingside castling, **O-O-O** — queenside
-- **=Q** — promotion (e8=Q)
-- **!** good move, **?** mistake
+## Try writing a move
 
-## Why It Matters
-Notation lets you replay famous games, study openings, solve puzzles, and review your own games. Every lesson and puzzle in this app speaks it.`,
+\`\`\`chess
+mode: interactive
+fen: 4k3/8/8/8/8/5N2/8/4K3 w - - 0 1
+caption: Drag the knight to e5. In notation that's "Ne5" — knight to e5.
+\`\`\`
+
+## The whole notation cheat sheet
+
+- **Pieces:** K K**N**ight Q R B  *(pawns have no letter — just the square: "e4")*
+- **Capture:** Bxe5 *(bishop takes on e5)*
+- **Check:** + *(Nf6+)*  &nbsp; **Mate:** # *(Qxf7#)*
+- **Castle:** O-O *(short)* &nbsp; O-O-O *(long)*
+- **Promote:** e8=Q *(pawn to queen)*
+- **Annotation:** ! good &nbsp; ? bad &nbsp; !! brilliant &nbsp; ?? blunder
+
+## Read a real game
+
+\`\`\`chess
+mode: animate
+moves: e4 e5 Nf3 Nc6 Bb5 a6
+autoplay: true
+caption: 1. e4 e5  2. Nf3 Nc6  3. Bb5 a6 — that's the Ruy Lopez opening, in just six symbols.
+\`\`\`
+
+Now you can read the moves above any board. Welcome to the club.`,
           order: 1,
           difficulty: 1,
           estimatedMinutes: 10,
