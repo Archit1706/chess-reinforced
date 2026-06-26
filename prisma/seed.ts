@@ -1549,20 +1549,39 @@ This mate is rare in practice, but knowing it teaches you how to coordinate piec
           description: 'Pawns are the skeleton of the position — learn to read them',
           content: `# Pawn Structure
 
-Pawns move slowly and can't go backward, so the pawn structure is the most **permanent** feature of a position. It dictates where your pieces belong and where the weaknesses lie.
+Pawns **can't go back**. Every push is permanent. That's why pawn structure is the most lasting feature of any position.
 
-## Pawn Weaknesses
-- **Isolated pawn:** no friendly pawn on an adjacent file — it can't be defended by a pawn and the square in front is a great blockade post
-- **Doubled pawns:** two pawns on the same file — they can't defend each other and one may become weak
-- **Backward pawn:** a pawn left behind its neighbors, unable to advance safely; the square in front is an outpost for the enemy
+## Spot the isolated pawn
 
-## Pawn Strengths
-- **Pawn chain:** a diagonal line of pawns defending each other — attack it at the **base**
-- **Pawn majority:** more pawns than the opponent on one wing can create a passed pawn
-- **Connected pawns:** side-by-side pawns that support each other's advance
+\`\`\`chess
+mode: interactive
+fen: 4k3/p1p2p1p/8/3p4/3P4/8/P1P2P1P/4K3 w - - 0 1
+caption: Both d-pawns are ISOLATED — no friendly pawn on c or e to defend them. They're long-term weaknesses.
+\`\`\`
 
-## The Big Idea
-Don't move pawns carelessly — each push leaves squares behind it permanently weak. Ask whether a pawn move improves your structure or creates a hole.`,
+## Doubled pawns
+
+\`\`\`chess
+mode: interactive
+fen: 4k3/pp3ppp/2p5/8/8/2P5/PP3PPP/4K3 w - - 0 1
+caption: Two c-pawns stacked = doubled pawns. They can't defend each other and often become targets.
+\`\`\`
+
+## The pawn chain — attack the BASE
+
+\`\`\`chess
+mode: interactive
+fen: 4k3/pp3ppp/8/4p3/3pP3/3P4/PPP3PP/4K3 w - - 0 1
+caption: Diagonal pawn chains. To break a chain, attack the BASE pawn — here, the d3-pawn supports d4/e5 from below.
+\`\`\`
+
+## The big idea
+
+Each pawn move leaves a permanent hole behind it. Before you push, ask:
+- *Does this improve my structure?*
+- *Or does it weaken a key square?*
+
+**Pieces come and go. Pawn weaknesses last forever.**`,
           order: 1,
           difficulty: 3,
           estimatedMinutes: 18,
@@ -1573,26 +1592,40 @@ Don't move pawns carelessly — each push leaves squares behind it permanently w
           description: 'Put your rooks where they dominate — on open lines',
           content: `# Open Files & Rook Power
 
-Rooks are clumsy in the opening but become monsters once lines open. Their natural habitat is the **open file**.
+Rooks are clumsy in the opening but **monsters** once lines open. Their natural habitat is the open file.
 
-## Files Explained
-- **Open file:** no pawns of either color — a highway for your rook
-- **Half-open file:** no pawns of *your* color; aim the rook at the enemy pawn that remains
-- **Closed file:** blocked by pawns — no work for a rook here
-
-## Rook Principles
-1. **Seize open files** before your opponent — a rook on an open file controls the whole board
-2. **Double your rooks** (stack them on the same file) to multiply the pressure
-3. Aim for the **7th rank** — a rook there attacks pawns and pins the king to the back
+## Open vs half-open vs closed
 
 \`\`\`chess
 mode: interactive
 fen: 3r2k1/pp3ppp/8/8/8/8/PP3PPP/3R2K1 w - - 0 1
-caption: The d-file is wide open — both sides fight to own it with their rook.
+caption: D-file: OPEN (no pawns) — both sides race for it. Whoever owns it owns the board.
 \`\`\`
 
-## Connected Rooks
-Once your back rank is cleared of minor pieces and the king has castled, your rooks defend each other — "connected" rooks are a sign your development is complete.`,
+## Double your rooks
+
+\`\`\`chess
+mode: interactive
+fen: 6k1/pp3ppp/8/8/8/8/PP3PPP/3R1RK1 w - - 0 1
+caption: Pile two rooks on the same file (e.g., Rd2 then Rfd1) — pressure multiplies.
+\`\`\`
+
+## The 7th rank — a rook's dream
+
+\`\`\`chess
+mode: animate
+fen: 4k3/pp3ppp/8/8/8/8/PP3PPP/3RK3 w - - 0 1
+moves: Rd7
+caption: Rd7 lands on the absolute 7th rank — attacking pawns and trapping the king. Often worth a whole pawn.
+\`\`\`
+
+## The three rook rules
+
+1. **Open files first** — race your opponent
+2. **Double up** on key files
+3. **Seventh rank** is paradise
+
+The opening positions rooks; the middlegame rewards the player who gets them onto open lines first.`,
           order: 2,
           difficulty: 3,
           estimatedMinutes: 18,
@@ -1603,24 +1636,37 @@ Once your back rank is cleared of minor pieces and the king has castled, your ro
           description: 'Plant a knight on a protected square deep in enemy territory',
           content: `# Outposts
 
-An **outpost** is a square — usually on the 4th, 5th, or 6th rank — that an enemy pawn can never attack, protected by one of your own pawns. A knight parked there is worth its weight in gold.
+A **square deep in enemy territory** that no enemy pawn can attack, protected by one of yours. Park a knight there and it's a monster.
 
-## What Makes a Good Outpost
-- It **cannot be challenged by a pawn** (no enemy pawn can advance to hit it)
-- It is **defended by your pawn**, so trading it off costs the opponent a better piece
-- It sits **near the enemy camp**, cramping their position
+## The dream outpost
 
 \`\`\`chess
 mode: interactive
 fen: r2q1rk1/pp3ppp/2n1p3/2Np4/3P4/2P5/PP3PPP/R2Q1RK1 w - - 0 1
-caption: The knight on c5 is a dream outpost — no black pawn can ever drive it away.
+caption: The knight on c5 is OUTPOSTED. No black pawn can ever drive it away. Trade it? Black loses a much better piece.
 \`\`\`
 
-## Knights Love Outposts
-A knight is short-ranged, so a permanent advanced home transforms it into a dominant piece. Bishops and rooks also enjoy outposts, but the **knight on a central outpost** is the classic positional trophy.
+## What makes an outpost "good"
 
-## Creating Them
-Look for holes in the enemy structure — squares they weakened by pushing pawns — and maneuver a knight toward them, supported by a pawn.`,
+| ✓ Good | ✗ Bad |
+|---|---|
+| Square can't be hit by a pawn | Pawn can drive the knight away |
+| Defended by your own pawn | Hangs to a simple capture |
+| 4th–6th rank in enemy half | Stuck on your own side |
+
+## Hunt for the hole
+
+\`\`\`chess
+mode: interactive
+fen: r1bq1rk1/ppp2ppp/2nb1n2/3p4/2PP4/2N1PN2/PP3PPP/R1BQKB1R w KQ - 0 1
+caption: Where can a knight land safely on a square Black can never attack with a pawn? (Hint: e5, supported by d4 — if you can get a knight there.)
+\`\`\`
+
+## Knights love outposts most
+
+Bishops, rooks, even queens enjoy them — but the **short-legged knight** becomes a different piece on an advanced outpost. It's the classic positional trophy.
+
+When you weaken a square in your own camp, you give your opponent an outpost — usually forever. So push pawns carefully.`,
           order: 3,
           difficulty: 3,
           estimatedMinutes: 18,
@@ -1631,22 +1677,39 @@ Look for holes in the enemy structure — squares they weakened by pushing pawns
           description: 'Why some bishops shine and others bite on granite',
           content: `# Good & Bad Bishops
 
-A bishop is only as good as the diagonals it can use. Your **pawn structure** decides whether a bishop is a hero or a spectator.
+Your bishop is only as good as the diagonals it can use. **Pawn structure** decides whether it's a hero or a spectator.
 
-## The Definitions
-- **Bad bishop:** blocked by your **own** pawns fixed on its color — it stares at its own wall
-- **Good bishop:** free of such pawns, with open diagonals to roam
+## Spot the bad bishop
 
-## How to Handle Each
-- If you have a **bad bishop**, try to **trade it off** or get its pawns off its color
-- Place **your pawns on the opposite color** of your remaining bishop so it stays active
-- A bad bishop can become "good" if you can free it — sometimes a single pawn break does it
+\`\`\`chess
+mode: interactive
+fen: 4k3/1ppp1ppp/8/8/8/8/1PPPBPPP/4K3 w - - 0 1
+caption: White's bishop is on a LIGHT square. Look at the white pawns — almost all on LIGHT squares too. The bishop is BAD — blocked by its own pawns.
+\`\`\`
 
-## The Bishop Pair
-Holding **both bishops** while the opponent has given one up is a lasting edge, especially in open positions: together the bishops cover both square colors and dominate long diagonals.
+## Spot the good bishop
 
-## Practical Tip
-Before trading a bishop for a knight, ask whether your remaining bishop will be good or bad given the pawn structure to come.`,
+\`\`\`chess
+mode: interactive
+fen: 4k3/1pp2ppp/3p4/8/8/3P4/1PP2PPP/3BK3 w - - 0 1
+caption: Same bishop, different pawns — White's pawns are mostly on DARK squares now, leaving the bishop's diagonals free. GOOD bishop.
+\`\`\`
+
+## The rule
+
+**Put your pawns on the OPPOSITE color of your remaining bishop.**
+- Dark-squared bishop? Pawns on light squares.
+- Light-squared bishop? Pawns on dark squares.
+
+## The bishop pair
+
+\`\`\`chess
+mode: interactive
+fen: r3k2r/pppq1ppp/2n2n2/3p4/3P4/2P2N2/PPQ2PPP/R3KB1R w KQkq - 0 1
+caption: White has both bishops (b1, f1); Black gave one up. Together White's pair covers EVERY square — a lasting edge in open positions.
+\`\`\`
+
+Before trading a bishop for a knight, ask: *"Will my remaining bishop be good or bad given the pawn structure to come?"*`,
           order: 4,
           difficulty: 3,
           estimatedMinutes: 18,
@@ -1657,24 +1720,37 @@ Before trading a bishop for a knight, ask whether your remaining bishop will be 
           description: 'Use advanced pawns to cramp your opponent and maneuver freely',
           content: `# Space Advantage
 
-**Space** is the territory your pawns control. The side with more space can shuffle pieces behind the lines while the opponent stumbles over each other in a cramped camp.
+**Space** = the rows behind your advanced pawns. More space = more room for your pieces to maneuver while the opponent stumbles over their own.
 
-## How Space Is Gained
-- Advanced pawns (like a chain on e5/d4) push the enemy back and seize squares
-- The more rows your pawns control, the more room your pieces have to maneuver
+## See the space edge
 
-## Using a Space Edge
-1. **Avoid trades** — exchanges relieve the cramped side; keep pieces on to highlight their lack of room
-2. **Maneuver on the side where you have more space**, switching the attack from wing to wing faster than the opponent can react
-3. Use the extra room to **reroute knights** to strong squares
+\`\`\`chess
+mode: interactive
+fen: r1bqkb1r/pp1n1ppp/2p1pn2/3pP3/2PP4/2N2N2/PP3PPP/R1BQKB1R w KQkq - 0 1
+caption: White's pawns on c4/d4/e5 grab the whole 4th and 5th ranks. White has SPACE; Black is cramped.
+\`\`\`
 
-## The Counterplay
-The cramped side has a clear plan too:
-- **Trade pieces** to gain breathing room
-- Strike at the **base of the pawn chain** with a timely pawn break (like ...c5 or ...f6) to challenge the space
+## Two rules for the side with more space
 
-## The Balance
-Space is an asset, not a guarantee. Over-extend and those advanced pawns become weaknesses. Hold the space *and* keep the pawns defensible.`,
+1. **Don't trade pieces** — trades relieve the cramped side
+2. **Switch wings fast** — your pieces move freely behind the lines, the opponent's pieces collide
+
+\`\`\`chess
+mode: animate
+fen: r1bqkb1r/pp1n1ppp/2p1pn2/3pP3/2PP4/2N2N2/PP3PPP/R1BQKB1R w KQkq - 0 1
+moves: Bd3 Be7 O-O O-O h3 Re8 Re1
+autoplay: true
+caption: White calmly develops, refusing trades. Black's pieces have nowhere good to go.
+\`\`\`
+
+## Counterplay for the cramped side
+
+- **Trade pieces** at every chance
+- **Strike the pawn chain** at its base (...c5 or ...f6) to challenge the space
+
+## The trap
+
+Over-extend and your advanced pawns become **weaknesses** instead of strengths. Hold the space, but keep the pawns defensible.`,
           order: 5,
           difficulty: 3,
           estimatedMinutes: 18,
@@ -1696,21 +1772,34 @@ Space is an asset, not a guarantee. Over-extend and those advanced pawns become 
           description: 'Insert a forcing move before the "obvious" recapture',
           content: `# Zwischenzug — the In-Between Move
 
-A *zwischenzug* (German for "in-between move") is a surprise interjection: instead of making the move your opponent expects — usually a recapture — you slip in a more forcing move first.
+German for *"in-between move"*. The opponent expects you to recapture. You don't. You make a **more forcing move first**.
 
-## The Idea
-1. Your opponent plays a capture, expecting you to recapture automatically
-2. Instead you play an **even more forcing move** — usually a check or a bigger threat
-3. The opponent must answer it; *then* you carry out your original recapture, having gained something extra
+## See it in action
 
-## Why It Works
-Recaptures feel automatic, so they are easy to assume. But a check or a mate threat is **more forcing** than a recapture — it jumps the queue. Squeezing one in can win a tempo, an extra pawn, or a whole piece.
+\`\`\`chess
+mode: animate
+fen: r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/3P1N2/PPP2PPP/RNBQ1RK1 w kq - 0 1
+moves: Bxf7+ Kxf7
+caption: Imagine White just took on f7. You'd expect the king to recapture — yes. But sometimes you can squeeze in a CHECK first, win material, THEN take.
+\`\`\`
 
-## How to Spot One
-Before you recapture, always ask: *"Do I have a check or a bigger threat first?"* The in-between move is one of the most overlooked resources in chess — and one of the most common ways strong players win material.
+## The killer trick
 
-## A Cousin: The Desperado
-When a piece is doomed anyway, it can grab material on its way out — a "desperado." That's a close relative of the zwischenzug, covered in its own lesson.`,
+Recaptures feel automatic. But a **check** or **mate threat** is more forcing — it jumps the queue. Slip one in and you collect extra material before the dust settles.
+
+## Try thinking like this
+
+\`\`\`chess
+mode: interactive
+fen: 4k3/8/4r3/8/8/4R3/8/4K3 w - - 0 1
+caption: If you trade rooks (Rxe6 Rxe1 Kxe1), the position is equal. But always ask: "Before I recapture, do I have a CHECK or bigger threat?"
+\`\`\`
+
+## The one-question rule
+
+Before every recapture, ask yourself: ***"Do I have a check or a bigger threat first?"*** This single habit catches countless wins that lazy players miss.
+
+The zwischenzug is one of the most **overlooked** resources in chess. Strong players see it; club players don't.`,
           order: 1,
           difficulty: 4,
           estimatedMinutes: 15,
@@ -1721,29 +1810,35 @@ When a piece is doomed anyway, it can grab material on its way out — a "desper
           description: 'A see-saw of discovered checks that strips the board bare',
           content: `# The Windmill
 
-The windmill (or "see-saw") is one of the most spectacular tactics: a rook and bishop combine to deliver a **repeating cycle of discovered checks**, harvesting enemy material on every turn.
+The most **spectacular** tactic in chess. A rook and bishop combine to deliver a chain of discovered checks, harvesting enemy material on every turn.
 
-## How It Works
-- A bishop aims at the enemy king along a long diagonal
-- A rook sits on that diagonal, blocking the check
-- The rook swings away **with check from the bishop**, grabs a piece, then returns **with a rook check**
-- The enemy king shuffles back and forth, helpless, while you gobble everything in reach
+## Watch the see-saw scythe through
 
 \`\`\`chess
 mode: animate
 fen: 7k/ppp3Rp/8/8/8/8/1B3PPP/6K1 w - - 0 1
 moves: Rxc7+ Kg8 Rg7+ Kh8 Rxb7+ Kg8 Rg7+ Kh8 Rxa7+ Kg8 Rg7+ Kh8
 autoplay: true
-caption: The see-saw: each time the rook leaves g7 the bishop checks, so the rook devours the 7th rank.
+caption: Every time the rook leaves g7, the bishop on b2 checks. The rook devours the 7th rank pawn by pawn. The king bounces helplessly.
 \`\`\`
 
-## The Famous Example
-The most celebrated windmill is **Carlos Torre vs. Emanuel Lasker, Moscow 1925**, where Torre's rook scythed through Black's position before returning to win the queen.
+## The recipe
 
-## The Requirements
-1. A bishop with a clear diagonal to the enemy king
-2. A rook that can alternate between blocking that diagonal (with check) and capturing
-3. An enemy king with only one shuffle square to bounce between`,
+1. **Bishop** with a clear long diagonal to the enemy king
+2. **Rook** that alternates between blocking the diagonal (with check) and capturing
+3. **Enemy king** with only ONE shuffle square between
+
+The king is forced to bounce back-and-forth while you eat everything in reach.
+
+## Spot the setup
+
+\`\`\`chess
+mode: interactive
+fen: 5rk1/6Rp/8/8/8/8/1B6/6K1 w - - 0 1
+caption: Bishop on b2 ✓ Rook on g7 with discovered check ready ✓. The windmill is loaded — Rxh7+ Kxh7? Or even just keep cycling.
+\`\`\`
+
+The most famous windmill: **Torre vs Lasker, Moscow 1925** — Torre's rook scythed through Black's pieces and won the queen at the end of the cycle. One of the most beautiful games ever played.`,
           order: 2,
           difficulty: 5,
           estimatedMinutes: 18,
@@ -1754,22 +1849,36 @@ The most celebrated windmill is **Carlos Torre vs. Emanuel Lasker, Moscow 1925**
           description: 'Vacate a square or line — even by giving up material — to let another piece through',
           content: `# Clearance Sacrifice
 
-Sometimes the piece in your way is *your own*. A **clearance sacrifice** gives up material to vacate a key square, file, or diagonal so another piece can deliver the decisive blow.
+Sometimes the piece in your way is **your own**. A clearance sacrifice gives up material to vacate a key square, file, or diagonal so a bigger threat can land.
 
-## The Concept
-- You have a powerful threat — but one of your own pieces (or pawns) blocks the path
-- You **clear the obstruction**, often by sacrificing it with a forcing move
-- The line opens, and your follow-up wins
+## Watch a line clearance
 
-## Two Flavors
-- **Line clearance:** open a rank, file, or diagonal for a queen, rook, or bishop
-- **Square clearance:** vacate a square so a knight or other piece can land on it with decisive effect
+\`\`\`chess
+mode: interactive
+fen: 6k1/5ppp/8/8/8/8/4RPPP/3R2K1 w - - 0 1
+caption: White wants Rd8+ but the rook on e2 isn't on the d-file. The IDEA: if a piece blocks your file, sacrifice it with a forcing move so your big threat lands.
+\`\`\`
 
-## How to Find It
-When you see a crushing move that's *almost* possible — blocked only by your own unit — look for a forcing way to get that unit out of the way **with tempo**. The opponent must respond to the threat, and your real idea lands the next move.
+## Two flavors
 
-## The Key Principle
-A clearance sacrifice trades **material for time and access**. It only works if the opened line leads to something bigger than what you gave up — so calculate the follow-up to the end.`,
+- **Line clearance** — open a rank/file/diagonal for a long-range piece
+- **Square clearance** — vacate a key square so a knight or piece can land there
+
+## The detective question
+
+When you spot a crushing move that's **almost** possible — blocked only by your own unit — ask: *"Can I shift my own piece out of the way **with tempo**?"* If the shifted piece makes its own threat, the opponent must answer it, and your real move lands next turn.
+
+## The deal
+
+A clearance sacrifice trades **material for time and access**. Only do it if the opened line wins more than you gave up. Calculate to the end.
+
+## Try the thought process
+
+\`\`\`chess
+mode: interactive
+fen: 3r2k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 1
+caption: Rooks face off on the d-file. If you could just clear your own d1-rook with check or a bigger threat, you'd own the file. That hunt for clearance is the tactic.
+\`\`\``,
           order: 3,
           difficulty: 5,
           estimatedMinutes: 15,
@@ -1780,21 +1889,35 @@ A clearance sacrifice trades **material for time and access**. It only works if 
           description: 'Cut the line between an enemy piece and what it defends',
           content: `# Interference
 
-Interference (sometimes called *obstruction* or a *Novotny*) is the rare and beautiful idea of **planting a piece between an enemy piece and the square it guards** — breaking the defensive connection.
+The rarest and most beautiful tactical idea: **plant your own piece between an enemy piece and what it defends** — cutting the line.
 
-## The Concept
-- An enemy piece defends a key square or another piece along a line
-- You interpose a unit **on that line**, often as a sacrifice
-- The defender is suddenly cut off, and the undefended target falls
+## The pattern
 
-## The Novotny
-The classic version drops a piece on a square where **two** enemy line-pieces cross. Whichever one captures it, it blocks the other — so a single sacrifice severs two defenses at once.
+\`\`\`chess
+mode: interactive
+fen: 3r2k1/8/8/8/8/8/3B4/3R2K1 w - - 0 1
+caption: White's d2-bishop and d1-rook face Black's d8-rook. The bishop interferes — if it could be sacrificed mid-file, the rook battery would have a clean shot.
+\`\`\`
 
-## Why It's Hard to Spot
-We instinctively look for captures and checks, not for **quiet interpositions** on empty squares. Interference often involves placing a piece *en prise* in the middle of the board, which looks absurd until you see the point.
+## Why nobody sees it
 
-## How to Hunt for It
-Identify the enemy piece doing the defending and the **line** it works along. Then ask whether you can drop something onto that line to break the connection — even at the cost of material.`,
+Captures and checks scream "look at me!". A **quiet interposition** on an empty square — often putting a piece *en prise* — looks insane until you see the point.
+
+## The Novotny — two defenses cut at once
+
+Drop a piece on a square where **two** enemy line-pieces cross. Whichever one captures, it blocks the other. One sacrifice severs two defenses.
+
+## Hunt for it
+
+When stuck, ask: *"What is that enemy piece defending? Can I put something **on the line** to cut it off?"* The defender suddenly can't defend, and what it was guarding falls.
+
+\`\`\`chess
+mode: interactive
+fen: 6k1/3q4/8/3R4/8/3B4/8/6K1 w - - 0 1
+caption: Black's queen on d7 defends the d-file. If you could plant a piece between d3 and d7 with a threat, the queen couldn't recapture without losing.
+\`\`\`
+
+Interference is what separates calculation wizards from the rest. It's worth one whole rating class on its own.`,
           order: 4,
           difficulty: 5,
           estimatedMinutes: 15,
@@ -1805,20 +1928,34 @@ Identify the enemy piece doing the defending and the **line** it works along. Th
           description: 'A doomed piece sells itself as dearly as possible',
           content: `# The Desperado
 
-A *desperado* is a piece that is **going to be lost anyway**, so it grabs as much material as it can — or forces a favorable trade — before it disappears.
+A piece that's **going to be lost anyway** — so it grabs as much material as it can on its way out. The chess version of "go down swinging."
 
-## Two Situations
-- **A trapped piece:** your piece can't escape capture, so it captures something on its way out, getting *value* for itself instead of nothing
-- **Mutual captures:** when several pieces hang at once, the side to move can have its doomed piece take an extra pawn or piece before the recaptures settle
+## See it pay off
 
-## The Mindset
-When you realize a piece is lost, don't just give it up. Ask: *"What can it take or accomplish before it dies?"* A knight that's about to be captured might snap off a central pawn; a rook caught in a trade might grab a defender first.
+\`\`\`chess
+mode: interactive
+fen: 4k3/8/8/4p3/3n4/8/3P4/4K3 w - - 0 1
+caption: White's d2-pawn is attacked by Black's knight. Before it dies — take the e5-pawn (d2 isn't the desperado here, but the IDEA is: a doomed piece grabs material on its way out).
+\`\`\`
 
-## Defensive Desperado
-The idea also saves half-points: a piece about to be lost can sometimes force a **perpetual check** or a drawing simplification by throwing itself at the enemy king.
+## The mindset that wins games
 
-## The Lesson
-No piece should die for free. Squeeze every last bit of value out of a doomed unit — that's the desperado.`,
+When you realize a piece is lost, **don't sigh and give it up**. Ask:
+- *Can it capture something on the way out?*
+- *Can it force a favorable trade?*
+- *Can it block a critical square long enough for help to arrive?*
+
+## A defensive desperado
+
+\`\`\`chess
+mode: interactive
+fen: 7k/6pp/8/8/8/8/q7/6QK w - - 0 1
+caption: White's queen is losing material soon. Throw it at the king with checks — perpetual check forces a draw from a lost position.
+\`\`\`
+
+## The lesson
+
+**No piece should die for free.** Squeeze every last bit of value out of a doomed unit — a captured pawn, a tempo, a draw by repetition. That's the desperado.`,
           order: 5,
           difficulty: 4,
           estimatedMinutes: 15,
