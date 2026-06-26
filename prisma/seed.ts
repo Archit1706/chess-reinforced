@@ -1962,6 +1962,179 @@ caption: White's queen is losing material soon. Throw it at the king with checks
         },
       ],
     },
+    {
+      slug: 'strategic-thinking',
+      title: 'Strategic Thinking',
+      description: 'The planning skills that separate good players from great ones',
+      level: 'intermediate',
+      order: 5,
+      icon: 'Lightbulb',
+      lessons: [
+        {
+          slug: 'piece-values-and-trading',
+          title: 'Piece Values & Trading',
+          description: 'Know what your pieces are worth and when to swap them',
+          content: `# Piece Values & Trading
+
+Every piece has a price. Knowing it tells you instantly whether a trade is good, bad, or a disaster.
+
+## The point system
+
+\`\`\`chess
+mode: interactive
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+caption: Pawn = 1 · Knight = 3 · Bishop = 3 · Rook = 5 · Queen = 9 · King = priceless. Memorize these — they guide every capture.
+\`\`\`
+
+## A good trade wins material
+
+\`\`\`chess
+mode: animate
+fen: 4k3/8/8/6r1/8/4B3/8/4K3 w - - 0 1
+moves: Bxg5
+caption: Bishop (3) takes rook (5) — you gain 2 points of material. A clearly good trade.
+\`\`\`
+
+## The trading rules
+
+1. **Trade when you're ahead** — fewer pieces makes your extra material decisive
+2. **Avoid trades when behind** — you need pieces on the board to create chances
+3. **Trade your bad pieces** for the opponent's good ones
+4. **Never trade a higher value for a lower** unless it wins something bigger (a mate, a fork, a promotion)
+
+## Count before every capture
+
+\`\`\`chess
+mode: interactive
+fen: 4k3/8/8/3q4/4P3/8/8/4K3 w - - 0 1
+caption: The pawn can take the queen! exd5 wins 9 points for free. Always check: is something hanging?
+\`\`\`
+
+Counting material is the first habit of every strong player. Do it every move.`,
+          order: 1,
+          difficulty: 1,
+          estimatedMinutes: 12,
+        },
+        {
+          slug: 'prophylaxis',
+          title: 'Prophylaxis',
+          description: "Stop your opponent's plan before you push your own",
+          content: `# Prophylaxis
+
+The most underrated skill in chess: **prevent your opponent's idea** before you chase your own. Named by Aron Nimzowitsch.
+
+## The key question
+
+Before every move, ask: ***"What does my opponent want to do?"*** Then stop it.
+
+\`\`\`chess
+mode: interactive
+fen: r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/2N2N2/PPPP1PPP/R1BQK2R w KQkq - 0 1
+caption: Before developing further, notice Black eyes ...Ng4 and ...d5 breaks. A prophylactic move like h3 quietly removes a threat before it appears.
+\`\`\`
+
+## A famous prophylactic move
+
+\`\`\`chess
+mode: animate
+fen: r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/2N2N2/PPPP1PPP/R1BQK2R w KQkq - 0 1
+moves: h3
+caption: h3 looks like a "nothing" move — but it permanently stops ...Bg4 and ...Ng4. Small, quiet, strong.
+\`\`\`
+
+## How to play prophylactically
+
+1. Spot the opponent's **most natural plan**
+2. Ask if **one quiet move** can prevent it
+3. Make that move — *then* pursue your own ideas
+
+## Why it wins
+
+Most players think only about their own attack. The prophylactic player sees both sides of the board — and slowly suffocates the opponent's counterplay. It's how Karpov and Petrosian crushed the world.`,
+          order: 2,
+          difficulty: 4,
+          estimatedMinutes: 15,
+        },
+        {
+          slug: 'two-weaknesses',
+          title: 'The Principle of Two Weaknesses',
+          description: 'One weakness rarely loses — two usually do',
+          content: `# The Principle of Two Weaknesses
+
+A single weakness can often be defended. **Two weaknesses** on opposite sides of the board stretch the defender until something snaps.
+
+## Why one isn't enough
+
+\`\`\`chess
+mode: interactive
+fen: 6k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 1
+caption: If Black has just ONE weak pawn, the defender plants a piece on it and holds. You need a SECOND target to win.
+\`\`\`
+
+## Open a second front
+
+\`\`\`chess
+mode: interactive
+fen: 6k1/p4ppp/8/8/8/8/5PPP/R5K1 w - - 0 1
+caption: Black has a weak a7-pawn AND a vulnerable king. White attacks BOTH — the defender can't cover both sides at once.
+\`\`\`
+
+## The winning method
+
+1. Create or fix a **first weakness** (a weak pawn, a draughty king)
+2. Tie an enemy piece down to defending it
+3. Open a **second front** elsewhere
+4. The overloaded defender collapses
+
+## The big idea
+
+Strong players don't just pile up on one target. They **provoke a second weakness**, then bounce the attack between the two until the defense cracks. It's the deepest winning method in chess strategy.`,
+          order: 3,
+          difficulty: 4,
+          estimatedMinutes: 15,
+        },
+        {
+          slug: 'improve-your-worst-piece',
+          title: 'Improve Your Worst Piece',
+          description: "The simplest plan when you don't know what to do",
+          content: `# Improve Your Worst Piece
+
+Stuck for a plan? Here's the most practical advice in all of chess: **find your worst-placed piece and make it better.**
+
+## Spot the sad piece
+
+\`\`\`chess
+mode: interactive
+fen: r1bq1rk1/ppp2ppp/2np1n2/2b1p3/2B1P3/2NP1N2/PPP2PPP/R1BQ1RK1 w - - 0 1
+caption: Which white piece is doing the least? The c1-bishop is hemmed in. Finding a good square for it is your plan.
+\`\`\`
+
+## Reroute it to a better home
+
+\`\`\`chess
+mode: animate
+fen: r1bq1rk1/ppp2ppp/2np1n2/2b1p3/2B1P3/2NP1N2/PPP2PPP/R1BQ1RK1 w - - 0 1
+moves: Bg5
+caption: Bg5 develops the sleepy bishop to an active square, pinning the f6-knight. The worst piece just became useful.
+\`\`\`
+
+## The method
+
+1. Look at **all your pieces**, one by one
+2. Find the one with the **fewest good squares** or no purpose
+3. Find it a better home — even if it takes two or three moves
+
+## Why it works
+
+A position is only as strong as its **weakest piece**. When every piece is active, threats appear by themselves. When you have no plan, this rule always gives you one.
+
+*"Sit on your hands and find your worst piece"* — the timeless coaching advice.`,
+          order: 4,
+          difficulty: 3,
+          estimatedMinutes: 12,
+        },
+      ],
+    },
 
     // === ADVANCED MODULES ===
     {
@@ -2832,6 +3005,42 @@ This is the rule that saves more half-points than any other. Memorize it.`,
       eco: 'D97',
       themes: 'sacrifice,attack,tactical',
       difficulty: 5,
+    },
+    {
+      id: 'opera-game',
+      white: 'Paul Morphy',
+      black: 'Duke of Brunswick & Count Isouard',
+      year: 1858,
+      event: 'Paris Opera',
+      result: '1-0',
+      pgn: '1.e4 e5 2.Nf3 d6 3.d4 Bg4 4.dxe5 Bxf3 5.Qxf3 dxe5 6.Bc4 Nf6 7.Qb3 Qe7 8.Nc3 c6 9.Bg5 b5 10.Nxb5 cxb5 11.Bxb5+ Nbd7 12.O-O-O Rd8 13.Rxd7 Rxd7 14.Rd1 Qe6 15.Bxd7+ Nxd7 16.Qb8+ Nxb8 17.Rd8# 1-0',
+      eco: 'C41',
+      themes: 'sacrifice,attack,development,romantic',
+      difficulty: 2,
+    },
+    {
+      id: 'evergreen-game',
+      white: 'Adolf Anderssen',
+      black: 'Jean Dufresne',
+      year: 1852,
+      event: 'Berlin',
+      result: '1-0',
+      pgn: '1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4 Bxb4 5.c3 Ba5 6.d4 exd4 7.O-O d3 8.Qb3 Qf6 9.e5 Qg6 10.Re1 Nge7 11.Ba3 b5 12.Qxb5 Rb8 13.Qa4 Bb6 14.Nbd2 Bb7 15.Ne4 Qf5 16.Bxd3 Qh5 17.Nf6+ gxf6 18.exf6 Rg8 19.Rad1 Qxf3 20.Rxe7+ Nxe7 21.Qxd7+ Kxd7 22.Bf5+ Ke8 23.Bd7+ Kf8 24.Bxe7# 1-0',
+      eco: 'C52',
+      themes: 'sacrifice,attack,combination,romantic',
+      difficulty: 4,
+    },
+    {
+      id: 'reti-tartakower',
+      white: 'Richard Réti',
+      black: 'Savielly Tartakower',
+      year: 1910,
+      event: 'Vienna',
+      result: '1-0',
+      pgn: '1.e4 c6 2.d4 d5 3.Nc3 dxe4 4.Nxe4 Nf6 5.Qd3 e5 6.dxe5 Qa5+ 7.Bd2 Qxe5 8.O-O-O Nxe4 9.Qd8+ Kxd8 10.Bg5+ Kc7 11.Bd8# 1-0',
+      eco: 'B15',
+      themes: 'sacrifice,mate,queenSacrifice,miniature',
+      difficulty: 3,
     },
   ];
 

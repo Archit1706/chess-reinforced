@@ -306,6 +306,28 @@ export const LESSON_DEMOS: Record<string, LessonDemo> = {
     fen: '8/8/8/8/8/6b1/5k1p/7K w - - 0 1',
     caption: 'Wrong bishop: it cannot control h1, so the cornered king is stalemated — a draw.',
   },
+  'piece-values-and-trading': {
+    mode: 'interactive',
+    fen: '4k3/8/8/3q4/4P3/8/8/4K3 w - - 0 1',
+    caption: 'The pawn can take the queen — exd5 wins 9 points for free. Always check what is hanging.',
+  },
+  prophylaxis: {
+    mode: 'animate',
+    fen: 'r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/2N2N2/PPPP1PPP/R1BQK2R w KQkq - 0 1',
+    moves: ['h3'],
+    caption: 'h3 looks like nothing — but it permanently stops ...Bg4 and ...Ng4. Quiet prevention.',
+  },
+  'two-weaknesses': {
+    mode: 'interactive',
+    fen: '6k1/p4ppp/8/8/8/8/5PPP/R5K1 w - - 0 1',
+    caption: 'Black has a weak a7-pawn AND a loose king — attack both and the defender cracks.',
+  },
+  'improve-your-worst-piece': {
+    mode: 'animate',
+    fen: 'r1bq1rk1/ppp2ppp/2np1n2/2b1p3/2B1P3/2NP1N2/PPP2PPP/R1BQ1RK1 w - - 0 1',
+    moves: ['Bg5'],
+    caption: 'Bg5 develops the sleepy c1-bishop to an active square — your worst piece, improved.',
+  },
   'back-rank-mate': {
     mode: 'animate',
     fen: '6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1',
