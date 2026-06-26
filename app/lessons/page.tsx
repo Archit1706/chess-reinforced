@@ -115,7 +115,13 @@ export default function LessonsPage() {
 
   useEffect(() => {
     startSession();
-    fetchModules().then(setModules);
+    let active = true;
+    fetchModules().then((rows) => {
+      if (active) setModules(rows);
+    });
+    return () => {
+      active = false;
+    };
   }, [startSession]);
 
   if (modules === null) {

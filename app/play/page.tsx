@@ -82,7 +82,8 @@ export default function PlayPage() {
     getPgn,
   } = useGameStore();
 
-  const { showEvaluation, autoAnalyze } = useUIStore();
+  const { showEvaluation, autoAnalyze, showLegalMoves, toggleEvaluation, toggleLegalMoves } =
+    useUIStore();
   const { recordGamePlayed, startSession } = useUserStore();
 
   const [engineReady, setEngineReady] = useState(false);
@@ -96,6 +97,9 @@ export default function PlayPage() {
   const [hintLoading, setHintLoading] = useState(false);
   // Guard so a finished game is persisted to history exactly once.
   const savedGameRef = useRef(false);
+  // Track the FEN the computer last attempted to move from, so a failed engine
+  // reply (illegal move / dead worker) can't loop the move-trigger effect.
+  const computerLastFenRef = useRef<string | null>(null);
 
   const playerToMove = mode === 'vsComputer' && !isGameOver && turn === playerColor;
 
@@ -119,20 +123,37 @@ export default function PlayPage() {
 
   // Make the computer move when it's its turn. Not gated on engineReady: if
   // Stockfish hasn't loaded, makeComputerMove falls back to the local engine,
-  // so the computer always replies.
+  // so the computer always replies. Guards against re-firing on the same FEN
+  // (which would loop forever if the engine returned an illegal move).
   useEffect(() => {
-    if (mode === 'vsComputer' && !isGameOver && turn !== playerColor && !isThinking) {
+    if (
+      mode === 'vsComputer' &&
+      !isGameOver &&
+      turn !== playerColor &&
+      !isThinking &&
+      computerLastFenRef.current !== fen
+    ) {
+      computerLastFenRef.current = fen;
       makeComputerMove();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, turn, playerColor, isGameOver, isThinking, fen]);
 
-  // Analyze position when autoAnalyze is enabled
+  // Reset the per-FEN guard whenever a new game starts so the computer can move
+  // again from the fresh starting position.
   useEffect(() => {
-    if (autoAnalyze && engineReady && !isThinking) {
+    if (history.length === 0) computerLastFenRef.current = null;
+  }, [history.length]);
+
+  // Analyze position when autoAnalyze is enabled. Skips during the engine's
+  // own turn so auto-analyze can't compete with the move search for the same
+  // (serialized) engine slot.
+  useEffect(() => {
+    if (autoAnalyze && engineReady && !isThinking && turn === playerColor && !isGameOver) {
       analyzeCurrentPosition();
     }
-  }, [fen, autoAnalyze, engineReady]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fen, autoAnalyze, engineReady, isThinking, turn, playerColor, isGameOver]);
 
   // Reset the save guard whenever a fresh game is in progress.
   useEffect(() => {
@@ -489,18 +510,12 @@ export default function PlayPage() {
 
               <div className="flex items-center justify-between">
                 <span className="text-sm">Show Evaluation</span>
-                <Switch
-                  checked={showEvaluation}
-                  onCheckedChange={() => useUIStore.getState().toggleEvaluation()}
-                />
+                <Switch checked={showEvaluation} onCheckedChange={toggleEvaluation} />
               </div>
 
               <div className="flex items-center justify-between">
                 <span className="text-sm">Show Legal Moves</span>
-                <Switch
-                  checked={useUIStore.getState().showLegalMoves}
-                  onCheckedChange={() => useUIStore.getState().toggleLegalMoves()}
-                />
+                <Switch checked={showLegalMoves} onCheckedChange={toggleLegalMoves} />
               </div>
             </CardContent>
           </Card>

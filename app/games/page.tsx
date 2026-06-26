@@ -30,9 +30,17 @@ export default function GamesPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
+    let active = true;
     fetchGames()
-      .then(setGames)
-      .finally(() => setLoading(false));
+      .then((rows) => {
+        if (active) setGames(rows);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
   }, []);
 
   const handleDelete = async (id: string) => {

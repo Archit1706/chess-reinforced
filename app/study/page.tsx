@@ -20,7 +20,13 @@ export default function StudyPage() {
   const [games, setGames] = useState<FamousGameSummary[] | null>(null);
 
   useEffect(() => {
-    fetchFamousGames().then(setGames);
+    let active = true;
+    fetchFamousGames().then((rows) => {
+      if (active) setGames(rows);
+    });
+    return () => {
+      active = false;
+    };
   }, []);
 
   return (

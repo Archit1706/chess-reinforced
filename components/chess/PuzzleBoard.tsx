@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Chess, Square, PieceSymbol } from 'chess.js';
 import { ChessBoard } from './ChessBoard';
 import { Button } from '@/components/ui/button';
@@ -62,6 +62,39 @@ export function PuzzleBoard({
   const [hintsUsed, setHintsUsed] = useState(0);
   const [lastMove, setLastMove] = useState<{ from: Square; to: Square } | null>(null);
 
+  // Track pending timers + mount status so a fast unmount/skip can't fire
+  // setState callbacks (or double-call onSolved) after the board is gone.
+  const timersRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
+  const mountedRef = useRef(true);
+  const solvedFiredRef = useRef(false);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    const timers = timersRef.current;
+    return () => {
+      mountedRef.current = false;
+      timers.forEach(clearTimeout);
+      timers.clear();
+    };
+  }, []);
+
+  /** Schedule a callback that no-ops if the board has already unmounted. */
+  const safeTimeout = useCallback((fn: () => void, ms: number) => {
+    const id = setTimeout(() => {
+      timersRef.current.delete(id);
+      if (mountedRef.current) fn();
+    }, ms);
+    timersRef.current.add(id);
+    return id;
+  }, []);
+
+  /** Fire `onSolved` at most once for this puzzle instance. */
+  const fireSolved = useCallback(() => {
+    if (solvedFiredRef.current) return;
+    solvedFiredRef.current = true;
+    onSolved?.();
+  }, [onSolved]);
+
   // Determine player color (opposite of first move's color)
   const playerColor = game.turn();
 
@@ -104,24 +137,29 @@ export function PuzzleBoard({
             // Flash the winning move green first, THEN reveal the solved panel,
             // so the user sees their move land instead of the board vanishing.
             setPuzzleState('correct');
-            setTimeout(() => {
+            safeTimeout(() => {
               setPuzzleState('solved');
-              onSolved?.();
+              fireSolved();
             }, SOLVE_REVEAL_MS);
           } else {
             // Show correct feedback briefly
             setPuzzleState('correct');
 
             // Make opponent's response after a short delay
-            setTimeout(() => {
+            safeTimeout(() => {
               const opponentMoveUci = moves[moveIndex + 1];
               if (opponentMoveUci) {
                 const oppMove = parseUciMove(opponentMoveUci);
-                game.move({
-                  from: oppMove.from,
-                  to: oppMove.to,
-                  promotion: oppMove.promotion,
-                });
+                try {
+                  game.move({
+                    from: oppMove.from,
+                    to: oppMove.to,
+                    promotion: oppMove.promotion,
+                  });
+                } catch {
+                  // Skip a malformed engine reply rather than crashing the board.
+                  return;
+                }
                 setCurrentFen(game.fen());
                 setLastMove({ from: oppMove.from, to: oppMove.to });
                 setMoveIndex(moveIndex + 2);
@@ -129,9 +167,9 @@ export function PuzzleBoard({
                 // Check if that was the last move
                 if (moveIndex + 2 >= moves.length) {
                   setPuzzleState('correct');
-                  setTimeout(() => {
+                  safeTimeout(() => {
                     setPuzzleState('solved');
-                    onSolved?.();
+                    fireSolved();
                   }, SOLVE_REVEAL_MS);
                 } else {
                   setPuzzleState('playing');
@@ -151,14 +189,14 @@ export function PuzzleBoard({
         onFailed?.();
 
         // Reset after showing feedback
-        setTimeout(() => {
+        safeTimeout(() => {
           setPuzzleState('playing');
         }, 1000);
 
         return false;
       }
     },
-    [game, moves, moveIndex, puzzleState, onSolved, onFailed]
+    [game, moves, moveIndex, puzzleState, onFailed, safeTimeout, fireSolved]
   );
 
   // Show hint
@@ -166,11 +204,15 @@ export function PuzzleBoard({
     setShowHint(true);
     setHintsUsed((h) => h + 1);
     // Hide hint after 3 seconds
-    setTimeout(() => setShowHint(false), 3000);
+    safeTimeout(() => setShowHint(false), 3000);
   };
 
   // Retry puzzle
   const handleRetry = () => {
+    // Clear any pending flash/opponent-reply timers from the previous attempt.
+    timersRef.current.forEach(clearTimeout);
+    timersRef.current.clear();
+    solvedFiredRef.current = false;
     game.load(fen);
     setCurrentFen(fen);
     setMoveIndex(0);

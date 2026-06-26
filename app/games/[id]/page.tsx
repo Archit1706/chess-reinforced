@@ -37,9 +37,17 @@ export default function GameDetailPage({ params }: { params: { id: string } }) {
   const [analysis, setAnalysis] = useState<GameAnalysis | null>(null);
 
   useEffect(() => {
+    let active = true;
     fetchGame(params.id)
-      .then(setGame)
-      .finally(() => setLoading(false));
+      .then((g) => {
+        if (active) setGame(g);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
   }, [params.id]);
 
   // Parse the PGN into a verbose move list for the analysis panel.

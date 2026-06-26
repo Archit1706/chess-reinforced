@@ -54,10 +54,18 @@ export default function DashboardPage() {
 
   useEffect(() => {
     startSession();
+    let active = true;
     fetch('/api/dashboard')
       .then((res) => (res.ok ? res.json() : null))
-      .then((data) => setDash(data))
-      .catch(() => setDash(null));
+      .then((data) => {
+        if (active) setDash(data);
+      })
+      .catch(() => {
+        if (active) setDash(null);
+      });
+    return () => {
+      active = false;
+    };
   }, [startSession]);
 
   const stats = user?.stats || {
