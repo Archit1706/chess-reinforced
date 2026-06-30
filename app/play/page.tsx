@@ -247,28 +247,38 @@ export default function PlayPage() {
 
   // Suggest the player's best move as an arrow. Prefers full-strength Stockfish
   // (the playing engine is ELO-limited), falling back to the local engine.
+  //
+  // Race-safe: captures the FEN at request time and discards the result if the
+  // position has changed by the time the engine replies. Without this guard, a
+  // hint requested at position X that resolves AFTER the player moves to Y
+  // would paint a stale arrow on the new position.
   const getHint = async () => {
     if (!playerToMove || isThinking || hintLoading) return;
+    const requestFen = fen;
+    const isStale = () => useGameStore.getState().fen !== requestFen;
+
     setHintLoading(true);
     try {
       let uci: string | null = null;
       if (isEngineReady()) {
         uci = await Promise.race<string | null>([
-          analyzePosition(fen, 15, 1).then((r) => r.bestMove),
+          analyzePosition(requestFen, 15, 1).then((r) => r.bestMove),
           new Promise<null>((resolve) => setTimeout(() => resolve(null), 2500)),
         ]);
       }
-      if (!uci) uci = getLocalBestMove(fen, 2200);
-      if (uci) {
+      if (!uci) uci = getLocalBestMove(requestFen, 2200);
+      if (uci && !isStale()) {
         const { from, to } = parseUciMove(uci);
         setHintArrow([from as Square, to as Square]);
       }
     } catch (error) {
       console.error('Hint failed:', error);
-      const fallback = getLocalBestMove(fen, 2200);
-      if (fallback) {
-        const { from, to } = parseUciMove(fallback);
-        setHintArrow([from as Square, to as Square]);
+      if (!isStale()) {
+        const fallback = getLocalBestMove(requestFen, 2200);
+        if (fallback && !isStale()) {
+          const { from, to } = parseUciMove(fallback);
+          setHintArrow([from as Square, to as Square]);
+        }
       }
     } finally {
       setHintLoading(false);
@@ -358,7 +368,9 @@ export default function PlayPage() {
             <div className="relative flex-1 min-w-0">
               <ChessBoard
                 boardWidth={560}
-                customArrows={hintArrow ? [[hintArrow[0], hintArrow[1], 'rgb(34, 197, 94)']] : undefined}
+                customArrows={
+                  hintArrow ? [[hintArrow[0], hintArrow[1], 'rgb(34, 197, 94)']] : []
+                }
               />
 
               {/* Thinking indicator */}

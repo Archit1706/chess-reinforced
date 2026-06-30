@@ -1,17 +1,16 @@
 'use client';
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
-import { Square, PieceSymbol } from 'chess.js';
+import { Chess, Square, PieceSymbol } from 'chess.js';
 import { useGameStore } from '@/store/game-store';
 import { useUIStore } from '@/store/ui-store';
 import { useContainerWidth } from '@/hooks/useContainerWidth';
 import { cn } from '@/lib/utils';
 
-// Define promotion piece option type (react-chessboard uses "wQ", "wR", etc.)
+// react-chessboard uses promotion strings like "wQ" / "bR".
 type PromotionPiece = 'wQ' | 'wR' | 'wB' | 'wN' | 'bQ' | 'bR' | 'bB' | 'bN';
 
-// Helper to extract piece symbol from promotion option (e.g., "wQ" -> "q")
 function extractPieceSymbol(promotionPiece: PromotionPiece): PieceSymbol {
   return promotionPiece[1].toLowerCase() as PieceSymbol;
 }
@@ -24,11 +23,23 @@ interface ChessBoardProps {
   customArrows?: [Square, Square, string?][];
   customSquareStyles?: Record<string, React.CSSProperties>;
   onMove?: (from: Square, to: Square, promotion?: PieceSymbol) => boolean;
+  /**
+   * When provided, ChessBoard runs in **local mode**: selection / legal-move
+   * highlights / last-move highlight are derived from THIS chess.js instance
+   * instead of the global game store. Use for puzzles, viewers, mistake
+   * trainers — anywhere the displayed position is decoupled from the play
+   * page's game (otherwise you'd see the play-page's turn/selection bleeding
+   * onto a puzzle position).
+   */
+  localGame?: Chess;
+  /** Explicit board orientation override (defaults to global config). */
+  boardOrientation?: 'w' | 'b' | 'white' | 'black';
 }
 
 /**
- * Main chess board component using react-chessboard
- * Handles piece movement, highlighting, and visual feedback
+ * Main interactive chess board.
+ * - Default: bound to the global game store (play page).
+ * - With `localGame`: self-contained, uses its own selection state.
  */
 export function ChessBoard({
   className,
@@ -38,28 +49,63 @@ export function ChessBoard({
   customArrows,
   customSquareStyles,
   onMove,
+  localGame,
+  boardOrientation,
 }: ChessBoardProps) {
   const {
-    fen,
-    selectedSquare,
-    legalMoves,
-    lastMove,
+    fen: storeFen,
+    selectedSquare: storeSelected,
+    legalMoves: storeLegal,
+    lastMove: storeLastMove,
     config,
-    selectSquare,
-    movePiece,
-    isGameOver,
+    selectSquare: storeSelect,
+    movePiece: storeMove,
+    isGameOver: storeIsGameOver,
+    game: storeGame,
   } = useGameStore();
 
   const { showLegalMoves, highlightLastMove, animationSpeed } = useUIStore();
 
-  // Promotion dialog state
+  const useLocal = !!localGame;
+
+  // Local selection state — only used in local mode.
+  const [localSelected, setLocalSelected] = useState<Square | null>(null);
+  const [localLegal, setLocalLegal] = useState<Square[]>([]);
+  const [localLastMove, setLocalLastMove] = useState<{
+    from: Square;
+    to: Square;
+  } | null>(null);
+
+  // Promotion dialog state.
   const [showPromotion, setShowPromotion] = useState(false);
   const [promotionSquare, setPromotionSquare] = useState<{
     from: Square;
     to: Square;
   } | null>(null);
 
-  // Calculate animation duration
+  // Reset local selection whenever the displayed position changes (e.g., a new
+  // puzzle is loaded, or the opponent's reply landed).
+  useEffect(() => {
+    if (useLocal) {
+      setLocalSelected(null);
+      setLocalLegal([]);
+    }
+  }, [useLocal, customFen]);
+
+  // Reset local lastMove when a fresh puzzle starts (FEN matches localGame's
+  // current FEN AND no move has been played yet against this instance).
+  useEffect(() => {
+    if (useLocal && localGame && customFen && localGame.history().length === 0) {
+      setLocalLastMove(null);
+    }
+  }, [useLocal, localGame, customFen]);
+
+  // Effective view of selection / legal moves / last move based on mode.
+  const effectiveSelected = useLocal ? localSelected : storeSelected;
+  const effectiveLegal = useLocal ? localLegal : storeLegal;
+  const effectiveLastMove = useLocal ? localLastMove : storeLastMove;
+  const effectiveIsGameOver = useLocal ? localGame!.isGameOver() : storeIsGameOver;
+
   const animationDuration = useMemo(() => {
     switch (animationSpeed) {
       case 'slow':
@@ -73,38 +119,32 @@ export function ChessBoard({
     }
   }, [animationSpeed]);
 
-  // Generate square styles for highlighting
+  // Generate square styles for highlighting.
   const squareStyles = useMemo(() => {
     const styles: Record<string, React.CSSProperties> = {};
 
-    // Custom styles take precedence
-    if (customSquareStyles) {
-      Object.assign(styles, customSquareStyles);
-    }
+    if (customSquareStyles) Object.assign(styles, customSquareStyles);
 
-    // Highlight last move
-    if (highlightLastMove && lastMove) {
-      styles[lastMove.from] = {
-        ...styles[lastMove.from],
+    if (highlightLastMove && effectiveLastMove) {
+      styles[effectiveLastMove.from] = {
+        ...styles[effectiveLastMove.from],
         backgroundColor: 'rgba(255, 255, 0, 0.4)',
       };
-      styles[lastMove.to] = {
-        ...styles[lastMove.to],
+      styles[effectiveLastMove.to] = {
+        ...styles[effectiveLastMove.to],
         backgroundColor: 'rgba(255, 255, 0, 0.4)',
       };
     }
 
-    // Highlight selected square
-    if (selectedSquare) {
-      styles[selectedSquare] = {
-        ...styles[selectedSquare],
+    if (effectiveSelected) {
+      styles[effectiveSelected] = {
+        ...styles[effectiveSelected],
         backgroundColor: 'rgba(186, 202, 68, 0.6)',
       };
     }
 
-    // Show legal moves
-    if (showLegalMoves && selectedSquare && legalMoves.length > 0) {
-      legalMoves.forEach((square) => {
+    if (showLegalMoves && effectiveSelected && effectiveLegal.length > 0) {
+      effectiveLegal.forEach((square) => {
         styles[square] = {
           ...styles[square],
           background:
@@ -118,28 +158,50 @@ export function ChessBoard({
   }, [
     customSquareStyles,
     highlightLastMove,
-    lastMove,
-    selectedSquare,
+    effectiveLastMove,
+    effectiveSelected,
     showLegalMoves,
-    legalMoves,
+    effectiveLegal,
   ]);
 
-  // Handle piece drag start
-  const onPieceDragBegin = useCallback(
-    (piece: string, sourceSquare: Square) => {
-      if (!interactive || isGameOver) return false;
-      selectSquare(sourceSquare);
-      return true;
+  /** Select a square in local mode — derives legal moves from `localGame`. */
+  const selectLocalSquare = useCallback(
+    (square: Square | null) => {
+      if (!localGame) return;
+      if (!square) {
+        setLocalSelected(null);
+        setLocalLegal([]);
+        return;
+      }
+      const piece = localGame.get(square);
+      if (piece && piece.color === localGame.turn()) {
+        const moves = localGame.moves({ square, verbose: true });
+        setLocalSelected(square);
+        setLocalLegal(moves.map((m) => m.to as Square));
+      } else {
+        setLocalSelected(null);
+        setLocalLegal([]);
+      }
     },
-    [interactive, isGameOver, selectSquare]
+    [localGame]
   );
 
-  // Handle piece drop
+  // Handle piece drag start.
+  const onPieceDragBegin = useCallback(
+    (_piece: string, sourceSquare: Square) => {
+      if (!interactive || effectiveIsGameOver) return false;
+      if (useLocal) selectLocalSquare(sourceSquare);
+      else storeSelect(sourceSquare);
+      return true;
+    },
+    [interactive, effectiveIsGameOver, useLocal, selectLocalSquare, storeSelect]
+  );
+
+  // Handle piece drop.
   const onPieceDrop = useCallback(
     (sourceSquare: Square, targetSquare: Square, piece: string) => {
       if (!interactive) return false;
 
-      // Check for pawn promotion
       const isPawnPromotion =
         piece[1] === 'P' &&
         ((piece[0] === 'w' && targetSquare[1] === '8') ||
@@ -151,86 +213,115 @@ export function ChessBoard({
         return false;
       }
 
-      // Use custom onMove handler if provided
       if (onMove) {
-        return onMove(sourceSquare, targetSquare);
+        const ok = onMove(sourceSquare, targetSquare);
+        if (ok && useLocal) {
+          setLocalSelected(null);
+          setLocalLegal([]);
+          setLocalLastMove({ from: sourceSquare, to: targetSquare });
+        }
+        return ok;
       }
-
-      // Default: use store's movePiece
-      return movePiece(sourceSquare, targetSquare);
+      return storeMove(sourceSquare, targetSquare);
     },
-    [interactive, onMove, movePiece]
+    [interactive, onMove, storeMove, useLocal]
   );
 
-  // Handle promotion selection
-  // react-chessboard uses promotion pieces like "wQ", "bR", etc.
+  // Handle promotion selection.
   const onPromotionPieceSelect = useCallback(
     (piece?: PromotionPiece, promoteFromSquare?: Square, promoteToSquare?: Square) => {
       setShowPromotion(false);
       if (!piece) return false;
 
-      // Use provided squares or fall back to stored promotion square
       const from = promoteFromSquare || promotionSquare?.from;
       const to = promoteToSquare || promotionSquare?.to;
-
       if (!from || !to) return false;
 
       setPromotionSquare(null);
-
-      // Extract the piece symbol (e.g., "wQ" -> "q")
       const pieceSymbol = extractPieceSymbol(piece);
 
       if (onMove) {
-        return onMove(from, to, pieceSymbol);
+        const ok = onMove(from, to, pieceSymbol);
+        if (ok && useLocal) {
+          setLocalSelected(null);
+          setLocalLegal([]);
+          setLocalLastMove({ from, to });
+        }
+        return ok;
       }
-      return movePiece(from, to, pieceSymbol);
+      return storeMove(from, to, pieceSymbol);
     },
-    [promotionSquare, onMove, movePiece]
+    [promotionSquare, onMove, storeMove, useLocal]
   );
 
-  // Handle square click
+  // Handle square click.
   const onSquareClick = useCallback(
     (square: Square) => {
-      if (!interactive || isGameOver) return;
+      if (!interactive || effectiveIsGameOver) return;
 
-      // If a square is already selected, try to move there
-      if (selectedSquare && legalMoves.includes(square)) {
-        const piece = useGameStore.getState().game.get(selectedSquare);
+      // If a square is already selected and the click is a legal target, move.
+      if (effectiveSelected && effectiveLegal.includes(square)) {
+        const sourceGame = useLocal ? localGame! : storeGame;
+        const piece = sourceGame.get(effectiveSelected);
         const isPawnPromotion =
           piece?.type === 'p' &&
           ((piece.color === 'w' && square[1] === '8') ||
             (piece.color === 'b' && square[1] === '1'));
 
         if (isPawnPromotion) {
-          setPromotionSquare({ from: selectedSquare, to: square });
+          setPromotionSquare({ from: effectiveSelected, to: square });
           setShowPromotion(true);
           return;
         }
 
         if (onMove) {
-          onMove(selectedSquare, square);
+          const ok = onMove(effectiveSelected, square);
+          if (ok && useLocal) {
+            setLocalSelected(null);
+            setLocalLegal([]);
+            setLocalLastMove({ from: effectiveSelected, to: square });
+          }
         } else {
-          movePiece(selectedSquare, square);
+          storeMove(effectiveSelected, square);
         }
         return;
       }
 
-      // Otherwise, select the clicked square
-      selectSquare(square);
+      if (useLocal) selectLocalSquare(square);
+      else storeSelect(square);
     },
-    [interactive, isGameOver, selectedSquare, legalMoves, onMove, movePiece, selectSquare]
+    [
+      interactive,
+      effectiveIsGameOver,
+      effectiveSelected,
+      effectiveLegal,
+      useLocal,
+      localGame,
+      storeGame,
+      onMove,
+      storeMove,
+      selectLocalSquare,
+      storeSelect,
+    ]
   );
 
-  // Handle right click (for arrows in future)
-  const onSquareRightClick = useCallback((square: Square) => {
-    // Future: handle arrow drawing
+  const onSquareRightClick = useCallback(() => {
+    /* Future: arrow drawing */
   }, []);
 
-  // Size the board to the available container width (capped by `boardWidth`),
-  // so it shrinks to fit on mobile instead of overflowing.
+  // Size to the container, capped by `boardWidth`.
   const [containerRef, containerWidth] = useContainerWidth<HTMLDivElement>();
   const maxWidth = boardWidth || 560;
   const resolvedWidth = containerWidth > 0 ? Math.min(maxWidth, containerWidth) : maxWidth;
+
+  const orientation =
+    boardOrientation === 'w' || boardOrientation === 'white'
+      ? 'white'
+      : boardOrientation === 'b' || boardOrientation === 'black'
+      ? 'black'
+      : config.orientation === 'w'
+      ? 'white'
+      : 'black';
 
   return (
     <div
@@ -240,11 +331,11 @@ export function ChessBoard({
     >
       <Chessboard
         id="chess-board"
-        position={customFen || fen}
+        position={customFen || storeFen}
         boardWidth={resolvedWidth}
-        boardOrientation={config.orientation === 'w' ? 'white' : 'black'}
+        boardOrientation={orientation}
         animationDuration={animationDuration}
-        arePiecesDraggable={interactive && !isGameOver}
+        arePiecesDraggable={interactive && !effectiveIsGameOver}
         onPieceDragBegin={onPieceDragBegin}
         onPieceDrop={onPieceDrop}
         onSquareClick={onSquareClick}

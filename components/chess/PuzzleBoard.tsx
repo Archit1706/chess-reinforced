@@ -34,6 +34,9 @@ type PuzzleState = 'playing' | 'correct' | 'incorrect' | 'solved';
 // How long the winning move stays on the board (green flash) before the
 // "Solved!" panel appears — so the move is visible, not snapped away instantly.
 const SOLVE_REVEAL_MS = 700;
+// How long the solved banner stays visible before auto-advancing (only when
+// `onSkip` is supplied — i.e. there's somewhere to advance to).
+const AUTO_ADVANCE_MS = 1800;
 // How long the opponent's in-between reply waits, so the user can follow it.
 const OPPONENT_REPLY_MS = 450;
 
@@ -97,6 +100,20 @@ export function PuzzleBoard({
 
   // Determine player color (opposite of first move's color)
   const playerColor = game.turn();
+
+  // Auto-advance once the solved banner has been visible for AUTO_ADVANCE_MS —
+  // but only when there's a "next" to advance to (i.e. onSkip provided).
+  useEffect(() => {
+    if (puzzleState !== 'solved' || !onSkip) return;
+    const timers = timersRef.current;
+    const id = safeTimeout(() => {
+      onSkip();
+    }, AUTO_ADVANCE_MS);
+    return () => {
+      clearTimeout(id);
+      timers.delete(id);
+    };
+  }, [puzzleState, onSkip, safeTimeout]);
 
   // Make the first move (opponent's move) to set up the puzzle
   useEffect(() => {
@@ -294,6 +311,11 @@ export function PuzzleBoard({
           customFen={currentFen}
           interactive={puzzleState === 'playing'}
           onMove={handleMove}
+          // Drive selection / legal-move highlighting from THIS puzzle's chess
+          // instance, not the global play-page game (was the source of the
+          // "wrong color highlights" bug on Black-to-move puzzles).
+          localGame={game}
+          boardOrientation={playerColor === 'b' ? 'black' : 'white'}
           customSquareStyles={{
             ...getHintHighlight(),
             ...(lastMove
@@ -329,31 +351,50 @@ export function PuzzleBoard({
           </div>
         )}
 
-        {/* Solved overlay */}
+        {/* Solved banner — translucent, keeps the board visible so the user
+            sees the winning move land. Auto-advances if onSkip is provided. */}
         {puzzleState === 'solved' && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/50 animate-in fade-in duration-300">
-            <div className="bg-background p-6 rounded-xl text-center space-y-4">
-              <div className="flex items-center justify-center gap-2 text-green-500">
-                <Check className="h-8 w-8" />
-                <span className="text-2xl font-bold">Puzzle Solved!</span>
+          <div
+            className={cn(
+              'absolute top-2 left-2 right-2 z-10 rounded-lg p-3 shadow-xl backdrop-blur',
+              'flex items-center justify-between gap-3 flex-wrap',
+              'bg-green-500/90 text-white',
+              'animate-in slide-in-from-top-2 fade-in duration-300'
+            )}
+          >
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="rounded-full bg-white/20 p-1 shrink-0">
+                <Check className="h-5 w-5" />
               </div>
-              {hintsUsed > 0 && (
-                <p className="text-sm text-muted-foreground">
-                  Hints used: {hintsUsed}
-                </p>
-              )}
-              <div className="flex gap-2 justify-center">
-                <Button onClick={handleRetry} variant="outline">
-                  <RotateCcw className="h-4 w-4 mr-2" />
-                  Retry
-                </Button>
-                {onSkip && (
-                  <Button onClick={onSkip}>
-                    Next Puzzle
-                    <ChevronRight className="h-4 w-4 ml-2" />
-                  </Button>
+              <div className="min-w-0">
+                <div className="font-bold leading-tight">Puzzle solved!</div>
+                {hintsUsed > 0 && (
+                  <div className="text-xs opacity-90 leading-tight">
+                    Hints used: {hintsUsed}
+                  </div>
                 )}
               </div>
+            </div>
+            <div className="flex gap-2 shrink-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleRetry}
+                className="text-white hover:bg-white/20 hover:text-white"
+              >
+                <RotateCcw className="h-4 w-4 sm:mr-1" />
+                <span className="hidden sm:inline">Retry</span>
+              </Button>
+              {onSkip && (
+                <Button
+                  size="sm"
+                  onClick={onSkip}
+                  className="bg-white text-green-700 hover:bg-white/90"
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              )}
             </div>
           </div>
         )}
