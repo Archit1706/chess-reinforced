@@ -1,23 +1,33 @@
 /**
  * Stockfish Chess Engine Integration
  *
- * Wraps the Stockfish WASM engine (loaded in a Web Worker from a CDN) for move
- * calculation, evaluation, playing, and post-game analysis.
+ * Loads Stockfish 18 (lite-single, ~7MB) bundled in /public/engine/, spawned
+ * directly as a Web Worker. Same-origin loading: no CDN dependency, no COEP
+ * cross-origin headache, browser caches the WASM once and forever.
  *
- * Robustness model:
- * - Engine searches are **serialized** through a single-slot mutex, so two
- *   overlapping callers (e.g. auto-analyze + a computer move) never clobber each
- *   other's results or UCI options.
- * - Every search and the init handshake has a **hard timeout**, so a blocked
- *   CDN, a dead worker, or a missing `bestmove` can never leak a pending promise
- *   or hang the UI — callers always get a result (possibly empty) and fall back.
- * - `onerror`/`terminate` settle the in-flight search instead of orphaning it.
+ * The build/postinstall hook `scripts/setup-engine.mjs` copies the engine
+ * files from `node_modules/stockfish/bin/` into `/public/engine/` on every
+ * install — they're not committed to git.
+ *
+ * Robustness:
+ * - Searches are serialized through a single in-flight slot so overlapping
+ *   callers (auto-analyze vs computer move) can't clobber each other.
+ * - Init handshake + every search has a hard timeout, so a blocked worker
+ *   never leaks a pending promise. Callers always get a result and fall back
+ *   to the pure-JS engine in `lib/local-engine.ts` if Stockfish failed.
+ * - onerror/terminate settle the in-flight search instead of orphaning it.
  */
 
 import type { MoveAnalysis, PositionAnalysis, StockfishSettings } from '@/types/chess';
 import { isClient } from './utils';
 
-// Default settings for Stockfish
+// Same-origin worker path. Hash params: `<wasm-filename>,worker` — the loader
+// reads them off self.location.hash to (a) locate the WASM beside itself and
+// (b) switch into worker mode (self-initialize + listen for UCI commands).
+const ENGINE_WORKER_URL =
+  '/engine/stockfish-18-lite-single.js#stockfish-18-lite-single.wasm,worker';
+
+// Default settings for Stockfish.
 const DEFAULT_SETTINGS: StockfishSettings = {
   elo: 1500,
   depth: 15,
@@ -32,7 +42,6 @@ const INIT_TIMEOUT_MS = 8000;
 // races, so this only bounds pathological hangs.
 const SEARCH_TIMEOUT_MS = 8000;
 
-// Stockfish engine state
 interface EngineState {
   worker: Worker | null;
   ready: boolean;
@@ -40,7 +49,6 @@ interface EngineState {
   settings: StockfishSettings;
 }
 
-// Global engine state
 let engineState: EngineState = {
   worker: null,
   ready: false,
@@ -65,7 +73,6 @@ let initPromise: Promise<boolean> | null = null;
 /** Run `fn` once the engine is free, then release it for the next caller. */
 function runExclusive<T>(fn: () => Promise<T>): Promise<T> {
   const run = engineLock.then(fn, fn);
-  // Keep the chain alive even if a search rejects (it never should).
   engineLock = run.then(
     () => undefined,
     () => undefined
@@ -75,8 +82,9 @@ function runExclusive<T>(fn: () => Promise<T>): Promise<T> {
 
 /**
  * Initialize the Stockfish engine. Idempotent and concurrency-safe: parallel
- * callers share one worker and one init promise. Resolves `false` (never throws)
- * when the engine can't be created or doesn't become ready in time.
+ * callers share one worker and one init promise. Resolves `false` (never
+ * throws) when the engine can't be created or doesn't become ready in time —
+ * callers fall back to the local pure-JS engine.
  */
 export async function initEngine(): Promise<boolean> {
   if (!isClient()) return false;
@@ -89,72 +97,29 @@ export async function initEngine(): Promise<boolean> {
       if (settled) return;
       settled = true;
       resolve(ok);
-      // Allow a later re-init if this attempt failed.
       if (!ok) initPromise = null;
     };
 
     try {
-      // Web Worker that loads Stockfish 16 (NNUE) from the CDN and relays UCI I/O.
-      const workerCode = `
-        let stockfish = null;
-        try {
-          importScripts('https://unpkg.com/stockfish@16.0.0/src/stockfish-nnue-16.js');
-          Stockfish().then(function (sf) {
-            stockfish = sf;
-            postMessage({ type: 'ready' });
-            stockfish.addMessageListener(function (line) {
-              postMessage({ type: 'output', data: line });
-            });
-          }).catch(function (err) {
-            postMessage({ type: 'error', data: String(err) });
-          });
-        } catch (err) {
-          postMessage({ type: 'error', data: String(err) });
-        }
-        onmessage = function (e) {
-          if (stockfish && e.data && e.data.command) {
-            stockfish.postMessage(e.data.command);
-          }
-        };
-      `;
-
-      const blob = new Blob([workerCode], { type: 'application/javascript' });
-      const workerUrl = URL.createObjectURL(blob);
-      let urlRevoked = false;
-      const revoke = () => {
-        if (urlRevoked) return;
-        urlRevoked = true;
-        URL.revokeObjectURL(workerUrl);
-      };
-
-      const worker = new Worker(workerUrl);
+      const worker = new Worker(ENGINE_WORKER_URL);
       engineState.worker = worker;
 
       worker.onmessage = (e) => {
-        revoke(); // safe to release the blob URL once the worker is running
-        const data = e.data as { type?: string; data?: string };
-        if (data?.type === 'error') {
-          console.error('Stockfish failed to load:', data.data);
-          engineState.ready = false;
-          finish(false);
-          return;
-        }
-        handleEngineMessage(data);
-        if (engineState.ready) {
-          // Configure once the engine first reports ready.
-          configureEngine();
-          finish(true);
-        }
+        handleEngineMessage(e.data);
+        // The engine is ready once it answers our `isready` ping with `readyok`.
+        if (engineState.ready && !settled) finish(true);
       };
 
       worker.onerror = (error) => {
         console.error('Stockfish worker error:', error);
-        revoke();
         engineState.ready = false;
         // Settle any in-flight search so it doesn't hang.
         settleActiveSearch({ bestMove: '', analysis: [] });
         finish(false);
       };
+
+      // Kick off the UCI handshake. `readyok` from the engine flips `ready`.
+      configureEngine();
 
       // Hard cap: if the worker never reports ready, give up and fall back.
       setTimeout(() => {
@@ -169,7 +134,7 @@ export async function initEngine(): Promise<boolean> {
   return initPromise;
 }
 
-/** Send the standard UCI configuration (called once the engine is ready). */
+/** Send the standard UCI configuration (idempotent). */
 function configureEngine() {
   sendCommand('uci');
   sendCommand('setoption name UCI_LimitStrength value true');
@@ -188,22 +153,18 @@ function settleActiveSearch(result: SearchResult) {
   if (resolver) resolver(result);
 }
 
-/** Handle messages from the Stockfish worker. */
-function handleEngineMessage(message: { type?: string; data?: string }) {
-  if (message.type === 'ready') {
+/**
+ * Handle a raw UCI message from the engine worker. The lite-single engine
+ * communicates as plain text strings (one UCI line per message).
+ */
+function handleEngineMessage(line: unknown) {
+  if (typeof line !== 'string') return;
+  if (line.startsWith('bestmove')) {
+    handleBestMove(line);
+  } else if (line.startsWith('info')) {
+    handleInfo(line);
+  } else if (line === 'readyok' || line === 'uciok') {
     engineState.ready = true;
-    return;
-  }
-
-  if (message.type === 'output' && message.data) {
-    const line = message.data;
-    if (line.startsWith('bestmove')) {
-      handleBestMove(line);
-    } else if (line.startsWith('info')) {
-      handleInfo(line);
-    } else if (line === 'readyok') {
-      engineState.ready = true;
-    }
   }
 }
 
@@ -247,9 +208,12 @@ function toInt(value: string, fallback: number): number {
   return Number.isFinite(n) ? n : fallback;
 }
 
-/** Send a UCI command to the engine. */
+/**
+ * Send a raw UCI command string to the engine worker. The lite-single engine
+ * treats `e.data` as the command text directly (no envelope).
+ */
 function sendCommand(command: string) {
-  engineState.worker?.postMessage({ command });
+  engineState.worker?.postMessage(command);
 }
 
 /** Update engine settings (and apply live ones if ready). */
@@ -374,8 +338,6 @@ export function setElo(elo: number) {
 /**
  * Toggle UCI_LimitStrength. The engine is normally capped to `computerElo` for
  * *playing*; analysis must run at full strength to produce trustworthy evals.
- * Disabling the limit removes the cap; re-enabling it restores the configured
- * ELO (UCI_Elo only takes effect while LimitStrength is on).
  */
 export function setLimitStrength(enabled: boolean) {
   if (!engineState.ready) return;

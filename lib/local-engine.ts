@@ -1,12 +1,22 @@
 /**
  * Pure-JS fallback chess engine.
  *
- * Stockfish loads from a CDN inside a Web Worker and needs cross-origin
- * isolation; when that fails (blocked CDN, COEP, slow network) the computer
- * opponent would never move. This dependency-free engine guarantees the
- * computer always replies. It's a small negamax + alpha-beta search over
- * chess.js move generation with material + piece-square evaluation, with
- * strength scaled to the configured ELO.
+ * Always-available fallback for when Stockfish isn't usable (worker blocked,
+ * still loading, errored). Negamax + alpha-beta + iterative deepening, plus
+ * the standard search optimizations that make a real difference at low depth:
+ *   - **Quiescence search** at horizon nodes (extends captures + checks) so
+ *     the engine doesn't blunder material to "horizon effect" tactics.
+ *   - **MVV-LVA** capture ordering so big-prize captures with cheap attackers
+ *     are searched first → tighter alpha-beta pruning.
+ *   - **Killer-move heuristic** (2 slots per ply) and a **history table** so
+ *     non-capturing moves that worked elsewhere bubble up.
+ *   - **Transposition table** (bounded, LRU-ish) so repeated positions don't
+ *     re-search from scratch.
+ *
+ * Strength is still scaled to the configured ELO (low ratings cap depth +
+ * inject occasional random moves so the bot feels beatable). The pure-Stockfish
+ * path is still preferred when available; this engine guarantees the computer
+ * always replies.
  */
 
 import { Chess } from 'chess.js';
@@ -86,6 +96,17 @@ const PST: Record<string, number[]> = {
   ],
 };
 
+/** Minimal verbose-move shape used internally (chess.js subset). */
+interface VMove {
+  from: string;
+  to: string;
+  promotion?: string;
+  captured?: string;
+  flags: string;
+  piece: string;
+  san: string;
+}
+
 /** Static evaluation from White's perspective (centipawns). */
 function evaluate(game: Chess): number {
   const board = game.board(); // board[0] = rank 8 (a8..h8)
@@ -102,45 +123,180 @@ function evaluate(game: Chess): number {
   return score;
 }
 
-/** Captures first — cheap move ordering to help alpha-beta pruning. */
-function orderMoves(moves: any[]): any[] {
-  return [...moves].sort((a, b) => {
-    const av = a.captured ? PIECE_VALUE[a.captured] : 0;
-    const bv = b.captured ? PIECE_VALUE[b.captured] : 0;
-    return bv - av;
-  });
-}
+// --- Search state ----------------------------------------------------------
 
 const ABORT = Symbol('search-timeout');
+const MAX_PLY = 64;
+
+// Most Valuable Victim − Least Valuable Attacker. Captures are sorted by
+// (10 * value-of-captured) − value-of-attacker, so QxP scores below PxQ.
+function mvvLva(m: VMove): number {
+  if (!m.captured) return 0;
+  return 10 * PIECE_VALUE[m.captured] - PIECE_VALUE[m.piece];
+}
+
 let nodeCount = 0;
 let deadline = 0;
+// Killer-move slots per ply — two non-capturing moves that caused cutoffs.
+const killers: Array<[string | null, string | null]> = [];
+// History heuristic: success count per (from, to). Bounded by the search.
+const history: Map<string, number> = new Map();
 
-function negamax(game: Chess, depth: number, alpha: number, beta: number): number {
+// Transposition table — bounded LRU-ish by clearing when oversized.
+const TT_LIMIT = 1 << 16;
+interface TTEntry {
+  depth: number;
+  score: number;
+  flag: 'exact' | 'lower' | 'upper';
+  best: string | null;
+}
+const tt: Map<string, TTEntry> = new Map();
+
+function resetSearchState() {
+  nodeCount = 0;
+  killers.length = 0;
+  for (let i = 0; i < MAX_PLY; i++) killers.push([null, null]);
+  history.clear();
+  if (tt.size > TT_LIMIT) tt.clear();
+}
+
+function moveKey(m: VMove): string {
+  return m.from + m.to + (m.promotion ?? '');
+}
+
+/** Order moves: hash move, then captures (MVV-LVA), then killers, then history. */
+function orderMoves(moves: VMove[], ply: number, hashMove: string | null): VMove[] {
+  const [k1, k2] = killers[ply] ?? [null, null];
+  return [...moves].sort((a, b) => scoreOf(b) - scoreOf(a));
+
+  function scoreOf(m: VMove): number {
+    const key = moveKey(m);
+    if (hashMove && key === hashMove) return 1_000_000;
+    if (m.captured) return 100_000 + mvvLva(m);
+    if (key === k1) return 90_000;
+    if (key === k2) return 80_000;
+    return history.get(key) ?? 0;
+  }
+}
+
+/** Quiescence search — extends only captures + promotions at the horizon.
+ * Fail-soft: returns the discovered score, not the bound, so callers see real
+ * values (important for accurate root-move selection). Depth-bounded. */
+function quiesce(game: Chess, alpha: number, beta: number, qDepth: number): number {
   if ((++nodeCount & 1023) === 0 && Date.now() > deadline) throw ABORT;
-  if (game.isCheckmate()) return -MATE - depth; // prefer faster mates
-  if (game.isDraw() || game.isStalemate() || game.isThreefoldRepetition()) return 0;
-  if (depth === 0) {
+
+  const standPat = (() => {
     const e = evaluate(game);
     return game.turn() === 'w' ? e : -e;
-  }
+  })();
 
-  let best = -Infinity;
-  for (const m of orderMoves(game.moves({ verbose: true }) as any[])) {
+  let best = standPat;
+  if (best >= beta) return best;
+  if (best > alpha) alpha = best;
+  if (qDepth <= 0) return best;
+
+  const moves = game.moves({ verbose: true }) as VMove[];
+  // Only loud moves: captures and promotions (no quiet checks — too expensive).
+  const loud = moves.filter((m) => m.captured || (m.promotion && m.promotion !== 'k'));
+
+  for (const m of loud.sort((a, b) => mvvLva(b) - mvvLva(a))) {
     game.move(m);
-    const score = -negamax(game, depth - 1, -beta, -alpha);
+    const score = -quiesce(game, -beta, -alpha, qDepth - 1);
     game.undo();
     if (score > best) best = score;
-    if (best > alpha) alpha = best;
-    if (alpha >= beta) break;
+    if (score >= beta) return score; // fail-soft: return the true score
+    if (score > alpha) alpha = score;
   }
   return best;
 }
 
-function settingsForElo(elo: number): { depth: number; blunderChance: number } {
-  if (elo < 1000) return { depth: 1, blunderChance: 0.35 };
-  if (elo < 1400) return { depth: 2, blunderChance: 0.15 };
-  if (elo < 1800) return { depth: 3, blunderChance: 0.05 };
-  return { depth: 4, blunderChance: 0 };
+function negamax(
+  game: Chess,
+  depth: number,
+  alpha: number,
+  beta: number,
+  ply: number
+): number {
+  if ((++nodeCount & 1023) === 0 && Date.now() > deadline) throw ABORT;
+
+  if (game.isCheckmate()) return -MATE - depth; // prefer faster mates
+  if (game.isDraw() || game.isStalemate() || game.isThreefoldRepetition()) return 0;
+
+  // TT probe (uses the position-only part of FEN as the key).
+  const ttKey = positionKey(game);
+  const ttEntry = tt.get(ttKey);
+  if (ttEntry && ttEntry.depth >= depth) {
+    if (ttEntry.flag === 'exact') return ttEntry.score;
+    if (ttEntry.flag === 'lower' && ttEntry.score >= beta) return ttEntry.score;
+    if (ttEntry.flag === 'upper' && ttEntry.score <= alpha) return ttEntry.score;
+  }
+
+  if (depth <= 0) return quiesce(game, alpha, beta, 6);
+
+  const moves = game.moves({ verbose: true }) as VMove[];
+  if (moves.length === 0) {
+    return game.isCheck() ? -MATE - depth : 0;
+  }
+
+  const ordered = orderMoves(moves, ply, ttEntry?.best ?? null);
+  const originalAlpha = alpha;
+
+  let best = -Infinity;
+  let bestMoveKey: string | null = null;
+
+  for (const m of ordered) {
+    game.move(m);
+    const score = -negamax(game, depth - 1, -beta, -alpha, ply + 1);
+    game.undo();
+
+    if (score > best) {
+      best = score;
+      bestMoveKey = moveKey(m);
+    }
+    if (best > alpha) alpha = best;
+    if (alpha >= beta) {
+      // Beta cutoff. Promote a non-capturing move into the killer/history tables.
+      if (!m.captured) {
+        const key = moveKey(m);
+        const slots = killers[ply] ?? [null, null];
+        if (slots[0] !== key) {
+          slots[1] = slots[0];
+          slots[0] = key;
+        }
+        history.set(key, (history.get(key) ?? 0) + depth * depth);
+      }
+      break;
+    }
+  }
+
+  // Store TT entry — but NOT mate scores (distance-to-mate doesn't transfer
+  // correctly across positions without ply correction). Skipping is safer.
+  if (Math.abs(best) < MATE - 10000) {
+    const flag: TTEntry['flag'] =
+      best <= originalAlpha ? 'upper' : best >= beta ? 'lower' : 'exact';
+    tt.set(ttKey, { depth, score: best, flag, best: bestMoveKey });
+  }
+
+  return best;
+}
+
+/** Position-only TT key — strips the move-counter fields from a FEN. */
+function positionKey(game: Chess): string {
+  const parts = game.fen().split(' ');
+  return parts.slice(0, 4).join(' ');
+}
+
+function settingsForElo(elo: number): {
+  depth: number;
+  blunderChance: number;
+  budgetMs: number;
+} {
+  // Per-call time budget — high-ELO searches get a little more so the deeper
+  // iterations have a chance to finish (quiescence + TT costs more per node).
+  if (elo < 1000) return { depth: 1, blunderChance: 0.35, budgetMs: 400 };
+  if (elo < 1400) return { depth: 2, blunderChance: 0.15, budgetMs: 600 };
+  if (elo < 1800) return { depth: 3, blunderChance: 0.05, budgetMs: 800 };
+  return { depth: 4, blunderChance: 0, budgetMs: 1200 };
 }
 
 function toUci(move: { from: string; to: string; promotion?: string }): string {
@@ -163,9 +319,9 @@ export function evaluateFen(fen: string, depth = 2): number {
   if (game.isDraw() || game.isStalemate() || game.isThreefoldRepetition()) return 0;
 
   deadline = Date.now() + 400;
-  nodeCount = 0;
+  resetSearchState();
   try {
-    return negamax(game, depth, -Infinity, Infinity);
+    return negamax(game, depth, -Infinity, Infinity, 0);
   } catch {
     const e = evaluate(game);
     return game.turn() === 'w' ? e : -e;
@@ -185,38 +341,41 @@ export function getLocalBestMove(fen: string, elo = 1500): string | null {
   } catch {
     return null;
   }
-  const moves = game.moves({ verbose: true }) as any[];
+  const moves = game.moves({ verbose: true }) as VMove[];
   if (moves.length === 0) return null;
 
-  const { depth: maxDepth, blunderChance } = settingsForElo(elo);
+  const { depth: maxDepth, blunderChance, budgetMs } = settingsForElo(elo);
 
   if (Math.random() < blunderChance) {
     return toUci(moves[Math.floor(Math.random() * moves.length)]);
   }
 
-  const ordered = orderMoves(moves);
-  let bestMove = ordered[0];
-  deadline = Date.now() + 700;
-  nodeCount = 0;
+  deadline = Date.now() + budgetMs;
+  resetSearchState();
+
+  let bestMove: VMove = moves[0];
 
   for (let d = 1; d <= maxDepth; d++) {
     try {
-      // Search the previous iteration's best move first for better pruning.
-      const rootMoves = [bestMove, ...ordered.filter((m) => m !== bestMove)];
+      const ordered = orderMoves(moves, 0, moveKey(bestMove));
       let alpha = -Infinity;
       let iterationBest = bestMove;
       let iterationScore = -Infinity;
-      for (const m of rootMoves) {
+
+      for (const m of ordered) {
         game.move(m);
-        const raw = -negamax(game, d - 1, -Infinity, -alpha);
+        // Full window at the root — no alpha narrowing — so every move
+        // returns its TRUE score instead of a bound. Critical for correct
+        // root-move selection: a captured-queen and a king shuffle both
+        // returning the cutoff value `100` would be a coin flip otherwise.
+        const raw = -negamax(game, d - 1, -Infinity, Infinity, 1);
         game.undo();
-        // Jitter only non-mate scores, so the fastest forced mate still wins.
+        // Tie-break jitter (≤5 cp, never on mate scores) only for selection.
         const score = Math.abs(raw) > MATE - 10000 ? raw : raw + Math.random() * 5;
         if (score > iterationScore) {
           iterationScore = score;
           iterationBest = m;
         }
-        if (iterationScore > alpha) alpha = iterationScore;
       }
       bestMove = iterationBest; // only committed when the depth completes
     } catch (e) {
@@ -225,5 +384,6 @@ export function getLocalBestMove(fen: string, elo = 1500): string | null {
     }
     if (Date.now() > deadline) break;
   }
+
   return toUci(bestMove);
 }

@@ -50,18 +50,27 @@ formatting, opening detection). `chess.js` is the authority for legality — nev
 rules. `detectOpening` uses a small hardcoded ECO table, not a real database.
 
 ### Stockfish engine (`lib/stockfish.ts`)
-Module-level **singleton** engine state (not a React/Zustand concern). On `initEngine()` it spins
-up a Web Worker from an inline blob that `importScripts` Stockfish 16 **from the unpkg CDN** — so
-the engine requires network access at runtime. Communication is UCI text parsed from worker
-messages; async results resolve via a `pendingResolvers` map. `next.config.js` sets
-`Cross-Origin-Embedder-Policy: require-corp` and `COOP: same-origin` headers (needed for
-SharedArrayBuffer / threaded Stockfish) and enables async WebAssembly in webpack.
+Module-level **singleton** engine state (not a React/Zustand concern). `initEngine()` spawns a
+Web Worker directly from `/engine/stockfish-18-lite-single.js` (same-origin) — no CDN dependency,
+no supply-chain risk, and same-origin sidesteps the CORP requirement that COEP `require-corp`
+otherwise imposes on cross-origin subresources. The engine files are NOT committed; they're
+copied from `node_modules/stockfish/bin/` into `/public/engine/` by
+**`scripts/setup-engine.mjs`**, wired into both `postinstall` and `build`. Communication is raw
+UCI text; searches are serialized through a single in-flight slot with hard timeouts on the init
+handshake and every search, so a blocked worker can never leak a pending promise.
+`next.config.js` still sets `Cross-Origin-Embedder-Policy: require-corp` and `COOP: same-origin`
+(needed for SAB-based engines and other isolated-context APIs) and enables async WebAssembly in
+webpack.
 
-`lib/local-engine.ts` is a **pure-JS fallback opponent** (negamax + alpha-beta with
-piece-square eval, iterative deepening under a ~700ms budget, strength scaled to ELO). The play
-page defaults to `vsComputer` and, in `makeComputerMove`, prefers Stockfish when it's loaded (with
-a timeout) but falls back to the local engine — so the computer always replies even if the
-CDN/worker is blocked.
+`lib/local-engine.ts` is a **pure-JS fallback opponent** that guarantees the computer always
+moves. Negamax + alpha-beta with iterative deepening, **quiescence search** (depth-bounded,
+fail-soft) at horizon nodes, **MVV-LVA** capture ordering, **killer-move** + **history**
+heuristics, and a bounded **transposition table** (mate scores deliberately not cached because
+distance-to-mate doesn't transfer between positions). The root loop uses a full window and only
+jitters scores for tie-breaking (never alpha cutoffs) — this matters: a fail-hard cutoff
+combined with jitter at the root used to make captures and quiet moves coin-flips. Per-call
+budget scales with ELO (400ms–1200ms). The play page prefers Stockfish when loaded but falls
+back to this engine on a timeout, so the computer always replies.
 
 `lib/analysis.ts` builds on this for **post-game review**: it replays the game, evaluates every
 position, and derives per-move centipawn loss, a classification (`classifyMove`), and a
