@@ -250,10 +250,13 @@ export default function PuzzlesPage() {
     }
   }, [reviewIndex, reviewQueue.length, loadReviews]);
 
+  // Solved: only log the attempt. Advancing waits for the user to click Next
+  // (onSkip → handleSkipReview). Advancing here would unmount the puzzle board
+  // instantly and hide the success banner — the whole point of review is to
+  // sit with the correct answer for a moment.
   const handleReviewSolved = useCallback(() => {
     logAttempt(reviewPuzzle, true);
-    advanceReview();
-  }, [reviewPuzzle, logAttempt, advanceReview]);
+  }, [reviewPuzzle, logAttempt]);
 
   const handleReviewFailed = useCallback(() => {
     // Record the miss (reschedules it sooner); let the user retry on the board.
@@ -554,6 +557,9 @@ export default function PuzzlesPage() {
                       onSolved={handleReviewSolved}
                       onFailed={handleReviewFailed}
                       onSkip={handleSkipReview}
+                      // Review is deliberate — user studies the final position
+                      // and clicks Next when ready, no timer-driven advance.
+                      autoAdvance={false}
                     />
                   ) : (
                     <div className="text-center py-12 space-y-4">

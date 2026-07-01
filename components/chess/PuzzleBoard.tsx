@@ -26,6 +26,13 @@ interface PuzzleBoardProps {
   onSkip?: () => void;
   showRating?: boolean;
   showHintButton?: boolean;
+  /**
+   * When true (default), the solved banner auto-advances via `onSkip` after
+   * AUTO_ADVANCE_MS. Set to `false` for slow-review modes (spaced repetition,
+   * daily) where you want the user to sit with the final position and click
+   * Next manually.
+   */
+  autoAdvance?: boolean;
   className?: string;
 }
 
@@ -54,6 +61,7 @@ export function PuzzleBoard({
   onSkip,
   showRating = true,
   showHintButton = true,
+  autoAdvance = true,
   className,
 }: PuzzleBoardProps) {
   // Game state
@@ -111,9 +119,11 @@ export function PuzzleBoard({
   const [playerColor] = useState<'w' | 'b'>(() => game.turn());
 
   // Auto-advance once the solved banner has been visible for AUTO_ADVANCE_MS —
-  // but only when there's a "next" to advance to (i.e. onSkip provided).
+  // but only when there's a "next" to advance to (`onSkip` provided) AND the
+  // caller opted into auto-advance (`autoAdvance`). Review-style modes turn
+  // this off so the user studies the final position and clicks Next manually.
   useEffect(() => {
-    if (puzzleState !== 'solved' || !onSkip) return;
+    if (puzzleState !== 'solved' || !onSkip || !autoAdvance) return;
     const timers = timersRef.current;
     const id = safeTimeout(() => {
       onSkip();
@@ -122,7 +132,7 @@ export function PuzzleBoard({
       clearTimeout(id);
       timers.delete(id);
     };
-  }, [puzzleState, onSkip, safeTimeout]);
+  }, [puzzleState, onSkip, autoAdvance, safeTimeout]);
 
   // Make the first move (opponent's move) to set up the puzzle
   useEffect(() => {
