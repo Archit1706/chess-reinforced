@@ -75,6 +75,10 @@ export default function PuzzlesPage() {
   const puzzleStartRef = useRef<number>(Date.now());
   // Avoid showing the same puzzle twice in a row within a session.
   const seenRef = useRef<Set<string>>(new Set());
+  // Guard so the Rush's end-of-round only fires once — a wrong move delays
+  // endRush by 1.2s to let PuzzleBoard's red "Try again" flash render, and the
+  // clock could tick to 0 during that window; both paths race unless gated.
+  const rushFinishingRef = useRef(false);
 
   const ratingBand = useCallback((): { minRating?: number; maxRating?: number } => {
     const elo = user?.stats.estimatedElo;
@@ -154,7 +158,9 @@ export default function PuzzlesPage() {
     let interval: ReturnType<typeof setInterval>;
     if (rushActive && rushTime > 0) {
       interval = setInterval(() => setRushTime((t) => t - 1), 1000);
-    } else if (rushTime === 0 && rushActive) {
+    } else if (rushTime === 0 && rushActive && !rushFinishingRef.current) {
+      // Time's up — no wrong-move animation to wait for, end immediately.
+      rushFinishingRef.current = true;
       endRush(rushScore);
     }
     return () => clearInterval(interval);
@@ -219,6 +225,7 @@ export default function PuzzlesPage() {
 
   const startRush = useCallback(async () => {
     seenRef.current.clear();
+    rushFinishingRef.current = false;
     setRushScore(0);
     setRushTime(RUSH_DURATION);
     setRushNewBest(false);
@@ -232,9 +239,16 @@ export default function PuzzlesPage() {
     void loadRush();
   }, [rushPuzzle, logAttempt, loadRush]);
 
+  // Delay the end-of-round so PuzzleBoard's red "Try again" flash (its own
+  // 1s reset timer) renders BEFORE the board is unmounted and swapped for
+  // the end-screen. Without this the wrong-move feedback is invisible — the
+  // parent yanks the board away the instant onFailed fires.
   const handleRushFailed = useCallback(() => {
+    if (rushFinishingRef.current) return;
+    rushFinishingRef.current = true;
     logAttempt(rushPuzzle, false);
-    endRush(rushScore);
+    const capturedScore = rushScore;
+    setTimeout(() => endRush(capturedScore), 1200);
   }, [rushPuzzle, logAttempt, endRush, rushScore]);
 
   // === Review (spaced repetition) ===
