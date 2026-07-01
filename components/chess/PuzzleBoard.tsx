@@ -62,7 +62,11 @@ export function PuzzleBoard({
   const [moveIndex, setMoveIndex] = useState(0);
   const [puzzleState, setPuzzleState] = useState<PuzzleState>('playing');
   const [showHint, setShowHint] = useState(false);
+  // Number of times the user pressed "Show hint" for this puzzle instance.
   const [hintsUsed, setHintsUsed] = useState(0);
+  // Number of wrong moves the user made before finding the solution. Distinct
+  // from `hintsUsed` — a wrong move is a mistake, not a hint request.
+  const [wrongAttempts, setWrongAttempts] = useState(0);
   const [lastMove, setLastMove] = useState<{ from: Square; to: Square } | null>(null);
 
   // Track pending timers + mount status so a fast unmount/skip can't fire
@@ -205,9 +209,9 @@ export function PuzzleBoard({
           return false;
         }
       } else {
-        // Wrong move
+        // Wrong move — count as a mistake, NOT as a hint.
         setPuzzleState('incorrect');
-        setHintsUsed((h) => h + 1);
+        setWrongAttempts((n) => n + 1);
         onFailed?.();
 
         // Reset after showing feedback
@@ -241,6 +245,10 @@ export function PuzzleBoard({
     setPuzzleState('playing');
     setShowHint(false);
     setLastMove(null);
+    // Reset per-attempt counters so a fresh retry doesn't carry over the
+    // hints/mistakes from the previous failed try.
+    setHintsUsed(0);
+    setWrongAttempts(0);
   };
 
   // Get hint highlight
@@ -372,10 +380,21 @@ export function PuzzleBoard({
                 <Check className="h-5 w-5" />
               </div>
               <div className="min-w-0">
-                <div className="font-bold leading-tight">Puzzle solved!</div>
-                {hintsUsed > 0 && (
+                <div className="font-bold leading-tight">
+                  {hintsUsed === 0 && wrongAttempts === 0
+                    ? 'Puzzle solved — first try!'
+                    : 'Puzzle solved!'}
+                </div>
+                {(hintsUsed > 0 || wrongAttempts > 0) && (
                   <div className="text-xs opacity-90 leading-tight">
-                    Hints used: {hintsUsed}
+                    {[
+                      hintsUsed > 0 &&
+                        `${hintsUsed} hint${hintsUsed === 1 ? '' : 's'}`,
+                      wrongAttempts > 0 &&
+                        `${wrongAttempts} wrong attempt${wrongAttempts === 1 ? '' : 's'}`,
+                    ]
+                      .filter(Boolean)
+                      .join(' · ')}
                   </div>
                 )}
               </div>
