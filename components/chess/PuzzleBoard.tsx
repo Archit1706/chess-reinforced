@@ -98,8 +98,13 @@ export function PuzzleBoard({
     onSolved?.();
   }, [onSolved]);
 
-  // Determine player color (opposite of first move's color)
-  const playerColor = game.turn();
+  // Solver's color — SNAPSHOT at mount from the initial FEN. Reading
+  // `game.turn()` on every render would flip the board mid-puzzle every time
+  // the engine's in-between reply lands (turn flips → orientation prop flips
+  // → board rotates for ~500ms → turn flips back → board rotates again). We
+  // want the perspective to stay fixed to the solver's side for the whole
+  // puzzle.
+  const [playerColor] = useState<'w' | 'b'>(() => game.turn());
 
   // Auto-advance once the solved banner has been visible for AUTO_ADVANCE_MS —
   // but only when there's a "next" to advance to (i.e. onSkip provided).
