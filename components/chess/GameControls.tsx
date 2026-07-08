@@ -32,6 +32,11 @@ interface GameControlsProps {
   showExportImport?: boolean;
   onExport?: () => void;
   onImport?: () => void;
+  /**
+   * Override for the New Game button. Pages with a new-game dialog should
+   * pass its opener so a misclick can't silently wipe a game in progress.
+   */
+  onNewGame?: () => void;
 }
 
 /**
@@ -46,6 +51,7 @@ export function GameControls({
   showExportImport = false,
   onExport,
   onImport,
+  onNewGame,
 }: GameControlsProps) {
   const {
     history,
@@ -195,7 +201,11 @@ export function GameControls({
         {showNewGame && (
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" onClick={() => newGame()}>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => (onNewGame ? onNewGame() : newGame())}
+              >
                 <RefreshCw className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
@@ -203,28 +213,32 @@ export function GameControls({
           </Tooltip>
         )}
 
-        {/* Export/Import */}
-        {showExportImport && (
+        {/* Export/Import — each renders only when its handler is wired up */}
+        {showExportImport && (onExport || onImport) && (
           <>
             <div className="w-px h-6 bg-border mx-1" />
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" onClick={onExport}>
-                  <Download className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Export PGN</TooltipContent>
-            </Tooltip>
+            {onExport && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" onClick={onExport}>
+                    <Download className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Export PGN</TooltipContent>
+              </Tooltip>
+            )}
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" onClick={onImport}>
-                  <Upload className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Import PGN</TooltipContent>
-            </Tooltip>
+            {onImport && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" onClick={onImport}>
+                    <Upload className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Import PGN</TooltipContent>
+              </Tooltip>
+            )}
           </>
         )}
       </div>
