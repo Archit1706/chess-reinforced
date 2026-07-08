@@ -49,6 +49,7 @@ export default function SettingsPage() {
     setAnalysisDepth,
     autoAnalyze,
     toggleAutoAnalyze,
+    resetSettings,
   } = useUIStore();
 
   const { computerElo, setComputerElo } = useGameStore();
@@ -303,7 +304,9 @@ export default function SettingsPage() {
               <Keyboard className="h-5 w-5" />
               Keyboard Shortcuts
             </CardTitle>
-            <CardDescription>Quick actions for power users</CardDescription>
+            <CardDescription>
+              Quick actions for power users — active on the Play page
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
@@ -345,11 +348,9 @@ export default function SettingsPage() {
               variant="outline"
               onClick={() => {
                 // Reset all settings to defaults
+                resetSettings();
                 setTheme('system');
-                setAnimationSpeed('normal');
-                setAnalysisDepth(15);
                 setComputerElo(1500);
-                // Note: Would need to add reset functions to stores for full reset
               }}
             >
               <RotateCcw className="h-4 w-4 mr-2" />
