@@ -63,27 +63,34 @@ interface UIActions {
   toggleAutoAnalyze: () => void;
   toggleEvaluation: () => void;
   setAnalysisDepth: (depth: number) => void;
+
+  // Restore every preference to its default value.
+  resetSettings: () => void;
 }
+
+const defaultState: UIState = {
+  theme: 'system',
+  boardTheme: 'classic',
+  pieceSet: 'standard',
+  soundEnabled: true,
+  volume: 0.5,
+  showCoordinates: true,
+  showLegalMoves: true,
+  highlightLastMove: true,
+  animationSpeed: 'normal',
+  isSidebarOpen: true,
+  isSettingsOpen: false,
+  showKeyboardShortcuts: false,
+  autoAnalyze: false,
+  showEvaluation: true,
+  analysisDepth: 15,
+};
 
 export const useUIStore = create<UIState & UIActions>()(
   persist(
     (set) => ({
       // Initial state
-      theme: 'system',
-      boardTheme: 'classic',
-      pieceSet: 'standard',
-      soundEnabled: true,
-      volume: 0.5,
-      showCoordinates: true,
-      showLegalMoves: true,
-      highlightLastMove: true,
-      animationSpeed: 'normal',
-      isSidebarOpen: true,
-      isSettingsOpen: false,
-      showKeyboardShortcuts: false,
-      autoAnalyze: false,
-      showEvaluation: true,
-      analysisDepth: 15,
+      ...defaultState,
 
       // Theme actions
       setTheme: (theme) => set({ theme }),
@@ -116,6 +123,9 @@ export const useUIStore = create<UIState & UIActions>()(
       toggleEvaluation: () =>
         set((state) => ({ showEvaluation: !state.showEvaluation })),
       setAnalysisDepth: (analysisDepth) => set({ analysisDepth }),
+
+      // Reset
+      resetSettings: () => set(defaultState),
     }),
     {
       name: 'chess-ui-storage',
