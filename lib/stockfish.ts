@@ -236,8 +236,14 @@ export function setEngineSettings(settings: Partial<StockfishSettings>) {
 /**
  * Core search primitive — serialized and timeout-bounded. Optionally sets a
  * temporary MultiPV for the duration of the search (restored afterwards).
+ * When `movetime` is given the engine searches for that many milliseconds
+ * (predictable latency — used for computer moves); otherwise it searches to
+ * a fixed depth (used for analysis).
  */
-function search(fen: string, opts: { depth?: number; multiPv?: number }): Promise<SearchResult> {
+function search(
+  fen: string,
+  opts: { depth?: number; multiPv?: number; movetime?: number }
+): Promise<SearchResult> {
   return runExclusive(
     () =>
       new Promise<SearchResult>((resolve) => {
@@ -265,7 +271,11 @@ function search(fen: string, opts: { depth?: number; multiPv?: number }): Promis
           sendCommand(`setoption name MultiPV value ${opts.multiPv}`);
         }
         sendCommand(`position fen ${fen}`);
-        sendCommand(`go depth ${opts.depth || engineState.settings.depth}`);
+        if (opts.movetime) {
+          sendCommand(`go movetime ${Math.max(50, Math.round(opts.movetime))}`);
+        } else {
+          sendCommand(`go depth ${opts.depth || engineState.settings.depth}`);
+        }
 
         // Backstop: force a stop and settle with whatever we have.
         timer = setTimeout(() => {
@@ -280,10 +290,11 @@ function search(fen: string, opts: { depth?: number; multiPv?: number }): Promis
 /** Get the best move for a position. Resolves `{ bestMove: '' }` on failure. */
 export async function getBestMove(
   fen: string,
-  depth?: number
+  depth?: number,
+  movetime?: number
 ): Promise<{ bestMove: string; analysis: MoveAnalysis[] }> {
   if (!engineState.ready) await initEngine();
-  return search(fen, { depth });
+  return search(fen, { depth, movetime });
 }
 
 /** Analyze a position and return a structured evaluation. */
@@ -314,9 +325,13 @@ export async function analyzePosition(
   };
 }
 
-/** Get the computer's move at the current ELO setting. */
-export async function getComputerMove(fen: string): Promise<string> {
-  const result = await getBestMove(fen);
+/**
+ * Get the computer's move at the current ELO setting. `movetime` bounds the
+ * search wall-clock (predictable reply latency); without it the search runs
+ * to the configured depth, which can take multiple seconds on slow devices.
+ */
+export async function getComputerMove(fen: string, movetime?: number): Promise<string> {
+  const result = await getBestMove(fen, undefined, movetime);
   return result.bestMove;
 }
 
