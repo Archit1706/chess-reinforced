@@ -276,7 +276,7 @@ export function PuzzleBoard({
 
     const { from } = parseUciMove(expectedMove);
     return {
-      [from]: { backgroundColor: 'rgba(255, 255, 0, 0.5)' },
+      [from]: { background: 'rgba(255, 255, 0, 0.5)' },
     };
   };
 
@@ -349,8 +349,8 @@ export function PuzzleBoard({
             ...getHintHighlight(),
             ...(lastMove
               ? {
-                  [lastMove.from]: { backgroundColor: 'rgba(255, 255, 0, 0.4)' },
-                  [lastMove.to]: { backgroundColor: 'rgba(255, 255, 0, 0.4)' },
+                  [lastMove.from]: { background: 'rgba(255, 255, 0, 0.4)' },
+                  [lastMove.to]: { background: 'rgba(255, 255, 0, 0.4)' },
                 }
               : {}),
           }}
