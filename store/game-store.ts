@@ -302,7 +302,8 @@ export const useGameStore = create<GameState & GameActions>()(
           lastMove: { from, to },
           openingName: opening?.name || get().openingName,
           openingEco: opening?.eco || get().openingEco,
-          evaluation: null,
+          // Keep the previous evaluation until fresh analysis arrives — nulling
+          // it here made the eval bar snap to 0.0 on every single move.
           bestMove: null,
         });
 
