@@ -10,13 +10,18 @@ interface KeyboardShortcutOptions {
    * in progress; without it, N starts a new game directly.
    */
   onNewGame?: () => void;
+  /**
+   * Temporarily suspend all shortcuts — e.g. while a dialog with its own
+   * keyboard handling (game review) is open, so arrows don't drive two boards.
+   */
+  disabled?: boolean;
 }
 
 /**
  * Global board/navigation keyboard shortcuts, bound to the game store.
  * Mount on pages where the store-backed board is the main content (play page).
  */
-export function useKeyboardShortcuts({ onNewGame }: KeyboardShortcutOptions = {}) {
+export function useKeyboardShortcuts({ onNewGame, disabled = false }: KeyboardShortcutOptions = {}) {
   const {
     undo,
     redo,
@@ -126,9 +131,10 @@ export function useKeyboardShortcuts({ onNewGame }: KeyboardShortcutOptions = {}
   );
 
   useEffect(() => {
+    if (disabled) return;
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleKeyDown]);
+  }, [handleKeyDown, disabled]);
 }
 
 // List of all keyboard shortcuts for display
