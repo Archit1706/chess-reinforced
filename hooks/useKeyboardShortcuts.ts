@@ -2,13 +2,21 @@
 
 import { useEffect, useCallback } from 'react';
 import { useGameStore } from '@/store/game-store';
-import { useUIStore } from '@/store/ui-store';
+
+interface KeyboardShortcutOptions {
+  /**
+   * Called for the "N" (new game) shortcut. Pages that have a new-game dialog
+   * should pass an opener here so a stray keypress can't silently wipe a game
+   * in progress; without it, N starts a new game directly.
+   */
+  onNewGame?: () => void;
+}
 
 /**
- * Custom hook for keyboard shortcuts
- * Supports chess-specific navigation and global shortcuts
+ * Global board/navigation keyboard shortcuts, bound to the game store.
+ * Mount on pages where the store-backed board is the main content (play page).
  */
-export function useKeyboardShortcuts() {
+export function useKeyboardShortcuts({ onNewGame }: KeyboardShortcutOptions = {}) {
   const {
     undo,
     redo,
@@ -19,14 +27,15 @@ export function useKeyboardShortcuts() {
     goToMove,
   } = useGameStore();
 
-  const { toggleSettings, toggleKeyboardShortcuts, setTheme, theme } = useUIStore();
-
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
-      // Don't trigger shortcuts when typing in input fields
+      // Don't trigger shortcuts while typing or interacting with form controls.
+      const target = event.target as HTMLElement | null;
       if (
-        event.target instanceof HTMLInputElement ||
-        event.target instanceof HTMLTextAreaElement
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target instanceof HTMLSelectElement ||
+        target?.isContentEditable
       ) {
         return;
       }
@@ -34,7 +43,6 @@ export function useKeyboardShortcuts() {
       const key = event.key.toLowerCase();
       const ctrlOrCmd = event.ctrlKey || event.metaKey;
 
-      // Navigation shortcuts
       switch (key) {
         // Arrow keys for move navigation
         case 'arrowleft':
@@ -77,17 +85,17 @@ export function useKeyboardShortcuts() {
         case 'n':
           if (!ctrlOrCmd) {
             event.preventDefault();
-            newGame();
+            if (onNewGame) onNewGame();
+            else newGame();
           }
           break;
 
-        // Z - Undo (with Ctrl/Cmd)
+        // Z - Undo (with Ctrl/Cmd); Ctrl+Shift+Z - Redo
         case 'z':
           if (ctrlOrCmd && !event.shiftKey) {
             event.preventDefault();
             undo();
           } else if (ctrlOrCmd && event.shiftKey) {
-            // Ctrl+Shift+Z - Redo
             event.preventDefault();
             redo();
           }
@@ -98,35 +106,6 @@ export function useKeyboardShortcuts() {
           if (ctrlOrCmd) {
             event.preventDefault();
             redo();
-          }
-          break;
-
-        // Escape - Close modals
-        case 'escape':
-          // Handle by modals themselves
-          break;
-
-        // ? - Show keyboard shortcuts
-        case '?':
-          if (event.shiftKey) {
-            event.preventDefault();
-            toggleKeyboardShortcuts();
-          }
-          break;
-
-        // S - Settings
-        case 's':
-          if (!ctrlOrCmd) {
-            event.preventDefault();
-            toggleSettings();
-          }
-          break;
-
-        // T - Toggle theme
-        case 't':
-          if (!ctrlOrCmd) {
-            event.preventDefault();
-            setTheme(theme === 'dark' ? 'light' : 'dark');
           }
           break;
 
@@ -143,19 +122,7 @@ export function useKeyboardShortcuts() {
           break;
       }
     },
-    [
-      undo,
-      redo,
-      flipBoard,
-      newGame,
-      goToMove,
-      history,
-      historyIndex,
-      toggleSettings,
-      toggleKeyboardShortcuts,
-      setTheme,
-      theme,
-    ]
+    [undo, redo, flipBoard, newGame, onNewGame, goToMove, history, historyIndex]
   );
 
   useEffect(() => {
@@ -184,15 +151,6 @@ export const keyboardShortcuts = [
       { key: 'N', description: 'New game' },
       { key: 'Ctrl+Z', description: 'Undo move' },
       { key: 'Ctrl+Y', description: 'Redo move' },
-    ],
-  },
-  {
-    category: 'General',
-    shortcuts: [
-      { key: 'T', description: 'Toggle theme' },
-      { key: 'S', description: 'Open settings' },
-      { key: 'Shift+?', description: 'Show shortcuts' },
-      { key: 'Esc', description: 'Close modal' },
     ],
   },
 ];
