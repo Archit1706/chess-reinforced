@@ -6,6 +6,14 @@ import { Bot, Loader2, Swords, Trash2, ChevronRight } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { fetchGames, deleteGame } from '@/lib/games/client';
 import type { GameOutcome, GameSummaryDTO } from '@/lib/games/types';
@@ -28,6 +36,8 @@ export default function GamesPage() {
   const [games, setGames] = useState<GameSummaryDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  // Game awaiting delete confirmation (deleting is irreversible).
+  const [confirmDelete, setConfirmDelete] = useState<GameSummaryDTO | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -44,6 +54,7 @@ export default function GamesPage() {
   }, []);
 
   const handleDelete = async (id: string) => {
+    setConfirmDelete(null);
     setDeletingId(id);
     const ok = await deleteGame(id);
     if (ok) setGames((prev) => prev.filter((g) => g.id !== id));
@@ -111,7 +122,7 @@ export default function GamesPage() {
                   variant="ghost"
                   size="icon"
                   className="shrink-0 text-muted-foreground hover:text-red-500"
-                  onClick={() => handleDelete(game.id)}
+                  onClick={() => setConfirmDelete(game)}
                   disabled={deletingId === game.id}
                   aria-label="Delete game"
                 >
@@ -129,6 +140,41 @@ export default function GamesPage() {
           ))}
         </div>
       )}
+
+      {/* Delete confirmation */}
+      <Dialog
+        open={confirmDelete !== null}
+        onOpenChange={(open) => {
+          if (!open) setConfirmDelete(null);
+        }}
+      >
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Delete this game?</DialogTitle>
+            <DialogDescription>
+              {confirmDelete
+                ? `${OUTCOME_LABEL[confirmDelete.outcome]} · ${
+                    confirmDelete.openingName || 'Unnamed opening'
+                  } · ${new Date(confirmDelete.createdAt).toLocaleDateString()}`
+                : ''}
+              <br />
+              This permanently removes the game and its analysis. This can&apos;t be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setConfirmDelete(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => confirmDelete && handleDelete(confirmDelete.id)}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
