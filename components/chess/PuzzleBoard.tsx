@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { parseUciMove } from '@/lib/chess';
+import { playSound } from '@/lib/sound';
 import {
   Lightbulb,
   Check,
@@ -107,6 +108,7 @@ export function PuzzleBoard({
   const fireSolved = useCallback(() => {
     if (solvedFiredRef.current) return;
     solvedFiredRef.current = true;
+    playSound('success');
     onSolved?.();
   }, [onSolved]);
 
@@ -164,9 +166,10 @@ export function PuzzleBoard({
       if (isCorrect) {
         // Make the move
         try {
-          game.move({ from, to, promotion: promotion || undefined });
+          const played = game.move({ from, to, promotion: promotion || undefined });
           setCurrentFen(game.fen());
           setLastMove({ from, to });
+          playSound(played.captured ? 'capture' : 'move');
 
           // Check if puzzle is complete
           if (moveIndex >= moves.length - 1) {
@@ -186,8 +189,9 @@ export function PuzzleBoard({
               const opponentMoveUci = moves[moveIndex + 1];
               if (opponentMoveUci) {
                 const oppMove = parseUciMove(opponentMoveUci);
+                let oppPlayed;
                 try {
-                  game.move({
+                  oppPlayed = game.move({
                     from: oppMove.from,
                     to: oppMove.to,
                     promotion: oppMove.promotion,
@@ -196,6 +200,7 @@ export function PuzzleBoard({
                   // Skip a malformed engine reply rather than crashing the board.
                   return;
                 }
+                playSound(oppPlayed.captured ? 'capture' : 'move');
                 setCurrentFen(game.fen());
                 setLastMove({ from: oppMove.from, to: oppMove.to });
                 setMoveIndex(moveIndex + 2);
@@ -220,6 +225,7 @@ export function PuzzleBoard({
         }
       } else {
         // Wrong move — count as a mistake, NOT as a hint.
+        playSound('error');
         setPuzzleState('incorrect');
         setWrongAttempts((n) => n + 1);
         onFailed?.();
