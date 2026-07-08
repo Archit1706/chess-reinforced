@@ -108,7 +108,7 @@ export default function GameDetailPage({ params }: { params: { id: string } }) {
   const orientation = game.playerColor === 'black' ? 'black' : 'white';
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl space-y-6">
+    <div className="container mx-auto px-4 py-8 max-w-6xl space-y-6">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <Button asChild variant="ghost" size="sm">
           <Link href="/games">
