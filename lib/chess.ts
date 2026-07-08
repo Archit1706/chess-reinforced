@@ -141,6 +141,21 @@ export function parseUciMove(uci: string): { from: Square; to: Square; promotion
 }
 
 /**
+ * Convert a UCI move to SAN for a given position (e.g., "g1f3" → "Nf3").
+ * Returns null if the move is illegal in that position.
+ */
+export function uciToSan(fen: string, uci: string): string | null {
+  try {
+    const game = new Chess(fen);
+    const { from, to, promotion } = parseUciMove(uci);
+    const move = game.move({ from, to, promotion });
+    return move?.san ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Get piece on a square
  */
 export function getPieceAt(game: Chess, square: Square) {
