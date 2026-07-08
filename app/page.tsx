@@ -2,7 +2,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Fraunces } from 'next/font/google';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
   Crown,
@@ -18,15 +17,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { HeroBoard } from '@/components/landing/HeroBoard';
-
-// Display serif for the landing page headlines — characterful against the
-// app's Inter body font.
-const fraunces = Fraunces({
-  subsets: ['latin'],
-  weight: ['500', '600'],
-  style: ['normal', 'italic'],
-  display: 'swap',
-});
 
 const features = [
   {
@@ -168,12 +158,9 @@ export default function HomePage() {
                 initial="hidden"
                 animate="visible"
                 custom={1}
-                className={`${fraunces.className} mt-6 text-5xl leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl`}
+                className="mt-6 text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl"
               >
-                Chess,{' '}
-                <em className="text-primary-400 [font-variation-settings:'opsz'_72]">
-                  reinforced.
-                </em>
+                Chess, <span className="text-primary-400">reinforced.</span>
               </motion.h1>
 
               <motion.p
@@ -251,7 +238,7 @@ export default function HomePage() {
       <section className="py-24 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className={`${fraunces.className} text-3xl sm:text-4xl tracking-tight mb-4`}>
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
               Everything you need to improve
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
@@ -285,7 +272,7 @@ export default function HomePage() {
       <section className="py-24">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className={`${fraunces.className} text-3xl sm:text-4xl tracking-tight mb-4`}>
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
               A structured path, start to finish
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
@@ -344,7 +331,7 @@ export default function HomePage() {
       <section className="py-24 bg-primary-600 text-white">
         <div className="container mx-auto px-4 text-center">
           <Crown className="h-16 w-16 mx-auto mb-6 opacity-90" />
-          <h2 className={`${fraunces.className} text-3xl sm:text-4xl tracking-tight mb-4`}>
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
             Ready to improve your chess?
           </h2>
           <p className="text-lg opacity-90 mb-2 max-w-2xl mx-auto">
