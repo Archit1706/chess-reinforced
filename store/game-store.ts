@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import { Chess, Square, Move } from 'chess.js';
 import type { ChessColor, BoardConfig, GameResult } from '@/types/chess';
 import { createGame, getGameState, makeMove, undoMove, detectOpening } from '@/lib/chess';
+import { playSound } from '@/lib/sound';
 
 /**
  * Main game state store using Zustand
@@ -275,6 +276,16 @@ export const useGameStore = create<GameState & GameActions>()(
         const state = getGameState(game);
         const opening = detectOpening(game);
 
+        playSound(
+          state.isGameOver
+            ? 'gameEnd'
+            : state.isCheck
+            ? 'check'
+            : move.captured
+            ? 'capture'
+            : 'move'
+        );
+
         set({
           fen: state.fen,
           turn: state.turn,
@@ -299,7 +310,7 @@ export const useGameStore = create<GameState & GameActions>()(
       },
 
       undo: () => {
-        const { game, history, historyIndex } = get();
+        const { game, historyIndex, mode, playerColor } = get();
 
         // If we're viewing history, go back one move
         if (historyIndex !== -1) {
@@ -310,6 +321,14 @@ export const useGameStore = create<GameState & GameActions>()(
         // Undo the last move
         const move = undoMove(game);
         if (!move) return;
+
+        // In vsComputer mode, take back the whole move pair so it's the
+        // player's turn again — undoing a single ply would leave the engine
+        // to move, and it would immediately replay a reply, making undo a
+        // no-op from the player's perspective.
+        if (mode === 'vsComputer' && game.turn() !== playerColor) {
+          undoMove(game);
+        }
 
         const state = getGameState(game);
 
