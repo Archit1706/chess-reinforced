@@ -125,21 +125,24 @@ export function ChessBoard({
 
     if (customSquareStyles) Object.assign(styles, customSquareStyles);
 
+    // Use the `background` shorthand everywhere (never `backgroundColor`):
+    // mixing the two on a square whose highlight changes kind between renders
+    // makes React warn about conflicting style properties and can flicker.
     if (highlightLastMove && effectiveLastMove) {
       styles[effectiveLastMove.from] = {
         ...styles[effectiveLastMove.from],
-        backgroundColor: 'rgba(255, 255, 0, 0.4)',
+        background: 'rgba(255, 255, 0, 0.4)',
       };
       styles[effectiveLastMove.to] = {
         ...styles[effectiveLastMove.to],
-        backgroundColor: 'rgba(255, 255, 0, 0.4)',
+        background: 'rgba(255, 255, 0, 0.4)',
       };
     }
 
     if (effectiveSelected) {
       styles[effectiveSelected] = {
         ...styles[effectiveSelected],
-        backgroundColor: 'rgba(186, 202, 68, 0.6)',
+        background: 'rgba(186, 202, 68, 0.6)',
       };
     }
 
