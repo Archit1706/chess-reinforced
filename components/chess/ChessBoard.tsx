@@ -64,7 +64,7 @@ export function ChessBoard({
     game: storeGame,
   } = useGameStore();
 
-  const { showLegalMoves, highlightLastMove, animationSpeed } = useUIStore();
+  const { showLegalMoves, highlightLastMove, animationSpeed, showCoordinates } = useUIStore();
 
   const useLocal = !!localGame;
 
@@ -334,6 +334,7 @@ export function ChessBoard({
         position={customFen || storeFen}
         boardWidth={resolvedWidth}
         boardOrientation={orientation}
+        showBoardNotation={showCoordinates}
         animationDuration={animationDuration}
         arePiecesDraggable={interactive && !effectiveIsGameOver}
         onPieceDragBegin={onPieceDragBegin}
