@@ -38,6 +38,12 @@ interface GameReviewProps {
   depth?: number;
   /** Fires once the full-game analysis completes (e.g. to derive practice puzzles). */
   onAnalyzed?: (analysis: GameAnalysis) => void;
+  /**
+   * Fill the parent's height (board left, scrollable move list right on large
+   * screens). Use inside a full-screen dialog; leave off for inline embeds,
+   * where the component sizes to its content.
+   */
+  fullHeight?: boolean;
   className?: string;
 }
 
@@ -98,6 +104,7 @@ export function GameReview({
   onSelectMove,
   depth = 12,
   onAnalyzed,
+  fullHeight = false,
   className,
 }: GameReviewProps) {
   const [status, setStatus] = useState<Status>('idle');
@@ -205,18 +212,6 @@ export function GameReview({
       .filter((p) => p > 0);
   }, [result]);
 
-  const jumpToNextNotable = useCallback(
-    (direction: 1 | -1) => {
-      if (notablePlies.length === 0) return;
-      const target =
-        direction === 1
-          ? notablePlies.find((p) => p > ply)
-          : [...notablePlies].reverse().find((p) => p < ply);
-      if (target != null) setPly(target);
-    },
-    [notablePlies, ply]
-  );
-
   const setPlyAndSync = useCallback(
     (next: number) => {
       const clamped = Math.max(0, Math.min(moves.length, next));
@@ -227,6 +222,64 @@ export function GameReview({
     },
     [moves.length, onSelectMove]
   );
+
+  const jumpToNextNotable = useCallback(
+    (direction: 1 | -1) => {
+      if (notablePlies.length === 0) return;
+      const target =
+        direction === 1
+          ? notablePlies.find((p) => p > ply)
+          : [...notablePlies].reverse().find((p) => p < ply);
+      if (target != null) setPlyAndSync(target);
+    },
+    [notablePlies, ply, setPlyAndSync]
+  );
+
+  // Keyboard navigation while the review is on screen: ←/→ step through moves,
+  // ↑/↓ jump between mistakes, Home/End go to the start/end of the game.
+  // Dialog (fullHeight) context only — inline embeds sit next to a GameViewer
+  // that already owns the arrow keys, and two boards must not step at once.
+  useEffect(() => {
+    if (status !== 'done' || !fullHeight) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target?.isContentEditable
+      ) {
+        return;
+      }
+      switch (event.key) {
+        case 'ArrowLeft':
+          event.preventDefault();
+          setPlyAndSync(ply - 1);
+          break;
+        case 'ArrowRight':
+          event.preventDefault();
+          setPlyAndSync(ply + 1);
+          break;
+        case 'ArrowUp':
+          event.preventDefault();
+          jumpToNextNotable(-1);
+          break;
+        case 'ArrowDown':
+          event.preventDefault();
+          jumpToNextNotable(1);
+          break;
+        case 'Home':
+          event.preventDefault();
+          setPlyAndSync(0);
+          break;
+        case 'End':
+          event.preventDefault();
+          setPlyAndSync(moves.length);
+          break;
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [status, fullHeight, ply, setPlyAndSync, jumpToNextNotable, moves.length]);
 
   // Auto-scroll the move list so the current move stays in view.
   const moveListRef = useRef<HTMLDivElement | null>(null);
@@ -294,45 +347,35 @@ export function GameReview({
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div className={cn('space-y-4', className)}>
-        {/* Accuracy per side */}
-        <div className="grid grid-cols-2 gap-3">
-          <AccuracyCard
-            label="White"
-            accuracy={result.accuracy.white}
-            acl={result.averageCentipawnLoss.white}
-          />
-          <AccuracyCard
-            label="Black"
-            accuracy={result.accuracy.black}
-            acl={result.averageCentipawnLoss.black}
-          />
-        </div>
-
-        {/* Mistake summary */}
-        <div className="flex items-center gap-2 text-sm flex-wrap">
-          <SummaryPill color="#f7c631" label="Inaccuracies" count={result.inaccuracies} />
-          <SummaryPill color="#ffa459" label="Mistakes" count={result.mistakes} />
-          <SummaryPill color="#fa412d" label="Blunders" count={result.blunders} />
-        </div>
-
-        {/* Eval sparkline — click to jump anywhere in the game */}
-        <EvalSparkline
-          evals={result.moves.map((m) => m.evaluation)}
-          currentPly={ply}
-          onSelect={setPlyAndSync}
-        />
-
-        {/* Interactive board */}
-        <div className="rounded-lg border p-3 space-y-3">
-          <div className="max-w-[420px] mx-auto w-full">
+      <div
+        className={cn(
+          'flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(0,1.35fr)_minmax(300px,1fr)] lg:gap-6',
+          fullHeight ? 'h-full min-h-0' : 'lg:items-start',
+          className
+        )}
+      >
+        {/* Board column — the star of the show, sized to the space available */}
+        <div
+          className={cn(
+            'rounded-lg border p-3 space-y-3 min-w-0',
+            fullHeight && 'lg:min-h-0 lg:flex lg:flex-col lg:justify-center'
+          )}
+        >
+          <div
+            className="mx-auto w-full"
+            style={{
+              maxWidth: fullHeight
+                ? 'min(680px, max(280px, calc(100vh - 350px)))'
+                : 480,
+            }}
+          >
             <ChessBoard
               customFen={currentFen}
               interactive={false}
               localGame={localGame}
               boardOrientation={orientation}
               customArrows={arrows}
-              boardWidth={420}
+              boardWidth={680}
             />
           </div>
 
@@ -458,11 +501,53 @@ export function GameReview({
           )}
         </div>
 
-        {/* Move-by-move list */}
+        {/* Details column — stats on top, the move list fills what's left */}
         <div
-          ref={moveListRef}
-          className="max-h-[280px] overflow-y-auto rounded-lg border divide-y"
+          className={cn(
+            'flex flex-col gap-3 min-w-0',
+            fullHeight && 'lg:h-full lg:min-h-0'
+          )}
         >
+          {/* Accuracy per side */}
+          <div className="grid grid-cols-2 gap-3 shrink-0">
+            <AccuracyCard
+              label="White"
+              accuracy={result.accuracy.white}
+              acl={result.averageCentipawnLoss.white}
+            />
+            <AccuracyCard
+              label="Black"
+              accuracy={result.accuracy.black}
+              acl={result.averageCentipawnLoss.black}
+            />
+          </div>
+
+          {/* Mistake summary */}
+          <div className="flex items-center gap-2 text-sm flex-wrap shrink-0">
+            <SummaryPill color="#f7c631" label="Inaccuracies" count={result.inaccuracies} />
+            <SummaryPill color="#ffa459" label="Mistakes" count={result.mistakes} />
+            <SummaryPill color="#fa412d" label="Blunders" count={result.blunders} />
+          </div>
+
+          {/* Eval sparkline — click to jump anywhere in the game */}
+          <div className="shrink-0">
+            <EvalSparkline
+              evals={result.moves.map((m) => m.evaluation)}
+              currentPly={ply}
+              onSelect={setPlyAndSync}
+            />
+          </div>
+
+          {/* Move-by-move list */}
+          <div
+            ref={moveListRef}
+            className={cn(
+              'overflow-y-auto rounded-lg border divide-y',
+              fullHeight
+                ? 'max-h-[280px] lg:max-h-none lg:flex-1 lg:min-h-0'
+                : 'max-h-[280px] lg:max-h-[420px]'
+            )}
+          >
           {result.moves.map((m, i) => {
             const moveNumber = Math.floor(i / 2) + 1;
             const isWhite = i % 2 === 0;
@@ -522,10 +607,18 @@ export function GameReview({
           })}
         </div>
 
-        <Button variant="outline" size="sm" onClick={startReview}>
-          <BarChart3 className="h-4 w-4 mr-2" />
-          Re-run review
-        </Button>
+          <div className="flex items-center justify-between gap-2 shrink-0">
+            <Button variant="outline" size="sm" onClick={startReview}>
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Re-run review
+            </Button>
+            {fullHeight && (
+              <span className="text-xs text-muted-foreground hidden lg:inline">
+                ← → moves · ↑ ↓ mistakes
+              </span>
+            )}
+          </div>
+        </div>
       </div>
     </TooltipProvider>
   );
