@@ -35,12 +35,14 @@ import {
   Play,
   Pause,
   Lightbulb,
+  X,
 } from 'lucide-react';
 import type { Square } from 'chess.js';
 import { cn } from '@/lib/utils';
 import { getComputerMove, setElo, initEngine, isEngineReady, analyzePosition } from '@/lib/stockfish';
 import { getLocalBestMove } from '@/lib/local-engine';
-import { parseUciMove } from '@/lib/chess';
+import { parseUciMove, uciToSan } from '@/lib/chess';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 
 // Minimum time the computer "thinks" before moving, so its reply is easy to follow.
 const COMPUTER_MIN_THINK_MS = 650;
@@ -61,8 +63,10 @@ export default function PlayPage() {
     fen,
     turn,
     history,
+    historyIndex,
     isGameOver,
     isCheckmate,
+    isStalemate,
     result,
     mode,
     playerColor,
@@ -95,6 +99,8 @@ export default function PlayPage() {
   // Hint arrow (best move for the player), shown on demand during a game.
   const [hintArrow, setHintArrow] = useState<[Square, Square] | null>(null);
   const [hintLoading, setHintLoading] = useState(false);
+  // Lets the user close the game-over overlay to study the final position.
+  const [gameOverDismissed, setGameOverDismissed] = useState(false);
   // Guard so a finished game is persisted to history exactly once.
   const savedGameRef = useRef(false);
   // Track the FEN the computer last attempted to move from, so a failed engine
@@ -102,6 +108,10 @@ export default function PlayPage() {
   const computerLastFenRef = useRef<string | null>(null);
 
   const playerToMove = mode === 'vsComputer' && !isGameOver && turn === playerColor;
+
+  // Board/navigation keyboard shortcuts (arrows, F flip, Ctrl+Z undo, …).
+  // "N" opens the new-game dialog instead of silently resetting the game.
+  useKeyboardShortcuts({ onNewGame: () => setShowNewGameDialog(true) });
 
   // Initialize engine and session. Default to playing the computer so the
   // opponent responds immediately (instead of landing in free/both-sides mode).
@@ -145,6 +155,13 @@ export default function PlayPage() {
     if (history.length === 0) computerLastFenRef.current = null;
   }, [history.length]);
 
+  // Also clear the guard whenever it's the player's turn: after an undo the
+  // player may replay the exact same move (same FEN), and a stale guard would
+  // block the computer from ever replying to it.
+  useEffect(() => {
+    if (turn === playerColor) computerLastFenRef.current = null;
+  }, [turn, playerColor, fen]);
+
   // Analyze position when autoAnalyze is enabled. Skips during the engine's
   // own turn so auto-analyze can't compete with the move search for the same
   // (serialized) engine slot.
@@ -157,7 +174,10 @@ export default function PlayPage() {
 
   // Reset the save guard whenever a fresh game is in progress.
   useEffect(() => {
-    if (!isGameOver) savedGameRef.current = false;
+    if (!isGameOver) {
+      savedGameRef.current = false;
+      setGameOverDismissed(false);
+    }
   }, [isGameOver]);
 
   // Record game result (stats) and persist the game to history — once.
@@ -291,7 +311,9 @@ export default function PlayPage() {
       setEvaluation(analysis.evaluation);
       setBestMove(analysis.bestMove);
       setAnalysisResult(
-        `Eval: ${analysis.evaluation > 0 ? '+' : ''}${(analysis.evaluation / 100).toFixed(2)} | Best: ${analysis.bestMove}`
+        `Eval: ${analysis.evaluation > 0 ? '+' : ''}${(analysis.evaluation / 100).toFixed(2)} | Best: ${
+          uciToSan(fen, analysis.bestMove) ?? analysis.bestMove
+        }`
       );
     } catch (error) {
       console.error('Error analyzing position:', error);
@@ -381,26 +403,55 @@ export default function PlayPage() {
                 </div>
               )}
 
-              {/* Game over overlay */}
-              {isGameOver && (
+              {/* Game over overlay — dismissible so the final position can be
+                  studied, and hidden while stepping back through the moves. */}
+              {isGameOver && !gameOverDismissed && historyIndex === -1 && (
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                  <Card className="w-72">
-                    <CardHeader className="text-center">
+                  <Card className="w-72 relative">
+                    <button
+                      onClick={() => setGameOverDismissed(true)}
+                      className="absolute top-2 right-2 p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                      aria-label="Close and view the board"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                    <CardHeader className="text-center pb-3">
                       <CardTitle>
-                        {result === '1-0'
-                          ? 'White Wins!'
-                          : result === '0-1'
-                          ? 'Black Wins!'
+                        {result === '1-0' || result === '0-1'
+                          ? mode === 'vsComputer'
+                            ? (result === '1-0') === (playerColor === 'w')
+                              ? 'You Won!'
+                              : 'You Lost'
+                            : result === '1-0'
+                            ? 'White Wins!'
+                            : 'Black Wins!'
                           : 'Draw!'}
                       </CardTitle>
+                      <p className="text-sm text-muted-foreground">
+                        {isCheckmate
+                          ? 'by checkmate'
+                          : isStalemate
+                          ? 'by stalemate'
+                          : 'Game drawn'}
+                      </p>
                     </CardHeader>
-                    <CardContent className="flex gap-2 justify-center">
+                    <CardContent className="flex flex-col gap-2 items-stretch">
                       <Button onClick={() => setShowNewGameDialog(true)}>
                         New Game
                       </Button>
-                      <Button variant="outline" onClick={handleExportPgn}>
-                        Export
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => setShowReview(true)}
+                        >
+                          <BarChart3 className="h-4 w-4 mr-1" />
+                          Review
+                        </Button>
+                        <Button variant="outline" className="flex-1" onClick={handleExportPgn}>
+                          Export
+                        </Button>
+                      </div>
                     </CardContent>
                   </Card>
                 </div>
@@ -410,7 +461,11 @@ export default function PlayPage() {
 
           {/* Game controls */}
           <div className="flex flex-wrap items-center justify-between gap-2 bg-muted/50 p-2 rounded-lg">
-            <GameControls showExportImport onExport={handleExportPgn} />
+            <GameControls
+              showExportImport
+              onExport={handleExportPgn}
+              onNewGame={() => setShowNewGameDialog(true)}
+            />
 
             <div className="flex items-center gap-3">
               {/* Hint — suggest the best move for the player */}
@@ -564,7 +619,7 @@ export default function PlayPage() {
                 Difficulty
               </label>
               <div className="grid grid-cols-2 gap-2">
-                {difficultyPresets.slice(0, 4).map((preset) => (
+                {difficultyPresets.map((preset) => (
                   <Button
                     key={preset.elo}
                     variant={computerElo === preset.elo ? 'default' : 'outline'}
