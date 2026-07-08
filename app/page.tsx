@@ -23,7 +23,7 @@ const features = [
     icon: BookOpen,
     title: 'Interactive Lessons',
     description:
-      '12 modules and 65+ lessons from piece movement to advanced tactics — with live boards you play on, not just read.',
+      '13 modules and 65+ lessons from piece movement to advanced endgames — with live boards you play on, not just read.',
   },
   {
     icon: Puzzle,
@@ -57,21 +57,49 @@ const features = [
   },
 ];
 
+// The real seeded curriculum — module titles per level, from prisma/seed.ts.
 const learningPath = [
   {
     level: 'Beginner',
-    topics: ['Piece movement', 'Basic tactics', 'Checkmate patterns'],
-    color: 'bg-green-500',
+    piece: '♙',
+    tagline: 'Learn how the game works',
+    modules: [
+      'Piece Movement',
+      'Basic Tactics',
+      'Checkmate Patterns',
+      'Rules & Special Moves',
+      'Reading Chess Notation',
+    ],
+    dot: 'bg-green-500',
+    text: 'text-green-600 dark:text-green-400',
+    ring: 'ring-green-500/30',
+    bar: 'from-green-500/80 to-green-500/0',
   },
   {
     level: 'Intermediate',
-    topics: ['Opening principles', 'Middle game strategy', 'Endgame basics'],
-    color: 'bg-yellow-500',
+    piece: '♘',
+    tagline: 'Turn rules into plans',
+    modules: [
+      'Opening Principles',
+      'Endgame Basics',
+      'Middlegame Strategy',
+      'Advanced Tactics',
+      'Strategic Thinking',
+    ],
+    dot: 'bg-yellow-500',
+    text: 'text-yellow-600 dark:text-yellow-400',
+    ring: 'ring-yellow-500/30',
+    bar: 'from-yellow-500/80 to-yellow-500/0',
   },
   {
     level: 'Advanced',
-    topics: ['Popular openings', 'Positional play', 'Advanced tactics'],
-    color: 'bg-orange-500',
+    piece: '♕',
+    tagline: 'Play like you mean it',
+    modules: ['Popular Openings', 'Attacking the King', 'Advanced Endgames'],
+    dot: 'bg-orange-500',
+    text: 'text-orange-600 dark:text-orange-400',
+    ring: 'ring-orange-500/30',
+    bar: 'from-orange-500/80 to-orange-500/0',
   },
 ];
 
@@ -268,55 +296,100 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ============ Learning Path ============ */}
-      <section className="py-24">
+      {/* ============ Learning Path — pawn to queen ============ */}
+      <section className="py-24 overflow-hidden">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
+          <div className="text-center mb-6">
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
               A structured path, start to finish
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Twelve modules take you from the basics to advanced strategy, with your
-              progress tracked lesson by lesson.
+              Thirteen modules take you from your first pawn push to advanced strategy,
+              with progress tracked lesson by lesson.
             </p>
           </div>
 
-          <div className="max-w-4xl mx-auto">
-            {learningPath.map((level, index) => (
-              <div key={level.level} className="flex gap-6 mb-8 last:mb-0">
-                {/* Progress indicator */}
-                <div className="flex flex-col items-center">
-                  <div
-                    className={`w-12 h-12 rounded-full ${level.color} text-white flex items-center justify-center font-bold text-lg`}
-                  >
-                    {index + 1}
-                  </div>
-                  {index < learningPath.length - 1 && (
-                    <div className="w-0.5 flex-1 bg-border my-2" />
-                  )}
-                </div>
+          <div className="relative max-w-5xl mx-auto pt-14">
+            {/* Connector line through the stage markers (desktop) */}
+            <div
+              aria-hidden
+              className="hidden lg:block absolute left-[16.66%] right-[16.66%] top-[3.5rem] h-px bg-gradient-to-r from-green-500/50 via-yellow-500/50 to-orange-500/50"
+            />
 
-                {/* Content */}
-                <Card className="flex-1">
-                  <CardHeader>
-                    <CardTitle>{level.level}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2">
-                      {level.topics.map((topic) => (
-                        <li key={topic} className="flex items-center gap-2 text-muted-foreground">
-                          <Check className="h-4 w-4 text-primary-600" />
-                          {topic}
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              </div>
-            ))}
+            <div className="grid gap-12 lg:gap-6 lg:grid-cols-3">
+              {learningPath.map((level, index) => (
+                <motion.div
+                  key={level.level}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-60px' }}
+                  transition={{ delay: index * 0.12, duration: 0.55, ease: [0.22, 0.9, 0.3, 1] }}
+                  className="relative"
+                >
+                  {/* Stage marker — the piece you've "become" at this level */}
+                  <div className="absolute -top-14 left-1/2 -translate-x-1/2 z-10">
+                    <div
+                      className={`flex h-14 w-14 items-center justify-center rounded-full bg-background ring-2 ${level.ring} shadow-md`}
+                    >
+                      <span className={`text-3xl leading-none select-none ${level.text}`}>
+                        {level.piece}
+                      </span>
+                    </div>
+                  </div>
+
+                  <Link href="/lessons" className="group block h-full">
+                    <Card className="relative h-full overflow-hidden pt-8 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-lg">
+                      {/* Level color accent */}
+                      <div
+                        className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${level.bar}`}
+                      />
+                      {/* Glyph watermark */}
+                      <span
+                        aria-hidden
+                        className="absolute -right-4 -bottom-8 text-[9rem] leading-none select-none opacity-[0.05] transition-opacity duration-300 group-hover:opacity-[0.09]"
+                      >
+                        {level.piece}
+                      </span>
+
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <CardTitle className="text-xl">{level.level}</CardTitle>
+                          <span
+                            className={`inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground`}
+                          >
+                            <span className={`h-1.5 w-1.5 rounded-full ${level.dot}`} />
+                            {level.modules.length} modules
+                          </span>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{level.tagline}</p>
+                      </CardHeader>
+                      <CardContent>
+                        <ul className="space-y-2.5">
+                          {level.modules.map((title) => (
+                            <li
+                              key={title}
+                              className="flex items-center gap-2.5 text-sm text-muted-foreground"
+                            >
+                              <Check className={`h-4 w-4 shrink-0 ${level.text}`} />
+                              {title}
+                            </li>
+                          ))}
+                        </ul>
+                        <div
+                          className={`mt-5 flex items-center gap-1 text-sm font-medium ${level.text} opacity-0 -translate-x-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0`}
+                        >
+                          Explore lessons
+                          <ArrowRight className="h-4 w-4" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
           </div>
 
-          <div className="text-center mt-12">
+          <div className="text-center mt-14">
             <Link href="/lessons">
               <Button size="lg">
                 Start Your Journey
