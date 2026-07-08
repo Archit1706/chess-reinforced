@@ -66,39 +66,38 @@ export function GameInfo({
 
   return (
     <div className={cn('space-y-3', className)}>
-      {/* Players */}
+      {/* Players — opponent on top, matching the board orientation */}
       {(playerWhite || playerBlack) && (
         <div className="space-y-2">
-          {/* Black player (top when board is white orientation) */}
-          {config.orientation === 'w' && (
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-gray-800 border border-gray-600" />
-                <span className="font-medium">{playerBlack || 'Black'}</span>
-              </div>
-              {blackTime !== undefined && (
-                <div className="flex items-center gap-1 text-sm font-mono">
-                  <Clock className="h-3 w-3" />
-                  {formatTime(blackTime)}
+          {(config.orientation === 'w' ? (['b', 'w'] as const) : (['w', 'b'] as const)).map(
+            (color) => {
+              const name = color === 'w' ? playerWhite || 'White' : playerBlack || 'Black';
+              const time = color === 'w' ? whiteTime : blackTime;
+              const isTurn = !isGameOver && turn === color;
+              return (
+                <div key={color} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className={cn(
+                        'w-4 h-4 rounded-full',
+                        color === 'w'
+                          ? 'bg-white border border-gray-300'
+                          : 'bg-gray-800 border border-gray-600'
+                      )}
+                    />
+                    <span className={cn('font-medium', isTurn && 'text-primary-600')}>
+                      {name}
+                    </span>
+                  </div>
+                  {time !== undefined && (
+                    <div className="flex items-center gap-1 text-sm font-mono">
+                      <Clock className="h-3 w-3" />
+                      {formatTime(time)}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          )}
-
-          {/* White player */}
-          {config.orientation === 'b' && (
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-white border border-gray-300" />
-                <span className="font-medium">{playerWhite || 'White'}</span>
-              </div>
-              {whiteTime !== undefined && (
-                <div className="flex items-center gap-1 text-sm font-mono">
-                  <Clock className="h-3 w-3" />
-                  {formatTime(whiteTime)}
-                </div>
-              )}
-            </div>
+              );
+            }
           )}
         </div>
       )}
