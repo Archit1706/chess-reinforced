@@ -39,13 +39,50 @@ import {
 } from 'lucide-react';
 import type { Square } from 'chess.js';
 import { cn } from '@/lib/utils';
-import { getComputerMove, setElo, initEngine, isEngineReady, analyzePosition } from '@/lib/stockfish';
+import {
+  getComputerMove,
+  setElo,
+  initEngine,
+  isEngineReady,
+  analyzePosition,
+  stopAnalysis,
+} from '@/lib/stockfish';
 import { getLocalBestMove } from '@/lib/local-engine';
 import { parseUciMove, uciToSan } from '@/lib/chess';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 
 // Minimum time the computer "thinks" before moving, so its reply is easy to follow.
 const COMPUTER_MIN_THINK_MS = 650;
+
+/**
+ * Wall-clock search budget for the computer's move, scaled by ELO. Using
+ * `go movetime` instead of a fixed depth keeps reply latency predictable
+ * (a depth-15 search can take many seconds on slow devices, which used to
+ * trip the fallback race and freeze the UI in the synchronous JS engine).
+ */
+function computerMoveTime(elo: number): number {
+  return Math.round(Math.max(300, Math.min(1400, 300 + (elo - 800) * 0.6)));
+}
+
+/**
+ * Let the browser paint (e.g. the "Thinking…" indicator) before running a
+ * long synchronous task on the main thread. Races a plain timeout against
+ * requestAnimationFrame because rAF never fires in hidden/background tabs —
+ * without the timeout the computer's move would stall until the tab refocuses.
+ */
+function yieldToPaint(): Promise<void> {
+  return new Promise((resolve) => {
+    let done = false;
+    const finish = () => {
+      if (!done) {
+        done = true;
+        resolve();
+      }
+    };
+    requestAnimationFrame(() => setTimeout(finish, 0));
+    setTimeout(finish, 60);
+  });
+}
 
 // Difficulty presets
 const difficultyPresets = [
@@ -82,12 +119,17 @@ export default function PlayPage() {
     setBestMove,
     newGame,
     movePiece,
-    goToMove,
     getPgn,
   } = useGameStore();
 
-  const { showEvaluation, autoAnalyze, showLegalMoves, toggleEvaluation, toggleLegalMoves } =
-    useUIStore();
+  const {
+    showEvaluation,
+    autoAnalyze,
+    showLegalMoves,
+    toggleEvaluation,
+    toggleLegalMoves,
+    analysisDepth,
+  } = useUIStore();
   const { recordGamePlayed, startSession } = useUserStore();
 
   const [engineReady, setEngineReady] = useState(false);
@@ -111,7 +153,12 @@ export default function PlayPage() {
 
   // Board/navigation keyboard shortcuts (arrows, F flip, Ctrl+Z undo, …).
   // "N" opens the new-game dialog instead of silently resetting the game.
-  useKeyboardShortcuts({ onNewGame: () => setShowNewGameDialog(true) });
+  // Suspended while a dialog is open — the review dialog has its own keyboard
+  // navigation and must not drive the underlying board at the same time.
+  useKeyboardShortcuts({
+    onNewGame: () => setShowNewGameDialog(true),
+    disabled: showReview || showNewGameDialog,
+  });
 
   // Initialize engine and session. Default to playing the computer so the
   // opponent responds immediately (instead of landing in free/both-sides mode).
@@ -139,6 +186,9 @@ export default function PlayPage() {
     if (
       mode === 'vsComputer' &&
       !isGameOver &&
+      // Never move while the user is browsing history — the engine would
+      // reply from a PAST position and truncate the rest of the game.
+      historyIndex === -1 &&
       turn !== playerColor &&
       !isThinking &&
       computerLastFenRef.current !== fen
@@ -147,7 +197,7 @@ export default function PlayPage() {
       makeComputerMove();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode, turn, playerColor, isGameOver, isThinking, fen]);
+  }, [mode, turn, playerColor, isGameOver, isThinking, fen, historyIndex]);
 
   // Reset the per-FEN guard whenever a new game starts so the computer can move
   // again from the fresh starting position.
@@ -161,6 +211,12 @@ export default function PlayPage() {
   useEffect(() => {
     if (turn === playerColor) computerLastFenRef.current = null;
   }, [turn, playerColor, fen]);
+
+  // Re-arm the trigger when the user returns from browsing history to the live
+  // position, so a reply that was discarded mid-browse is re-requested.
+  useEffect(() => {
+    if (historyIndex === -1) computerLastFenRef.current = null;
+  }, [historyIndex]);
 
   // Analyze position when autoAnalyze is enabled. Skips during the engine's
   // own turn so auto-analyze can't compete with the move search for the same
@@ -227,12 +283,23 @@ export default function PlayPage() {
       // Prefer Stockfish when it's loaded, but cap the wait so a stuck/blocked
       // engine can't freeze the game; otherwise use the built-in local engine.
       if (isEngineReady()) {
+        // Interrupt any in-flight analysis (auto-analyze / hint): searches are
+        // serialized through one engine slot, so a pending depth search would
+        // otherwise delay the computer's reply past the fallback race — which
+        // is exactly the stutter this used to cause.
+        stopAnalysis();
+        const budget = computerMoveTime(computerElo);
         uciMove = await Promise.race<string | null>([
-          getComputerMove(fen),
-          new Promise<null>((resolve) => setTimeout(() => resolve(null), 3500)),
+          getComputerMove(fen, budget),
+          // Generous cap: the movetime search should finish within its budget,
+          // so this only catches a genuinely wedged worker.
+          new Promise<null>((resolve) => setTimeout(() => resolve(null), budget + 3000)),
         ]);
       }
       if (!uciMove) {
+        // The local engine is synchronous — give the browser one frame to
+        // paint the "Thinking…" indicator before blocking the main thread.
+        await yieldToPaint();
         uciMove = getLocalBestMove(fen, computerElo);
       }
 
@@ -243,17 +310,28 @@ export default function PlayPage() {
         await new Promise((resolve) => setTimeout(resolve, COMPUTER_MIN_THINK_MS - elapsed));
       }
 
-      if (uciMove) {
+      // Discard the reply if the position changed while searching (the user
+      // undid a move or is browsing history) — applying it would corrupt the
+      // game. The history-return effect re-arms the trigger to search again.
+      const stillCurrent = () => {
+        const s = useGameStore.getState();
+        return s.fen === fen && s.historyIndex === -1;
+      };
+      if (uciMove && stillCurrent()) {
         const { from, to, promotion } = parseUciMove(uciMove);
         movePiece(from, to, promotion, true);
       }
     } catch (error) {
       console.error('Error getting computer move:', error);
       // Last resort so the game never stalls.
-      const fallback = getLocalBestMove(fen, computerElo);
-      if (fallback) {
-        const { from, to, promotion } = parseUciMove(fallback);
-        movePiece(from, to, promotion, true);
+      await yieldToPaint();
+      const s = useGameStore.getState();
+      if (s.fen === fen && s.historyIndex === -1) {
+        const fallback = getLocalBestMove(fen, computerElo);
+        if (fallback) {
+          const { from, to, promotion } = parseUciMove(fallback);
+          movePiece(from, to, promotion, true);
+        }
       }
     } finally {
       setIsThinking(false);
@@ -281,12 +359,19 @@ export default function PlayPage() {
     try {
       let uci: string | null = null;
       if (isEngineReady()) {
+        // Free the serialized engine slot from any in-flight auto-analyze so
+        // the hint search starts immediately instead of queueing.
+        stopAnalysis();
         uci = await Promise.race<string | null>([
           analyzePosition(requestFen, 15, 1).then((r) => r.bestMove),
           new Promise<null>((resolve) => setTimeout(() => resolve(null), 2500)),
         ]);
       }
-      if (!uci) uci = getLocalBestMove(requestFen, 2200);
+      if (!uci) {
+        // Synchronous search — let the spinner paint before blocking.
+        await yieldToPaint();
+        uci = getLocalBestMove(requestFen, 2200);
+      }
       if (uci && !isStale()) {
         const { from, to } = parseUciMove(uci);
         setHintArrow([from as Square, to as Square]);
@@ -294,6 +379,7 @@ export default function PlayPage() {
     } catch (error) {
       console.error('Hint failed:', error);
       if (!isStale()) {
+        await yieldToPaint();
         const fallback = getLocalBestMove(requestFen, 2200);
         if (fallback && !isStale()) {
           const { from, to } = parseUciMove(fallback);
@@ -306,14 +392,30 @@ export default function PlayPage() {
   };
 
   const analyzeCurrentPosition = async () => {
+    // Capture the analyzed position so a slow engine reply can't paint a
+    // stale evaluation onto a newer position (the move already happened).
+    const requestFen = fen;
+    const isStale = () => useGameStore.getState().fen !== requestFen;
     try {
-      const analysis = await analyzePosition(fen, 15, 1);
-      setEvaluation(analysis.evaluation);
+      const analysis = await analyzePosition(requestFen, analysisDepth, 1);
+      if (isStale() || !analysis.bestMove) return;
+
+      // UCI scores are from the side-to-move's perspective; the eval bar and
+      // readout are White-POV. Normalize (also folds mate scores into cp).
+      const sideToMove = requestFen.split(' ')[1];
+      const cpSideToMove = analysis.mate != null
+        ? (analysis.mate > 0 ? 100_000 - analysis.mate : -100_000 - analysis.mate)
+        : analysis.evaluation;
+      const cpWhite = sideToMove === 'w' ? cpSideToMove : -cpSideToMove;
+
+      setEvaluation(cpWhite);
       setBestMove(analysis.bestMove);
+      const evalText =
+        analysis.mate != null
+          ? `#${Math.abs(analysis.mate)}`
+          : `${cpWhite > 0 ? '+' : ''}${(cpWhite / 100).toFixed(2)}`;
       setAnalysisResult(
-        `Eval: ${analysis.evaluation > 0 ? '+' : ''}${(analysis.evaluation / 100).toFixed(2)} | Best: ${
-          uciToSan(fen, analysis.bestMove) ?? analysis.bestMove
-        }`
+        `Eval: ${evalText} | Best: ${uciToSan(requestFen, analysis.bestMove) ?? analysis.bestMove}`
       );
     } catch (error) {
       console.error('Error analyzing position:', error);
@@ -589,16 +691,23 @@ export default function PlayPage() {
         </div>
       </div>
 
-      {/* Game Review Dialog */}
+      {/* Game Review Dialog — near-fullscreen on large displays so the board
+          and move list get real estate; small screens scroll vertically. */}
       <Dialog open={showReview} onOpenChange={setShowReview}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
+        <DialogContent className="flex flex-col w-[96vw] max-w-[1280px] h-[94vh] max-h-[94vh] sm:h-[92vh] sm:max-h-[92vh] overflow-hidden gap-3">
+          <DialogHeader className="shrink-0">
             <DialogTitle>Game Review</DialogTitle>
             <DialogDescription>
-              Stockfish accuracy and a move-by-move breakdown. Click a move to jump to it.
+              Stockfish accuracy and a move-by-move breakdown. Click a move or use the
+              arrow keys to step through the game.
             </DialogDescription>
           </DialogHeader>
-          <GameReview moves={history} onSelectMove={(index) => goToMove(index)} />
+          <div className="flex-1 min-h-0 overflow-y-auto lg:overflow-hidden">
+            {/* No onSelectMove coupling: the review has its own board, and
+                driving the underlying live game to historical positions from
+                here risks the engine replying out of the past. */}
+            <GameReview moves={history} fullHeight />
+          </div>
         </DialogContent>
       </Dialog>
 
