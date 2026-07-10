@@ -62,6 +62,15 @@ caption: A pawn that reaches the last rank turns into a queen (or rook, bishop, 
 
 If an opponent's pawn jumps two squares and lands beside yours, you may capture it **in passing** — on the next move only — as if it had moved one square.
 
+## Challenge: pawn war!
+
+\`\`\`chess
+mode: interactive
+respond: true
+fen: 4k3/pppp4/8/8/8/8/PPPP4/4K3 w - - 0 1
+caption: Four pawns each. Push, capture, and race to promote — the board fights back!
+\`\`\`
+
 That's the whole pawn. Small steps, diagonal bite, and a queen waiting at the finish line.`,
           order: 1,
           difficulty: 1,
@@ -105,7 +114,16 @@ autoplay: true
 caption: Nf6+ checks the king AND attacks the queen — a knight fork.
 \`\`\`
 
-Knights are the slow, sneaky cousins of long-range pieces. Their gift is the **fork**: two attacks at once, with nothing able to block.`,
+Knights are the slow, sneaky cousins of long-range pieces. Their gift is the **fork**: two attacks at once, with nothing able to block.
+
+## Challenge: pawn hunt
+
+\`\`\`chess
+mode: interactive
+respond: true
+fen: 4k3/8/2p1p3/8/3N4/8/8/4K3 w - - 0 1
+caption: Hop your knight around and capture both pawns — the board defends them!
+\`\`\``,
           order: 2,
           difficulty: 1,
           estimatedMinutes: 10,
@@ -148,7 +166,16 @@ fen: 4k3/8/8/3p4/4P3/8/8/B3K3 w - - 0 1
 caption: The a1-bishop's diagonal is blocked by White's own e4-pawn. Bishops can't jump.
 \`\`\`
 
-When you trade a bishop, ask: *will my remaining bishop have open diagonals, or will my pawns block it?* Good bishops win games; bad bishops watch from the sidelines.`,
+When you trade a bishop, ask: *will my remaining bishop have open diagonals, or will my pawns block it?* Good bishops win games; bad bishops watch from the sidelines.
+
+## Challenge: diagonal sniper
+
+\`\`\`chess
+mode: interactive
+respond: true
+fen: 4k3/8/1p3p2/8/3B4/8/8/4K3 w - - 0 1
+caption: Both pawns sit on your bishop's color. Pick them off — the board fights back!
+\`\`\``,
           order: 3,
           difficulty: 1,
           estimatedMinutes: 8,
@@ -190,7 +217,16 @@ caption: Rd7 lands on the 7th rank — now your rook attacks an entire row of pa
 
 The king slides two squares toward a rook, and the rook leaps over to the king's other side. The only move where **two pieces move at once**.
 
-A rook in the opening is shy and clumsy. A rook in the endgame, on an open file, is the boss of the board.`,
+A rook in the opening is shy and clumsy. A rook in the endgame, on an open file, is the boss of the board.
+
+## Challenge: sweep the seventh
+
+\`\`\`chess
+mode: interactive
+respond: true
+fen: 4k3/2p2p2/8/8/8/8/8/3RK3 w - - 0 1
+caption: Use ranks and files to round up Black's pawns — the board defends. Watch out for the king!
+\`\`\``,
           order: 4,
           difficulty: 1,
           estimatedMinutes: 8,
@@ -231,7 +267,16 @@ fen: 6k1/5ppp/8/8/8/8/5PPP/3Q2K1 w - - 0 1
 caption: Once the board opens up, the queen rakes across files, ranks, and diagonals.
 \`\`\`
 
-Treat your queen like a sports car: amazing once the road is clear, but don't drive it into traffic on move three.`,
+Treat your queen like a sports car: amazing once the road is clear, but don't drive it into traffic on move three.
+
+## Challenge: hunt the rook
+
+\`\`\`chess
+mode: interactive
+respond: true
+fen: 4k3/8/8/r7/8/8/8/3QK3 w - - 0 1
+caption: Your queen vs a rook. Corner it, win it, then deliver mate — the board defends!
+\`\`\``,
           order: 5,
           difficulty: 1,
           estimatedMinutes: 8,
@@ -273,7 +318,16 @@ fen: 8/8/8/4k3/4P3/4K3/8/8 w - - 0 1
 caption: With few pieces left, the king becomes a fighter — push it toward the center.
 \`\`\`
 
-The king has two lives: a frightened civilian in the opening, a brave general in the endgame.`,
+The king has two lives: a frightened civilian in the opening, a brave general in the endgame.
+
+## Challenge: escort the pawn home
+
+\`\`\`chess
+mode: interactive
+respond: true
+fen: 8/8/8/4k3/8/3K4/4P3/8 w - - 0 1
+caption: The classic endgame test — use your king to escort the pawn to promotion while Black's king tries to stop you.
+\`\`\``,
           order: 6,
           difficulty: 1,
           estimatedMinutes: 8,
