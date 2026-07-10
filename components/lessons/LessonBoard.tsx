@@ -2,11 +2,12 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
-import { Chess, Square } from 'chess.js';
+import { Chess, Square, type PieceSymbol } from 'chess.js';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useContainerWidth } from '@/hooks/useContainerWidth';
-import { Play, Pause, RotateCcw, ChevronLeft, ChevronRight, Hand } from 'lucide-react';
+import { getLocalBestMove } from '@/lib/local-engine';
+import { Play, Pause, RotateCcw, ChevronLeft, ChevronRight, Hand, Loader2 } from 'lucide-react';
 import { framesFromMoves } from './lessonDemos';
 
 const BOARD_STYLE = {
@@ -23,6 +24,12 @@ interface LessonBoardProps {
   fen?: string;
   /** Let the reader drag legal moves from `fen`. */
   interactive?: boolean;
+  /**
+   * Interactive mode only: after the reader moves, the board answers with an
+   * engine reply (local pure-JS engine) so the sandbox plays back like a
+   * mini-opponent instead of a static diagram.
+   */
+  respond?: boolean;
   /** Auto-play the animation on mount. */
   autoPlay?: boolean;
   flip?: boolean;
@@ -43,6 +50,7 @@ export function LessonBoard({
   moves,
   fen,
   interactive = false,
+  respond = false,
   autoPlay = false,
   flip = false,
   caption,
@@ -56,6 +64,7 @@ export function LessonBoard({
       <InteractiveBoard
         startFen={fen ?? START_FEN}
         orientation={orientation}
+        respond={respond}
         caption={caption}
         boardWidth={boardWidth}
         className={className}
@@ -161,24 +170,38 @@ function AnimatedBoard({
   );
 }
 
+/** Delay before the board answers back, so the reader's move settles visually. */
+const REPLY_DELAY_MS = 550;
+
 function InteractiveBoard({
   startFen,
   orientation,
+  respond,
   caption,
   boardWidth,
   className,
 }: {
   startFen: string;
   orientation: 'white' | 'black';
+  respond: boolean;
   caption?: string;
   boardWidth: number;
   className?: string;
 }) {
   const game = useMemo(() => new Chess(startFen), [startFen]);
   const [fen, setFen] = useState(startFen);
+  const [thinking, setThinking] = useState(false);
   const [moveStyles, setMoveStyles] = useState<Record<string, React.CSSProperties>>({});
+  const replyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [boardRef, containerWidth] = useContainerWidth<HTMLElement>();
   const width = containerWidth > 0 ? Math.min(boardWidth, containerWidth) : boardWidth;
+
+  // Clear a pending engine reply if the board unmounts mid-think.
+  useEffect(() => {
+    return () => {
+      if (replyTimer.current) clearTimeout(replyTimer.current);
+    };
+  }, []);
 
   const clearHints = useCallback(() => setMoveStyles({}), []);
 
@@ -201,26 +224,56 @@ function InteractiveBoard({
     [game]
   );
 
+  /** In respond mode, answer the reader's move with a light engine reply. */
+  const scheduleReply = useCallback(() => {
+    if (!respond || game.isGameOver()) return;
+    setThinking(true);
+    replyTimer.current = setTimeout(() => {
+      try {
+        const uci = getLocalBestMove(game.fen(), 1200);
+        if (uci) {
+          game.move({
+            from: uci.slice(0, 2),
+            to: uci.slice(2, 4),
+            promotion: (uci[4] as PieceSymbol | undefined) || undefined,
+          });
+          setFen(game.fen());
+        }
+      } catch {
+        // A failed reply just leaves it the reader's move again — never crash.
+      } finally {
+        setThinking(false);
+      }
+    }, REPLY_DELAY_MS);
+  }, [respond, game]);
+
   const onDrop = useCallback(
     (from: string, to: string) => {
+      if (thinking) return false; // wait for the board's answer
       try {
         const move = game.move({ from, to, promotion: 'q' });
         if (!move) return false;
         setFen(game.fen());
         clearHints();
+        scheduleReply();
         return true;
       } catch {
         return false;
       }
     },
-    [game, clearHints]
+    [game, clearHints, scheduleReply, thinking]
   );
 
   const reset = useCallback(() => {
+    if (replyTimer.current) clearTimeout(replyTimer.current);
+    setThinking(false);
     game.load(startFen);
     setFen(startFen);
     clearHints();
   }, [game, startFen, clearHints]);
+
+  const turn = fen.split(' ')[1] === 'b' ? 'Black' : 'White';
+  const gameOver = game.isGameOver();
 
   return (
     <figure
@@ -239,16 +292,41 @@ function InteractiveBoard({
         animationDuration={200}
         {...BOARD_STYLE}
       />
-      <div className="mt-2 flex items-center justify-center gap-2">
-        <span className="flex items-center gap-1 text-xs text-muted-foreground">
-          <Hand className="h-3.5 w-3.5" />
-          Drag the pieces — only legal moves are allowed
+      <div className="mt-2 flex items-center justify-center gap-2 flex-wrap">
+        {/* Explicit call to action: whose move is it? */}
+        <span
+          className={cn(
+            'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium',
+            gameOver
+              ? 'text-muted-foreground'
+              : thinking
+                ? 'text-muted-foreground'
+                : 'border-green-500/40 bg-green-500/10 text-green-600 dark:text-green-500'
+          )}
+        >
+          {gameOver ? (
+            'Game over — hit Reset to try again'
+          ) : thinking ? (
+            <>
+              <Loader2 className="h-3 w-3 animate-spin" />
+              Thinking…
+            </>
+          ) : (
+            <>
+              <Hand className="h-3 w-3" />
+              Your move — {turn} to play
+            </>
+          )}
         </span>
         <Button variant="ghost" size="sm" onClick={reset}>
           <RotateCcw className="h-4 w-4 mr-1" />
           Reset
         </Button>
       </div>
+      <p className="mt-1 text-center text-[11px] text-muted-foreground">
+        Drag the pieces — only legal moves are allowed
+        {respond ? '. The board answers back!' : ''}
+      </p>
       {caption && (
         <figcaption className="mt-1 text-center text-sm text-muted-foreground max-w-[420px]">
           {caption}
