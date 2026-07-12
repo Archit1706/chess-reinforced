@@ -1744,7 +1744,7 @@ caption: Two c-pawns stacked = doubled pawns. They can't defend each other and o
 \`\`\`chess
 mode: interactive
 fen: 4k3/pp3ppp/8/4p3/3pP3/3P4/PPP3PP/4K3 w - - 0 1
-caption: Diagonal pawn chains. To break a chain, attack the BASE pawn — here, the d3-pawn supports d4/e5 from below.
+caption: Two locked chains. Each chain's BASE is its rear pawn: White's d3 props up e4; Black's e5 props up d4. To break a chain, strike its base — e.g., White plays f4 to hit e5.
 \`\`\`
 
 ## The big idea
@@ -1782,13 +1782,13 @@ fen: 6k1/pp3ppp/8/8/8/8/PP3PPP/3R1RK1 w - - 0 1
 caption: Pile two rooks on the same file (e.g., Rd2 then Rfd1) — pressure multiplies.
 \`\`\`
 
-## The 7th rank — a rook's dream
+## Your move — invade the 7th rank
 
 \`\`\`chess
-mode: animate
+mode: interactive
+respond: true
 fen: 4k3/pp3ppp/8/8/8/8/PP3PPP/3RK3 w - - 0 1
-moves: Rd7
-caption: Rd7 lands on the absolute 7th rank — attacking pawns and trapping the king. Often worth a whole pawn.
+caption: Your move: the d-file is wide open — slam the rook down to d7, the absolute 7th rank. It rakes Black's pawns and pins the king to the back. Often worth a whole pawn. The board answers back.
 \`\`\`
 
 ## The three rook rules
@@ -1826,12 +1826,13 @@ caption: The knight on c5 is OUTPOSTED. No black pawn can ever drive it away. Tr
 | Defended by your own pawn | Hangs to a simple capture |
 | 4th–6th rank in enemy half | Stuck on your own side |
 
-## Hunt for the hole
+## Your move — occupy the outpost
 
 \`\`\`chess
 mode: interactive
+respond: true
 fen: r1bq1rk1/ppp2ppp/2nb1n2/3p4/2PP4/2N1PN2/PP3PPP/R1BQKB1R w KQ - 0 1
-caption: Where can a knight land safely on a square Black can never attack with a pawn? (Hint: e5, supported by d4 — if you can get a knight there.)
+caption: Your move: e5 is a hole — supported by your d4-pawn and out of reach of Black's pawns. Leap the knight to e5 and clamp down. The board answers back.
 \`\`\`
 
 ## Knights love outposts most
@@ -1919,6 +1920,16 @@ caption: White calmly develops, refusing trades. Black's pieces have nowhere goo
 
 - **Trade pieces** at every chance
 - **Strike the pawn chain** at its base (...c5 or ...f6) to challenge the space
+
+## Your move — break free as Black
+
+\`\`\`chess
+mode: interactive
+respond: true
+flip: true
+fen: r1bqkb1r/pp1n1ppp/2p1pn2/3pP3/2PP4/2N2N2/PP3PPP/R1BQKB1R b KQkq - 0 1
+caption: You're Black and cramped. Don't sit still — strike the base of White's chain: play c5, hitting d4. Trades and open lines relieve the squeeze. The board answers as White.
+\`\`\`
 
 ## The trap
 
