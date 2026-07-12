@@ -943,8 +943,9 @@ caption: Two short moves — O-O for both sides. King in the corner, rook on f1/
 
 \`\`\`chess
 mode: interactive
+respond: true
 fen: rnbqk2r/pppp1ppp/5n2/2b1p3/2B1P3/3P1N2/PPP2PPP/RNBQ1RK1 b kq - 1 5
-caption: Your turn — castle kingside (O-O) by dragging the king two squares right.
+caption: Your move: castle kingside (O-O) by dragging the king two squares to the right — the rook jumps over automatically. The board plays on!
 \`\`\`
 
 ## The five rules of castling
@@ -954,6 +955,14 @@ caption: Your turn — castle kingside (O-O) by dragging the king two squares ri
 3. Squares between are empty ✓
 4. King isn't in check right now ✓
 5. King doesn't pass through (or land on) an attacked square ✓
+
+## Now try queenside
+
+\`\`\`chess
+mode: interactive
+fen: r3k2r/pppq1ppp/2npbn2/4p3/4P3/2NPBN2/PPPQ1PPP/R3K2R w KQkq - 0 1
+caption: Your move: castle queenside (O-O-O) by dragging the king two squares to the LEFT, toward the a-rook. Notice the king still moves exactly two squares — the rook travels farther.
+\`\`\`
 
 ## Kingside vs queenside
 
@@ -987,12 +996,12 @@ caption: Black just played ...d7-d5, skipping past your e5-pawn. You capture "in
 
 Yes, your pawn lands on an **empty** square (d6) and removes a pawn from a **different** square (d5). That's the magic.
 
-## Try it yourself
+## Your turn — capture en passant
 
 \`\`\`chess
 mode: interactive
-fen: 4k3/2p5/8/3P4/8/8/8/4K3 b - - 0 1
-caption: Play ...c5 (the two-square advance). White's d5-pawn can capture en passant with dxc6 on the very next move.
+fen: 4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1
+caption: Your move: Black's pawn just leaped from d7 to d5, right past your e5-pawn. Grab it "in passing" — play exd6, landing on the empty d6 square and removing the d5-pawn.
 \`\`\`
 
 ## The three rules to remember
@@ -1030,7 +1039,7 @@ caption: One push, one new queen. A pawn became your most powerful piece.
 \`\`\`chess
 mode: interactive
 fen: 4k3/4P3/8/8/8/8/8/4K3 w - - 0 1
-caption: Push the e-pawn to e8 and choose a queen. (You can promote even if you already have one.)
+caption: Your move: push the e-pawn to e8 — it becomes a queen the instant it lands. (You may promote even if you already have a queen.)
 \`\`\`
 
 ## Underpromotion — choosing NOT a queen
@@ -1039,9 +1048,10 @@ Sometimes the queen is wrong. **Underpromote to a knight** when only a knight ca
 
 \`\`\`chess
 mode: animate
-fen: 4k3/3P4/8/8/8/8/8/4K3 w - - 0 1
-moves: d8=N+
-caption: d8=N+ — underpromote to a knight, delivering check and forking the king. A queen on d8 wouldn't even give check!
+fen: 8/1q1P1k2/8/8/8/8/8/4K3 w - - 0 1
+moves: d8=N+ Kf6 Nxb7
+autoplay: true
+caption: d8=N+ — underpromote to a knight! It checks the king on f7 AND forks the queen on b7. A new queen on d8 wouldn't even give check. The king must run, then Nxb7 collects the queen.
 \`\`\`
 
 ## The pawn that *will* promote = the pawn that decides
@@ -1074,8 +1084,9 @@ caption: Disaster! Qf7?? — Black has no legal move and is NOT in check. Stalem
 
 \`\`\`chess
 mode: interactive
+respond: true
 fen: 7k/8/6K1/8/8/8/8/5Q2 w - - 0 1
-caption: Same position. Try Qf6 instead — Black still has a legal move (...Kg8 or ...Kh7). Bring your king up first, THEN mate.
+caption: Your move: play Qf6 instead of Qf7. It checks, and Black can still answer with ...Kg8 — so it's not stalemate. The board replies; now use your king to finish without ever taking away that last square.
 \`\`\`
 
 ## The other four draws
