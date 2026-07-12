@@ -143,6 +143,24 @@ export default function PlayPage() {
   const [hintLoading, setHintLoading] = useState(false);
   // Lets the user close the game-over overlay to study the final position.
   const [gameOverDismissed, setGameOverDismissed] = useState(false);
+  // One-time "how to move" coach tip for first-time players. Guest-safe: the
+  // seen-flag lives in localStorage and any access is tolerated to fail.
+  const [showCoach, setShowCoach] = useState(false);
+  useEffect(() => {
+    try {
+      if (!localStorage.getItem('chess-play-coached')) setShowCoach(true);
+    } catch {
+      /* private mode / storage disabled — just skip the tip */
+    }
+  }, []);
+  const dismissCoach = useCallback(() => {
+    setShowCoach(false);
+    try {
+      localStorage.setItem('chess-play-coached', '1');
+    } catch {
+      /* ignore */
+    }
+  }, []);
   // Guard so a finished game is persisted to history exactly once.
   const savedGameRef = useRef(false);
   // Track the FEN the computer last attempted to move from, so a failed engine
@@ -479,6 +497,33 @@ export default function PlayPage() {
               </Button>
             </div>
           </div>
+
+          {/* First-visit coach tip — how to make a move (dismiss = never again) */}
+          {showCoach && mode === 'vsComputer' && (
+            <div
+              role="note"
+              className="flex items-start gap-3 rounded-lg border border-primary-200 bg-primary-50 p-3 text-sm dark:border-primary-800 dark:bg-primary-950/40"
+            >
+              <Lightbulb className="mt-0.5 h-5 w-5 shrink-0 text-primary-600" />
+              <div className="min-w-0 flex-1">
+                <p className="font-medium">
+                  New to chess? You&apos;re playing {playerColor === 'w' ? 'White' : 'Black'} — your
+                  pieces are along the bottom.
+                </p>
+                <p className="mt-0.5 text-muted-foreground">
+                  Drag a piece to move it, or tap it and then tap a highlighted square. Stuck? Press{' '}
+                  <span className="font-medium text-foreground">Hint</span> for the best move.
+                </p>
+              </div>
+              <button
+                onClick={dismissCoach}
+                aria-label="Dismiss tip"
+                className="shrink-0 rounded-md p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          )}
 
           {/* Board with evaluation bar */}
           <div className="flex gap-2 items-stretch min-w-0">
