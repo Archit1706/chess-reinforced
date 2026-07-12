@@ -98,7 +98,10 @@ const initialConfig: BoardConfig = {
 const createInitialState = (): Omit<GameState, 'game'> => ({
   mode: 'free',
   playerColor: 'w',
-  computerElo: 1500,
+  // New players start against the gentlest opponent ("Beginner", 800) so a first
+  // game isn't a blowout; the difficulty selector is one click away. Returning
+  // users keep their own choice (computerElo is persisted).
+  computerElo: 800,
   fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
   turn: 'w',
   isGameOver: false,

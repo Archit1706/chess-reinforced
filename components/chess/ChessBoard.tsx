@@ -139,6 +139,24 @@ export function ChessBoard({
       };
     }
 
+    // King in check: paint the checked king's square red. A clear visual cue —
+    // beginners especially rely on it — shown for both check and checkmate.
+    const activeGame = useLocal ? localGame : storeGame;
+    if (activeGame && activeGame.isCheck()) {
+      const inCheckColor = activeGame.turn();
+      for (const row of activeGame.board()) {
+        const king = row.find((c) => c && c.type === 'k' && c.color === inCheckColor);
+        if (king) {
+          styles[king.square] = {
+            ...styles[king.square],
+            background:
+              'radial-gradient(circle, rgba(220,38,38,0.85) 40%, rgba(220,38,38,0.35) 72%, transparent 76%)',
+          };
+          break;
+        }
+      }
+    }
+
     if (effectiveSelected) {
       styles[effectiveSelected] = {
         ...styles[effectiveSelected],
@@ -165,6 +183,11 @@ export function ChessBoard({
     effectiveSelected,
     showLegalMoves,
     effectiveLegal,
+    // Recompute the check highlight after each move (effectiveLastMove changes
+    // every move) and when a fresh local position loads (localGame ref changes).
+    useLocal,
+    storeGame,
+    localGame,
   ]);
 
   /** Select a square in local mode — derives legal moves from `localGame`. */
