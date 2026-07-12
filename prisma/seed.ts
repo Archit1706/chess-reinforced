@@ -1479,12 +1479,13 @@ autoplay: true
 caption: Walk the king forward to support its pawn. Then push together — the king clears the path.
 \`\`\`
 
-## The Rule of the Square — does the king catch the pawn?
+## Your move — win the race (Rule of the Square)
 
 \`\`\`chess
 mode: interactive
+respond: true
 fen: 8/8/8/8/k7/8/4P3/4K3 w - - 0 1
-caption: Imagine a square from the e2-pawn to e8 and back to a8. If the black king can step INTO this square, it catches the pawn. Here? It's too far.
+caption: Your move: picture the square from the e2-pawn up to e8. The Black king is OUTSIDE it, so it can never catch up — just run! Push the pawn to promotion while the board chases in vain.
 \`\`\`
 
 ## Opposition — the silent king duel
@@ -1521,12 +1522,13 @@ fen: 8/8/3k4/3P4/8/8/r7/3RK3 w - - 0 1
 caption: The famous Tarrasch rule: rooks BEHIND passed pawns (yours or theirs). Here Black's rook is correctly behind White's pawn.
 \`\`\`
 
-## An active rook is worth a pawn
+## Your move — put the rook to work
 
 \`\`\`chess
 mode: interactive
+respond: true
 fen: 6k1/p4p1p/6p1/8/8/2R5/PP4PP/6K1 w - - 0 1
-caption: White's rook is FREE — attacking pawns and roaming. A rook tied to passive defense usually loses.
+caption: Your move: your rook is FREE — send it to the 7th rank with Rc7, hitting a7 and f7 at once. An active rook is worth a pawn; a passive one loses. The board answers back.
 \`\`\`
 
 ## Cut off the enemy king
@@ -1595,6 +1597,15 @@ autoplay: true
 caption: White has the opposition. Black must give way. White's king escorts the d-pawn forward.
 \`\`\`
 
+## Your move — win the duel yourself
+
+\`\`\`chess
+mode: interactive
+respond: true
+fen: 3k4/8/8/3K4/3P4/8/8/8 w - - 0 1
+caption: Your move: seize the opposition with Kd6 — kings face to face, one square apart, and Black must give ground. Then escort the pawn home. The board defends its best.
+\`\`\`
+
 Opposition is the chess version of a staring contest — and yes, you can win or lose entire games on it.`,
           order: 3,
           difficulty: 3,
@@ -1622,8 +1633,9 @@ caption: One step. One new queen. Passed pawns are unstoppable.
 
 \`\`\`chess
 mode: interactive
-fen: 8/4P3/8/8/8/8/k7/4K3 w - - 0 1
-caption: Your move — push the pawn. Don't wait, don't defend, don't dawdle. Push.
+respond: true
+fen: 8/8/8/8/4P3/8/k7/4K3 w - - 0 1
+caption: Your move — push the pawn, and keep pushing. Don't wait, don't defend, don't dawdle. The board chases; escort your passer all the way to e8 and promote.
 \`\`\`
 
 ## A protected passed pawn is a fortress
@@ -1638,12 +1650,12 @@ caption: The d6-pawn is passed AND protected by the e5-pawn. Almost unstoppable.
 
 A passed pawn on the **a or h file** is a winning weapon: it lures the enemy king to the wrong corner while yours feasts on the other side.
 
-## The Rule of the Square — can the king catch it?
+## Your move — the Rule of the Square
 
 \`\`\`chess
 mode: interactive
 fen: 8/4P3/8/8/k7/8/8/4K3 w - - 0 1
-caption: Picture a square from the e7-pawn to e8 to b8 and back. If Black's king can step INSIDE that square, it catches the pawn. Here? Too slow.
+caption: Your move: the Black king is OUTSIDE the square of the e7-pawn (e7-e8-b8 and back), so it can't catch up. Prove it — promote with e8=Q.
 \`\`\`
 
 A passed pawn is hope incarnate. **Push it.**`,
@@ -1674,12 +1686,13 @@ caption: Two bishops on parallel diagonals + your king nearby = mate. Bb2 finish
 2. **Bishops side-by-side** form a moving wall the king can't cross
 3. **Your king herds**, the bishops cut
 
-## Try the squeeze
+## Your move — squeeze it to the corner
 
 \`\`\`chess
 mode: interactive
-fen: 6k1/8/6K1/8/3B4/8/3B4/8 w - - 0 1
-caption: The black king is one square from the corner. Move a bishop to push it toward h8 where you can mate.
+respond: true
+fen: 6k1/8/6K1/8/3BB3/8/8/8 w - - 0 1
+caption: Your move: your bishops sit side by side on d4 and e4 — a moving wall on two colours. Slide them to herd the king toward h8. The board runs the king; keep squeezing, but leave it one square until you're ready to mate (don't stalemate!).
 \`\`\`
 
 ## Avoid stalemate
