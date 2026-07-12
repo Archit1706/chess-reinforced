@@ -1213,7 +1213,16 @@ The four squares **d4, d5, e4, e5** are the most important real estate on the bo
 \`\`\`chess
 mode: interactive
 fen: 4k3/8/8/8/4N3/8/8/4K3 w - - 0 1
-caption: A knight on e4 reaches 8 squares. A knight in the corner reaches 2. The center multiplies your pieces' power.
+caption: Click the e4-knight — it reaches 8 squares. Now imagine it in the corner: only 2. The center multiplies every piece's power. Drag it around and see for yourself.
+\`\`\`
+
+## Your move — take the center
+
+\`\`\`chess
+mode: interactive
+respond: true
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+caption: Your move: stake your flag in the middle — push a pawn to e4 (or d4). The board answers back, and the fight for the center is on.
 \`\`\`
 
 ## Classical: occupy it with pawns
@@ -1268,6 +1277,15 @@ caption: Knight, knight, bishop, bishop, castle. Eight moves, total development.
 3. **Don't bring the queen out early** — see the next lesson
 4. **Castle by move 10** — usually by move 7
 
+## Your move — develop a knight
+
+\`\`\`chess
+mode: interactive
+respond: true
+fen: rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2
+caption: Your move: obey rule #1 — knights before bishops. Develop your kingside knight to f3, attacking the e5-pawn as you go. The board answers back; keep developing.
+\`\`\`
+
 ## Spot the bad opening
 
 \`\`\`chess
@@ -1307,8 +1325,9 @@ caption: White castles just in time. An uncastled king in the center? Disaster w
 
 \`\`\`chess
 mode: interactive
+respond: true
 fen: rnbqkbnr/pppp1ppp/8/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 2 3
-caption: All set — drag the king two squares to the right (O-O) and tuck it away.
+caption: Your move: everything's ready — drag the king two squares to the right (O-O) and tuck it safely behind the pawns. The board plays on.
 \`\`\`
 
 ## Keep your pawn shield intact
@@ -1353,6 +1372,16 @@ caption: White moves the queen TWICE in the first four moves. Black develops wit
 ## The math of tempo
 
 By move 4, White has moved one piece three times. Black has developed three different pieces. **White is three tempi behind.** Black plays the opening for free.
+
+## Your move — punish the early queen
+
+\`\`\`chess
+mode: interactive
+respond: true
+flip: true
+fen: rnbqkbnr/pppp1ppp/8/4p2Q/4P3/8/PPPP1PPP/RNB1KBNR b KQkq - 1 2
+caption: You're Black. White just played 2.Qh5?! — don't panic, just develop. Play Nc6: it brings out a piece AND defends e5. The queen has achieved nothing, and you'll gain time chasing it. The board plays White.
+\`\`\`
 
 ## The right way
 
@@ -1408,15 +1437,16 @@ caption: Englund Gambit Trap — White grabs every offered pawn and walks into .
 3. Watch your **f2 / f7** square and your back rank
 4. If something looks too good to be true in the opening, **look twice**
 
-## Try it yourself
+## Your move — spring the Fried Liver
 
 \`\`\`chess
 mode: interactive
-fen: rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1
-caption: Greed kills. With normal moves you build a fine position; with traps, you bet the whole game on a single move.
+respond: true
+fen: r1bqkb1r/ppp2ppp/2n5/3np1N1/2B5/8/PPPP1PPP/RNBQK2R w KQkq - 0 6
+caption: Your move: this is the moment. Play Nxf7 — sacrificing the knight to drag the Black king into the open for a raging attack. The board answers back; hunt that king.
 \`\`\`
 
-Solid development beats every trap. Always.`,
+Solid development beats every trap — but when the chance appears, take it. Always.`,
           order: 5,
           difficulty: 3,
           estimatedMinutes: 15,
