@@ -458,7 +458,7 @@ export default function HomePage() {
               </Link>
             </div>
             <p className="text-sm text-muted-foreground">
-              Stockfish engine · puzzles from the Lichess open database
+              Stockfish engine · puzzles from the Lichess open database · built with Next.js
             </p>
           </div>
         </div>
