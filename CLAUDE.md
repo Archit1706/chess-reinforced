@@ -11,7 +11,7 @@ npm start            # Serve production build
 npm run lint         # next lint — the ONLY automated check in this repo (no test suite)
 
 npm run db:generate  # prisma generate (regenerate client after schema changes)
-npm run db:push      # Push prisma/schema.prisma to SQLite (no migrations used)
+npm run db:push      # Push prisma/schema.prisma to PostgreSQL (no migrations used)
 npm run db:seed      # tsx prisma/seed.ts — seeds modules/lessons + imports the bundled puzzle sample
 npm run db:studio    # Open Prisma Studio
 npm run db:import-puzzles            # Import the bundled 800-puzzle sample
@@ -131,19 +131,35 @@ locally before any keys exist.
 - **`app/api/lessons` (GET list), `app/api/lessons/[lesson]` (GET detail), and
   `app/api/lessons/[lesson]/complete` (POST)** — scoped to the signed-in user, else the guest.
 - **`components/lessons/Markdown.tsx`** — a tiny, dependency-free, XSS-safe renderer (headings,
-  lists, bold, inline code) for the lessons' markdown `content`.
+  unordered + ordered lists, GitHub-style pipe **tables**, **bold**, *italics*, inline code) for the
+  lessons' markdown `content`. It renders to React elements, so it does **not** decode HTML entities
+  — never write `&nbsp;`/`&amp;` etc. in lesson content (they show up verbatim); use plain text.
 - **`components/lessons/LessonBoard.tsx`** + **`lessonDemos.ts`** — interactive learning aids: an
   `animate` board (steps through legal FEN frames) and an `interactive` sandbox (drag legal moves,
-  chess.js-validated). `LESSON_DEMOS` keys topic-matched demos by lesson slug at the UI layer (no
-  DB/seed dependency); the lesson page also always renders a free practice sandbox.
+  chess.js-validated). Interactive boards also accept **`respond: true`**, which answers each reader
+  move with a light `getLocalBestMove` reply so a drill plays out like a mini-opponent. Two gotchas:
+  (1) `onDrop` hardcodes `promotion: 'q'`, so you **cannot** build an interactive underpromotion
+  drill — use `animate` for those; (2) the "Game over" badge fires only on `isCheckmate()`/
+  `isStalemate()`, deliberately **not** `isGameOver()`, so bare teaching positions (K+N vs K, K vs K
+  opposition) that are draws by insufficient material still invite the reader to move. `LESSON_DEMOS`
+  keys topic-matched demos by lesson slug at the UI layer (no DB/seed dependency); the lesson page
+  also always renders a free practice sandbox.
 - **Lesson content style**: lessons are written to be *interactive, not book-like*. Each lesson's
   markdown interleaves short prose with embedded **` ```chess `** blocks — `mode: animate` (a
   worked example that auto-plays a move list) and `mode: interactive` (a "your move" sandbox). The
-  Markdown renderer parses these fenced blocks into live boards. There are 12 modules / 65+ lessons;
+  Markdown renderer parses these fenced blocks into live boards (an interactive block may also set
+  `respond: true`, `flip: true`, `autoplay: true`, `caption:`). There are 12 modules / 65+ lessons;
   **every FEN and move sequence in `seed.ts` and `lessonDemos.ts` must be validated with chess.js**
-  before committing (illegal moves silently break the board). A scratch verifier that extracts all
-  ` ```chess ` blocks + `LESSON_DEMOS` and replays them (asserting `isCheckmate()` on `#` moves and
-  `isStalemate()` where claimed) is the standard check.
+  before committing (illegal moves silently break the board). The standard check is a scratch `.cjs`
+  verifier (in `scripts/`, deleted before committing) that unescapes the ` ```chess ` fences out of
+  the template literal and runs **three passes** over every block:
+  1. **Legality** — replay `animate` move lists; assert `isCheckmate()` on `#` moves and `isCheck()`
+     on `+` moves.
+  2. **Dead position** — no `interactive` FEN may load as checkmate/stalemate/insufficient material
+     (the board would read "Game over" / never let the reader move).
+  3. **Illegal position** — flip the side to move and call `isCheck()`; if true, the side *not* to
+     move is already in check (an illegal start). This class is easy to introduce by only checking
+     "the move mates" without checking the start was legal.
 - Pages: `app/lessons/page.tsx` (real modules + progress) and
   `app/lessons/[module]/[lesson]/page.tsx` (markdown + a persistent "mark complete" toggle that
   also feeds the streak via `recordLessonCompleted`).
