@@ -273,7 +273,11 @@ function InteractiveBoard({
   }, [game, startFen, clearHints]);
 
   const turn = fen.split(' ')[1] === 'b' ? 'Black' : 'White';
-  const gameOver = game.isGameOver();
+  // Only checkmate/stalemate genuinely ends a drill. Many teaching boards are
+  // single-piece or bare-king positions (K+N vs K, K vs K opposition) that
+  // chess.js reports as game-over by *insufficient material* — those should
+  // still invite the reader to move, not show a discouraging "Game over".
+  const gameOver = game.isCheckmate() || game.isStalemate();
 
   return (
     <figure
