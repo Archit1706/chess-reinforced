@@ -21,6 +21,7 @@ import {
   PlayCircle,
   ArrowRight,
   Trophy,
+  Compass,
   type LucideIcon,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -316,6 +317,29 @@ export default function LessonsPage() {
           </TabsContent>
         ))}
       </Tabs>
+
+      {/* Practice tool — board-vision drill, complements the notation lesson. */}
+      <Card className="mt-8">
+        <CardContent className="flex flex-col items-start gap-4 pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3">
+            <div className="hidden h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-900/30 sm:flex">
+              <Compass className="h-6 w-6 text-primary-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold">Coordinates Trainer</h3>
+              <p className="text-sm text-muted-foreground">
+                Learn to read the board fast — find as many squares as you can in 30 seconds.
+              </p>
+            </div>
+          </div>
+          <Link href="/coordinates" className="w-full sm:w-auto">
+            <Button variant="outline" className="w-full sm:w-auto">
+              <Compass className="mr-2 h-4 w-4" />
+              Practise
+            </Button>
+          </Link>
+        </CardContent>
+      </Card>
     </div>
   );
 }
