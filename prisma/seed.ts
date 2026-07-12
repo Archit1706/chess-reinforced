@@ -1127,34 +1127,60 @@ The universal language of chess. Once you know it, you can read **any** book, wa
 
 \`\`\`chess
 mode: interactive
-fen: 8/8/8/8/8/8/8/4K2k w - - 0 1
-caption: Files (columns) are a–h. Ranks (rows) are 1–8. White's king is on e1; Black's is on h1.
+fen: 4k3/8/8/8/3N4/8/8/4K3 w - - 0 1
+caption: Files (columns) run a–h left to right; ranks (rows) run 1–8 bottom to top. The knight sits on d4 — file d, rank 4. Drag any piece and watch its destination squares light up; every one has a name like that.
 \`\`\`
 
-## Try writing a move
+## Your move — write a move
 
 \`\`\`chess
 mode: interactive
 fen: 4k3/8/8/8/8/5N2/8/4K3 w - - 0 1
-caption: Drag the knight to e5. In notation that's "Ne5" — knight to e5.
+caption: Your move: drag the knight to e5. You just played "Ne5" — the piece letter (N for knight) followed by the destination square.
 \`\`\`
 
-## The whole notation cheat sheet
+## Your move — record a capture
 
-- **Pieces:** K K**N**ight Q R B  *(pawns have no letter — just the square: "e4")*
-- **Capture:** Bxe5 *(bishop takes on e5)*
-- **Check:** + *(Nf6+)*  &nbsp; **Mate:** # *(Qxf7#)*
-- **Castle:** O-O *(short)* &nbsp; O-O-O *(long)*
-- **Promote:** e8=Q *(pawn to queen)*
-- **Annotation:** ! good &nbsp; ? bad &nbsp; !! brilliant &nbsp; ?? blunder
+\`\`\`chess
+mode: interactive
+fen: 4k3/8/8/8/3p4/5N2/8/4K3 w - - 0 1
+caption: Your move: capture the pawn by dragging the knight onto d4. That move is written "Nxd4" — the x means "captures".
+\`\`\`
+
+## Your move — castle, and name it
+
+\`\`\`chess
+mode: interactive
+fen: 4k3/8/8/8/8/8/8/4K2R w K - 0 1
+caption: Your move: castle kingside by dragging the king two squares to the right. In notation that's "O-O" (queenside would be "O-O-O").
+\`\`\`
+
+## The piece letters
+
+| Piece | Letter |
+|---|---|
+| King | K |
+| Queen | Q |
+| Rook | R |
+| Bishop | B |
+| Knight | N |
+| Pawn | *(none — just the square, e.g. "e4")* |
+
+## The rest of the symbols
+
+- **Capture:** Bxe5 — the bishop takes on e5
+- **Check:** + as in Nf6+, and **mate:** # as in Qxf7#
+- **Castle:** O-O (short) or O-O-O (long)
+- **Promote:** e8=Q — a pawn becomes a queen
+- **Annotations:** ! good, ? bad, !! brilliant, ?? blunder
 
 ## Read a real game
 
 \`\`\`chess
 mode: animate
-moves: e4 e5 Nf3 Nc6 Bb5 a6
+moves: e4 e5 Nf3 Nc6 Bb5 a6 Bxc6 dxc6
 autoplay: true
-caption: 1. e4 e5  2. Nf3 Nc6  3. Bb5 a6 — that's the Ruy Lopez opening, in just six symbols.
+caption: 1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Bxc6 dxc6 — the Ruy Lopez Exchange. Watch Bxc6 (bishop captures) and dxc6 (the d-pawn recaptures). You just read a real game!
 \`\`\`
 
 Now you can read the moves above any board. Welcome to the club.`,
