@@ -2189,12 +2189,13 @@ caption: Bishop (3) takes rook (5) — you gain 2 points of material. A clearly 
 3. **Trade your bad pieces** for the opponent's good ones
 4. **Never trade a higher value for a lower** unless it wins something bigger (a mate, a fork, a promotion)
 
-## Count before every capture
+## Your move — count, then capture
 
 \`\`\`chess
 mode: interactive
+respond: true
 fen: 4k3/8/8/3q4/4P3/8/8/4K3 w - - 0 1
-caption: The pawn can take the queen! exd5 wins 9 points for free. Always check: is something hanging?
+caption: Your move: the humble e4-pawn can snap off the queen! Play exd5 and win 9 points for free. Always ask before every move — is anything hanging? The board plays on.
 \`\`\`
 
 Counting material is the first habit of every strong player. Do it every move.`,
@@ -2216,8 +2217,9 @@ Before every move, ask: ***"What does my opponent want to do?"*** Then stop it.
 
 \`\`\`chess
 mode: interactive
+respond: true
 fen: r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/2N2N2/PPPP1PPP/R1BQK2R w KQkq - 0 1
-caption: Before developing further, notice Black eyes ...Ng4 and ...d5 breaks. A prophylactic move like h3 quietly removes a threat before it appears.
+caption: Your move: don't just develop — prevent. Black would love ...Bg4 or ...Ng4. Play the quiet prophylactic h3 and take those squares away for good. The board answers back.
 \`\`\`
 
 ## A famous prophylactic move
@@ -2226,7 +2228,7 @@ caption: Before developing further, notice Black eyes ...Ng4 and ...d5 breaks. A
 mode: animate
 fen: r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/2N2N2/PPPP1PPP/R1BQK2R w KQkq - 0 1
 moves: h3
-caption: h3 looks like a "nothing" move — but it permanently stops ...Bg4 and ...Ng4. Small, quiet, strong.
+caption: There it is again — that quiet h3 permanently stops ...Bg4 and ...Ng4. A "nothing" move that quietly wins. Small, quiet, strong.
 \`\`\`
 
 ## How to play prophylactically
@@ -2258,12 +2260,13 @@ fen: 6k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 1
 caption: If Black has just ONE weak pawn, the defender plants a piece on it and holds. You need a SECOND target to win.
 \`\`\`
 
-## Open a second front
+## Your move — hit the second weakness
 
 \`\`\`chess
 mode: interactive
+respond: true
 fen: 6k1/p4ppp/8/8/8/8/5PPP/R5K1 w - - 0 1
-caption: Black has a weak a7-pawn AND a vulnerable king. White attacks BOTH — the defender can't cover both sides at once.
+caption: Your move: Black has TWO problems — a weak a7-pawn and a draughty king. Snatch the pawn with Rxa7, landing on the 7th rank where the rook also eyes the king. Bouncing between two weaknesses is how you win. The board answers back.
 \`\`\`
 
 ## The winning method
@@ -2292,8 +2295,9 @@ Stuck for a plan? Here's the most practical advice in all of chess: **find your 
 
 \`\`\`chess
 mode: interactive
+respond: true
 fen: r1bq1rk1/ppp2ppp/2np1n2/2b1p3/2B1P3/2NP1N2/PPP2PPP/R1BQ1RK1 w - - 0 1
-caption: Which white piece is doing the least? The c1-bishop is hemmed in. Finding a good square for it is your plan.
+caption: Your move: your worst piece is the sleepy c1-bishop. Give it a job — play Bg5, developing it to an active square and pinning the f6-knight. The board answers back.
 \`\`\`
 
 ## Reroute it to a better home
@@ -2302,7 +2306,7 @@ caption: Which white piece is doing the least? The c1-bishop is hemmed in. Findi
 mode: animate
 fen: r1bq1rk1/ppp2ppp/2np1n2/2b1p3/2B1P3/2NP1N2/PPP2PPP/R1BQ1RK1 w - - 0 1
 moves: Bg5
-caption: Bg5 develops the sleepy bishop to an active square, pinning the f6-knight. The worst piece just became useful.
+caption: There's the plan played out — Bg5 turns the sleepy bishop into an active pinner of the f6-knight. Your worst piece just became useful.
 \`\`\`
 
 ## The method
