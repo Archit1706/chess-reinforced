@@ -2979,8 +2979,8 @@ The **most important winning technique** in rook endgames. Memorize it once and 
 
 \`\`\`chess
 mode: interactive
-fen: 1K6/1P6/8/8/8/8/r7/2R3k1 w - - 0 1
-caption: K + R + pawn on the 7th, king in front of it. Sounds winning — but if the king steps aside, the rook checks drive it back. We need a "bridge".
+fen: 1K6/1P6/8/8/8/8/r1R5/6k1 w - - 0 1
+caption: K + R + pawn on the 7th, White's king in front of it. Sounds winning — but the moment the king steps aside, Black's rook checks it endlessly. The solution is a "bridge".
 \`\`\`
 
 ## Building the bridge
@@ -3061,14 +3061,15 @@ fen: 8/8/8/8/8/2N5/3BK3/7k w - - 0 1
 caption: Your dark-squared bishop means you can ONLY mate in a dark corner (a1 or h8). Black's king is already near h1 — wrong corner. You must drive it across the board.
 \`\`\`
 
-## The W-maneuver — guiding the king
+## Your move — herd the king
 
 The hardest part: getting the king from the wrong corner to the right one. The knight does most of the herding via a famous **W-shaped path**.
 
 \`\`\`chess
 mode: interactive
+respond: true
 fen: 8/8/8/2k5/8/6N1/3BK3/8 w - - 0 1
-caption: Coordinate king + bishop + knight to herd the enemy king toward the correct corner. The knight zig-zags in a W-shape to control the squares the bishop can't.
+caption: Your move: coordinate king, bishop and knight to herd the enemy king toward a DARK corner (a1 or h8). The knight zig-zags in a W to cover the squares the bishop can't. The board runs its king — squeeze it into the corner.
 \`\`\`
 
 ## Three rules to survive
@@ -3095,9 +3096,9 @@ One of chess's great surprises: **K + B + rook pawn** — material that *looks* 
 ## See the impossible draw
 
 \`\`\`chess
-mode: interactive
+mode: animate
 fen: 8/8/8/8/8/6b1/5k1p/7K w - - 0 1
-caption: White's king is trapped in the corner. Black has an EXTRA PIECE. But Black's bishop is DARK; h1 is LIGHT. Bishop can never touch h1 — King sits forever — DRAW.
+caption: White's king is trapped in the corner. Black has an EXTRA PIECE — but the bishop is DARK and h1 is LIGHT. The bishop can never control h1, so the king just sits there forever. DRAW.
 \`\`\`
 
 ## The rule
