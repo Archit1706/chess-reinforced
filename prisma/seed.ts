@@ -757,9 +757,9 @@ K+Q vs K is a forced mate in under ten moves — **if** you avoid stalemate.
 
 \`\`\`chess
 mode: animate
-fen: 4k3/8/3K4/8/8/8/8/4Q3 w - - 0 1
+fen: 4k3/8/3K4/8/7Q/8/8/8 w - - 0 1
 moves: Qe7#
-caption: White king on d6 covers d7, e7, f7. Black king has nowhere to go. Mate.
+caption: White's king on d6 already covers d7, e7 and f7. The queen swings in to e7 — Black's king has nowhere to go. Mate.
 \`\`\`
 
 ## The plan in three steps
@@ -901,8 +901,8 @@ That's the Arabian. Once you know the shape, you'll spot mate-in-one chances in 
 
 \`\`\`chess
 mode: interactive
-fen: 7k/8/5N2/8/8/8/8/K6R w - - 0 1
-caption: Your move: the knight on f6 already covers g8 and h7. Swing the rook to h7 — check down the h-file, and every escape is sealed. Mate in one!
+fen: 7k/1R6/5N2/8/8/8/8/K7 w - - 0 1
+caption: Your move: the knight on f6 already covers g8 and h7. Swing the rook along the 7th rank to h7 — check down the h-file, and every escape is sealed. Mate in one!
 \`\`\`
 
 (The rook is untouchable on h7 because the f6-knight defends it — that's the whole Arabian trick.)`,
