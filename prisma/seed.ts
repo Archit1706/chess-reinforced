@@ -1531,13 +1531,13 @@ fen: 6k1/p4p1p/6p1/8/8/2R5/PP4PP/6K1 w - - 0 1
 caption: Your move: your rook is FREE — send it to the 7th rank with Rc7, hitting a7 and f7 at once. An active rook is worth a pawn; a passive one loses. The board answers back.
 \`\`\`
 
-## Cut off the enemy king
+## Your move — cut off the enemy king
 
 \`\`\`chess
-mode: animate
+mode: interactive
+respond: true
 fen: 4k3/8/8/8/8/8/4P3/R3K3 w - - 0 1
-moves: Ra5
-caption: Ra5 puts the rook on the 5th rank, cutting off the enemy king from advancing. Now your pawn is safe to march.
+caption: Your move: play Ra5, planting the rook on the 5th rank so the enemy king can't advance past it. Now your own king and pawn march up safely. The board answers back.
 \`\`\`
 
 ## The two positions to know
@@ -1878,8 +1878,8 @@ caption: Same bishop, different pawns — White's pawns are mostly on DARK squar
 
 \`\`\`chess
 mode: interactive
-fen: r3k2r/pppq1ppp/2n2n2/3p4/3P4/2P2N2/PPQ2PPP/R3KB1R w KQkq - 0 1
-caption: White has both bishops (b1, f1); Black gave one up. Together White's pair covers EVERY square — a lasting edge in open positions.
+fen: r2qk2r/pppp1ppp/2n2n2/4p3/3PP3/3B1N2/PPP2PPP/RNBQK2R w KQkq - 0 1
+caption: White keeps BOTH bishops (c1 and d3) while Black has only knights. Working together, the pair covers squares of both colours — a lasting edge, especially as the position opens up.
 \`\`\`
 
 Before trading a bishop for a knight, ask: *"Will my remaining bishop be good or bad given the pawn structure to come?"*`,
@@ -3070,6 +3070,16 @@ mode: interactive
 respond: true
 fen: 8/8/8/2k5/8/6N1/3BK3/8 w - - 0 1
 caption: Your move: coordinate king, bishop and knight to herd the enemy king toward a DARK corner (a1 or h8). The knight zig-zags in a W to cover the squares the bishop can't. The board runs its king — squeeze it into the corner.
+\`\`\`
+
+## Watch the mate land
+
+\`\`\`chess
+mode: animate
+fen: 6k1/8/6K1/5N2/7B/8/8/8 w - - 0 1
+moves: Nh6+ Kh8 Bf6#
+autoplay: true
+caption: The finish in the correct (dark) corner: Nh6+ nudges the king to h8, then Bf6# — bishop, knight and king together seal every escape square.
 \`\`\`
 
 ## Three rules to survive
