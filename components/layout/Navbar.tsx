@@ -56,8 +56,10 @@ export function Navbar() {
             <span className="hidden sm:inline">Chess Reinforced</span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-1">
+          {/* Desktop Navigation — only at lg+, where all six labelled links fit.
+              Between md and lg the bar used to overflow horizontally, so the
+              fully-labelled mobile menu covers everything below lg instead. */}
+          <div className="hidden lg:flex items-center gap-1">
             {navItems.map((item) => {
               const isActive =
                 pathname === item.href || pathname?.startsWith(item.href + '/');
@@ -134,7 +136,7 @@ export function Navbar() {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden"
+              className="lg:hidden"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? (
@@ -149,7 +151,7 @@ export function Navbar() {
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-border">
+        <div className="lg:hidden border-t border-border">
           <div className="container mx-auto px-4 py-4 space-y-2">
             {navItems.map((item) => {
               const isActive =
