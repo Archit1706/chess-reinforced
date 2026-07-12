@@ -678,7 +678,7 @@ caption: One move — Ra8 — checkmate. The pawns on f7, g7, h7 block every fli
 \`\`\`chess
 mode: interactive
 fen: 6k1/5ppp/8/8/8/8/5PPP/2Q3K1 w - - 0 1
-caption: Play Qc8 — mate. Same idea with a queen instead of a rook.
+caption: Your move: play Qc8 — checkmate. Same trap as the rook, now with the queen. The pawns on f7, g7 and h7 do all the jailing.
 \`\`\`
 
 ## Make "luft" before it's too late
@@ -690,6 +690,15 @@ mode: animate
 fen: 6k1/5pp1/7p/8/8/8/8/R5K1 w - - 0 1
 moves: Ra8+ Kh7
 caption: Now Ra8 is just check, not mate — the king escapes to h7 thanks to ...h6.
+\`\`\`
+
+## Now save yourself — make luft
+
+\`\`\`chess
+mode: interactive
+respond: true
+fen: 4r1k1/5ppp/8/8/8/8/5PPP/6K1 w - - 0 1
+caption: Your move: Black's rook is already staring down your back rank. Play h3 to open an escape hatch before it crashes in — then keep going, the board answers back.
 \`\`\`
 
 **Always check your back rank.** It's the #1 way casual games end in disaster.`,
@@ -722,12 +731,13 @@ caption: One rook seals the 7th rank. The other checks on the 8th — mate.
 3. **Climb the ladder** — alternate rooks, one rank at a time
 4. Mate on the edge
 
-## Watch out — and dodge!
+## Your turn — climb the ladder
 
 \`\`\`chess
 mode: interactive
+respond: true
 fen: 8/R7/8/3k4/8/8/1R6/7K w - - 0 1
-caption: If the king ever marches toward your rook, slide that rook FAR away along its rank. Never get close enough to be captured.
+caption: Your move: check with a rook to push the king back a rank, then alternate rooks to climb. The board runs the king — if it ever marches at a rook, slide that rook FAR down its rank so it can never be captured.
 \`\`\`
 
 That's the whole technique. It's the cleanest mate in chess — practice it once and you'll never lose a K+2R vs K endgame.`,
@@ -766,6 +776,15 @@ fen: 7k/8/6K1/8/8/8/8/5Q2 w - - 0 1
 caption: Trap: Qf7?? leaves Black with no legal move but no check — STALEMATE, a draw. Always leave the king a square until the killing blow.
 \`\`\`
 
+## Your turn — box the king in
+
+\`\`\`chess
+mode: interactive
+respond: true
+fen: 4k3/8/8/8/3Q4/8/8/4K3 w - - 0 1
+caption: Your move: practice the whole win. Fence the king a knight's-move away with the queen, march your king up to help, then mate on the edge — without ever stalemating. The board defends!
+\`\`\`
+
 The rule of thumb: **king first, queen second**. If you're tempted to deliver mate but your king isn't close enough, take another move to walk it up.`,
           order: 3,
           difficulty: 2,
@@ -792,12 +811,12 @@ caption: Nf7 — check. The king can't escape (own rook on g8, own pawns on g7/h
 
 Every other check (rook, bishop, queen) can be blocked. **A knight check cannot be blocked.** So when every escape square is filled by friendly pieces, even one knight check ends the game.
 
-## Spot the pattern yourself
+## Your turn — mate in one
 
 \`\`\`chess
 mode: interactive
-fen: 5rk1/6pp/8/8/4N3/8/8/6K1 w - - 0 1
-caption: Where can the knight land to deliver a smothered-style attack? (Look for a square that gives check while the king is hemmed in by its own pieces.)
+fen: 6rk/6pp/3N4/8/8/8/8/6K1 w - - 0 1
+caption: Your move: the king on h8 is buried by its own rook and pawns. Jump the knight to f7 — a check that can't be blocked and can't be escaped. Mate!
 \`\`\`
 
 The full Philidor's Legacy combination — Nf7+ Kh8, Nxh6+? No: queen sacrifice on g8 first, *then* the knight returns — is one of the most famous tactics in chess history.`,
@@ -834,6 +853,16 @@ caption: ...g6! chases the queen and defends f7 in one move. The best reply.
 
 You can also play **...Qe7** (guards f7) or **...Qf6** — both stop mate immediately.
 
+## Your turn — defend as Black
+
+\`\`\`chess
+mode: interactive
+respond: true
+flip: true
+fen: r1bqkbnr/pppp1ppp/2n5/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 3 3
+caption: You're Black, and Qxf7# is threatened. Play g6 to attack the queen and guard f7 in one move — the mate threat vanishes. The board plays White, so keep going and harass that queen.
+\`\`\`
+
 ## The real lesson
 
 Beginners hope for Scholar's Mate. Anyone who knows it shrugs it off and **harasses the queen** for the next ten moves, leaving the attacker behind in development.
@@ -868,15 +897,15 @@ caption: Rh7 — mate. The knight on f6 guards g8 (no escape) AND defends the ro
 
 That's the Arabian. Once you know the shape, you'll spot mate-in-one chances in dozens of endgames.
 
-## Try it
+## Your turn — finish the Arabian
 
 \`\`\`chess
 mode: interactive
-fen: 6k1/8/5N2/8/8/8/8/R6K w - - 0 1
-caption: The king is on g8 — almost in the corner. Push the rook to a8 to deliver an Arabian-style mate.
+fen: 7k/8/5N2/8/8/8/8/K6R w - - 0 1
+caption: Your move: the knight on f6 already covers g8 and h7. Swing the rook to h7 — check down the h-file, and every escape is sealed. Mate in one!
 \`\`\`
 
-(Hint: Ra8+ — the king must go to h7, and the knight will tighten the noose.)`,
+(The rook is untouchable on h7 because the f6-knight defends it — that's the whole Arabian trick.)`,
           order: 6,
           difficulty: 3,
           estimatedMinutes: 12,
