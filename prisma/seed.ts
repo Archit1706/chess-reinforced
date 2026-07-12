@@ -2354,12 +2354,14 @@ autoplay: true
 caption: 1.e4 e5  2.Nf3 Nc6  3.Bc4 — the Italian. White's bishop already eyes f7.
 \`\`\`
 
-## Why Bc4?
+## Your move — answer the Italian
 
 \`\`\`chess
 mode: interactive
-fen: r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4
-caption: The bishop on c4 attacks f7 — defended only by the king. One careless move from Black and the f7 square cracks open.
+respond: true
+flip: true
+fen: r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 4 4
+caption: You're Black. Meet the Italian calmly — play Bc5, the Giuoco Piano: mirror White's bishop and eye f2 while you develop. The board answers back.
 \`\`\`
 
 ## Three flavors
@@ -2403,12 +2405,14 @@ autoplay: true
 caption: The bishop pressures the c6-knight (which defends e5). White finishes development and starts a slow strategic squeeze.
 \`\`\`
 
-## The key idea — why 3.Bb5?
+## Your move — the main reply
 
 \`\`\`chess
 mode: interactive
+respond: true
+flip: true
 fen: r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3
-caption: The bishop pins the c6-knight indirectly. If Black plays carelessly, White could grab e5 by removing the c6-knight first.
+caption: You're Black. The most popular reply is the Morphy Defence — play a6 to question the bishop at once. (White must choose: retreat with Ba4, or trade with Bxc6.) The board answers back.
 \`\`\`
 
 ## The three main responses for Black
@@ -2442,12 +2446,14 @@ autoplay: true
 caption: Black trades a flank pawn (c5) for a center pawn (d4). Half-open c-file for rook play, sharp middlegames — exactly what Black wanted.
 \`\`\`
 
-## The structural trade
+## Your move — enter the Najdorf
 
 \`\`\`chess
 mode: interactive
-fen: rnbqkb1r/pp2pppp/3p1n2/8/3NP3/2N5/PPP2PPP/R1BQKB1R w KQkq - 2 5
-caption: Black has fewer central pawns BUT a half-open c-file pointing at White's queenside. Active piece play in exchange for some center.
+respond: true
+flip: true
+fen: rnbqkb1r/pp2pppp/3p1n2/8/3NP3/2N5/PPP2PPP/R1BQKB1R b KQkq - 2 5
+caption: You're Black. Play the world champions' favourite — a6, the Najdorf: a tiny, flexible move that grabs the b5-square and prepares ...e5 or ...e6. The board answers back.
 \`\`\`
 
 ## Pick your flavor
@@ -2484,12 +2490,14 @@ autoplay: true
 caption: 1.d4 d5  2.c4 — offering the c-pawn. The "gambit" is half-fake: White usually gets the pawn back.
 \`\`\`
 
-## Why it's not a real gambit
+## Your move — try to keep the pawn
 
 \`\`\`chess
 mode: interactive
+respond: true
+flip: true
 fen: rnbqkbnr/ppp1pppp/8/3p4/2P5/8/PP1PPPPP/RNBQKBNR b KQkq c3 0 2
-caption: If Black plays ...dxc4 to keep the pawn, White just plays e3 and Bxc4 — back to equal. The point isn't the pawn; it's the central control.
+caption: You're Black. Go ahead — grab the gambit pawn with dxc4. Now watch: the board answers, and White simply plays e3 and Bxc4 to win it straight back. The point was never the pawn — it's the centre.
 \`\`\`
 
 ## The Queen's Gambit Declined (the main line)
@@ -2531,12 +2539,14 @@ autoplay: true
 caption: 1.e4 e6  2.d4 d5 — Black challenges the center immediately. White's e4 and Black's d5 stare each other down.
 \`\`\`
 
-## The "French bishop" problem
+## Your move — detonate the centre
 
 \`\`\`chess
 mode: interactive
-fen: rnbqkb1r/pp3ppp/4pn2/2pp4/3P4/2N1P3/PPP2PPP/R1BQKBNR w KQkq - 0 5
-caption: Black's c8-bishop is hemmed in by its own pawn on e6. This "bad French bishop" haunts every French game. Plans must free it.
+respond: true
+flip: true
+fen: rnbqkbnr/ppp2ppp/4p3/3pP3/3P4/8/PPP2PPP/RNBQKBNR b KQkq - 0 3
+caption: You're Black in the Advance French. White has grabbed space with e5 — now blow up the base of its chain: play c5, hitting d4. This break defines French strategy (and it helps free your hemmed-in c8-bishop). The board answers back.
 \`\`\`
 
 ## The signature break — ...c5
@@ -2580,12 +2590,14 @@ autoplay: true
 caption: The Classical Caro-Kann: ...Bf5 frees the c8-bishop BEFORE locking it in with ...e6. Solid AND active.
 \`\`\`
 
-## French vs Caro-Kann
+## Your move — free the bishop
 
 \`\`\`chess
 mode: interactive
-fen: rnbqkb1r/pp2pppp/2p2n2/8/3P4/8/PPP2PPP/R1BQKBNR w KQkq - 0 5
-caption: Same idea as the French (solid, central) — but Black's bishop on c8 still has the c8-h3 diagonal open. That's the Caro-Kann's gift.
+respond: true
+flip: true
+fen: rnbqkbnr/pp2pppp/2p5/8/3PN3/8/PPP2PPP/R1BQKBNR b KQkq - 0 4
+caption: You're Black. Here's the Caro-Kann's whole point: play Bf5, developing your light-squared bishop to an active square BEFORE ...e6 would lock it in. That freedom is the edge over the French. The board answers back.
 \`\`\`
 
 ## Why positional players love it
@@ -2624,12 +2636,13 @@ autoplay: true
 caption: White plays a Sicilian setup with an extra tempo. Fianchetto on g3, then play down the long diagonal.
 \`\`\`
 
-## The signature move — g3
+## Your move — complete the fianchetto
 
 \`\`\`chess
 mode: interactive
+respond: true
 fen: r1bqkb1r/pppp1ppp/2n2n2/4p3/2P5/2N3P1/PP1PPP1P/R1BQKBNR w KQkq - 0 4
-caption: g3 + Bg2 is the English's calling card. The g2-bishop rakes the long h1-a8 diagonal toward Black's queenside.
+caption: Your move: g3 is played — now finish the English's calling card with Bg2, aiming the bishop down the long h1-a8 diagonal toward Black's queenside. The board answers back.
 \`\`\`
 
 ## Why play the English
@@ -2670,12 +2683,13 @@ autoplay: true
 caption: The whole London System unfolds: Bf4, e3, Bd3, c3, Nbd2. Memorize the pattern and you have an opening for life.
 \`\`\`
 
-## The crucial trick — bishop OUT first
+## Your move — bishop OUT first
 
 \`\`\`chess
 mode: interactive
+respond: true
 fen: rnbqkbnr/ppp1pppp/8/3p4/3P4/5N2/PPP1PPPP/RNBQKB1R w KQkq - 0 3
-caption: Play Bf4 BEFORE e3! If you play e3 first, your dark bishop gets trapped behind its own pawns. The bishop's escape is the system's #1 rule.
+caption: Your move: the London's #1 rule — get the dark-squared bishop OUT with Bf4 BEFORE playing e3, or it gets trapped behind its own pawns. Play Bf4. The board answers back.
 \`\`\`
 
 ## The middlegame plan
@@ -2716,12 +2730,14 @@ autoplay: true
 caption: Black fianchettoes the dark-squared bishop, castles, and prepares to fight the center from a distance.
 \`\`\`
 
-## The g7-bishop — Black's secret weapon
+## Your move — strike the centre
 
 \`\`\`chess
 mode: interactive
-fen: rnbqk2r/ppp1ppbp/3p1np1/8/2PPP3/2N5/PP3PPP/R1BQKBNR w KQ - 1 5
-caption: The Bg7 rakes the entire a1-h8 diagonal. It pressures White's center and stays in place all game.
+respond: true
+flip: true
+fen: rnbqk2r/ppp1ppbp/3p1np1/8/2PPP3/2N5/PP3PPP/R1BQKBNR b KQ - 1 5
+caption: You're Black. Your g7-bishop already rakes the long diagonal — now challenge the big centre: play e5, striking d4. This break starts the great kingside-vs-queenside race the King's Indian is famous for. The board answers back.
 \`\`\`
 
 ## The classic race
@@ -2759,12 +2775,14 @@ autoplay: true
 caption: 1...d5! After exd5 Qxd5, the queen retreats to a5 and Black gets a sound, easy-to-play position.
 \`\`\`
 
-## The bishop you free
+## Your move — develop the free bishop
 
 \`\`\`chess
 mode: interactive
-fen: rnb1kbnr/ppp1pppp/8/q7/3P4/2N5/PPP2PPP/R1BQKBNR w KQkq - 2 4
-caption: The c8-bishop has open diagonals — unlike the French where it gets locked in. The Scandinavian's structural plus.
+respond: true
+flip: true
+fen: rnb1kbnr/ppp1pppp/8/q7/3P4/2N5/PPP2PPP/R1BQKBNR b KQkq - 2 4
+caption: You're Black. Unlike the French, your light-squared bishop is free — so use it! Play Bf5, developing actively to an open diagonal. The board answers back.
 \`\`\`
 
 ## Two flavors
@@ -2807,12 +2825,14 @@ autoplay: true
 caption: 3...Bb4 — the Nimzo. Pinning the knight, ready to trade it for the bishop and damage White's structure.
 \`\`\`
 
-## The trade-off in one position
+## Your move — play against the pawns
 
 \`\`\`chess
 mode: interactive
+respond: true
+flip: true
 fen: rnbqk2r/pppp1ppp/4pn2/8/2PP4/2P5/P3PPPP/R1BQKBNR b KQkq - 0 4
-caption: After ...Bxc3 bxc3, White has doubled c-pawns (weakness) BUT the bishop pair (strength). Black blockades the pawns and plays for the long game.
+caption: You're Black. You've traded ...Bxc3, saddling White with doubled c-pawns — the bishop pair was the price. Now clamp down: play c5, fixing and blockading those pawns while you develop. The board answers back.
 \`\`\`
 
 ## Why champions love it
