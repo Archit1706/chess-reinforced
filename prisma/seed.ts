@@ -2885,12 +2885,13 @@ autoplay: true
 caption: Bxh7+! drags the king out. Ng5+ leaps in. Qh5 threatens unstoppable Qh7 mate.
 \`\`\`
 
-## The three ingredients
+## Your move — play the sacrifice
 
 \`\`\`chess
 mode: interactive
+respond: true
 fen: r1bq1rk1/ppp2ppp/2n2n2/3p4/3P4/2NB1N2/PPP2PPP/R1BQ1RK1 w - - 0 1
-caption: SETUP CHECKLIST — (1) bishop on d3 aimed at h7 ✓ (2) knight ready to leap to g5 ✓ (3) queen with a fast route to h5 or h7 ✓. All three present? The Greek Gift is on.
+caption: The checklist is complete — bishop aimed at h7, knight ready for g5, queen with a route to h5. Now play it yourself: sacrifice with Bxh7+! The king must grab it — then bring the knight and queen. The board answers back.
 \`\`\`
 
 ## When NOT to play it
@@ -2924,6 +2925,15 @@ fen: r1bq1rk1/pp2ppbp/2np1np1/8/3NP3/2N1B3/PPPQ1PPP/2KR1B1R w - - 0 1
 moves: h4 a6 h5 b5 hxg6 hxg6 g4
 autoplay: true
 caption: White castled queenside, Black kingside. White hurls the h- and g-pawns at Black's king. Speed beats safety here.
+\`\`\`
+
+## Your move — launch the storm
+
+\`\`\`chess
+mode: interactive
+respond: true
+fen: r1bq1rk1/pp2ppbp/2np1np1/8/3NP3/2N1B3/PPPQ1PPP/2KR1B1R w - - 0 1
+caption: Your move: kings are on opposite wings, so race! Fire the first thrust — play h4, and keep the h- and g-pawns rolling to crack open Black's king. The board answers back.
 \`\`\`
 
 ## Same-side castling? Be careful
