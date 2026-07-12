@@ -2013,12 +2013,13 @@ caption: Every time the rook leaves g7, the bishop on b2 checks. The rook devour
 
 The king is forced to bounce back-and-forth while you eat everything in reach.
 
-## Spot the setup
+## Your move — drive the windmill
 
 \`\`\`chess
 mode: interactive
-fen: 5rk1/6Rp/8/8/8/8/1B6/6K1 w - - 0 1
-caption: Bishop on b2 ✓ Rook on g7 with discovered check ready ✓. The windmill is loaded — Rxh7+ Kxh7? Or even just keep cycling.
+respond: true
+fen: 7k/ppp3Rp/8/8/8/8/1B3PPP/6K1 w - - 0 1
+caption: Your move: start the see-saw. Play Rxc7+ — the rook slides off the long diagonal, so the b2-bishop delivers a discovered check. The king bounces to g8; then Rg7+ drives it back. Keep cycling and devour the 7th rank! The board answers back.
 \`\`\`
 
 The most famous windmill: **Torre vs Lasker, Moscow 1925** — Torre's rook scythed through Black's pieces and won the queen at the end of the cycle. One of the most beautiful games ever played.`,
@@ -2113,12 +2114,14 @@ Interference is what separates calculation wizards from the rest. It's worth one
 
 A piece that's **going to be lost anyway** — so it grabs as much material as it can on its way out. The chess version of "go down swinging."
 
-## See it pay off
+## Your move — cash in the doomed piece
 
 \`\`\`chess
 mode: interactive
-fen: 4k3/8/8/4p3/3n4/8/3P4/4K3 w - - 0 1
-caption: White's d2-pawn is attacked by Black's knight. Before it dies — take the e5-pawn (d2 isn't the desperado here, but the IDEA is: a doomed piece grabs material on its way out).
+respond: true
+flip: true
+fen: 4k3/8/8/2n1n3/3P4/5B2/8/4K3 b - - 0 1
+caption: You're Black: White's d4-pawn forks both knights, so one is lost no matter what. Don't just hand it over — desperado! Grab the bishop with check: play Nxf3+. You lose a knight but win a bishop instead of nothing. The board answers back.
 \`\`\`
 
 ## The mindset that wins games
@@ -2132,8 +2135,9 @@ When you realize a piece is lost, **don't sigh and give it up**. Ask:
 
 \`\`\`chess
 mode: interactive
-fen: 7k/6pp/8/8/8/8/q7/6QK w - - 0 1
-caption: White's queen is losing material soon. Throw it at the king with checks — perpetual check forces a draw from a lost position.
+respond: true
+fen: 6k1/8/8/8/8/7q/8/Q5K1 w - - 0 1
+caption: You're losing — but the Black king is exposed. Hurl your doomed queen at it: start with Qa8+ and keep checking. If the king can never escape, it's perpetual check — a draw snatched from a lost game. The board answers back.
 \`\`\`
 
 ## The lesson
