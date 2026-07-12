@@ -122,7 +122,7 @@ export default function SettingsPage() {
                 value={animationSpeed}
                 onValueChange={(value: any) => setAnimationSpeed(value)}
               >
-                <SelectTrigger className="w-32">
+                <SelectTrigger className="w-32" aria-label="Animation speed">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -156,6 +156,7 @@ export default function SettingsPage() {
               <Switch
                 checked={showCoordinates}
                 onCheckedChange={toggleCoordinates}
+                aria-label="Show board coordinates"
               />
             </div>
 
@@ -169,6 +170,7 @@ export default function SettingsPage() {
               <Switch
                 checked={showLegalMoves}
                 onCheckedChange={toggleLegalMoves}
+                aria-label="Highlight legal moves"
               />
             </div>
 
@@ -182,6 +184,7 @@ export default function SettingsPage() {
               <Switch
                 checked={highlightLastMove}
                 onCheckedChange={toggleHighlightLastMove}
+                aria-label="Highlight last move"
               />
             </div>
           </CardContent>
@@ -204,6 +207,7 @@ export default function SettingsPage() {
               <Switch
                 checked={showEvaluation}
                 onCheckedChange={toggleEvaluation}
+                aria-label="Show evaluation bar"
               />
             </div>
 
@@ -217,6 +221,7 @@ export default function SettingsPage() {
               <Switch
                 checked={autoAnalyze}
                 onCheckedChange={toggleAutoAnalyze}
+                aria-label="Auto-analyze positions"
               />
             </div>
 
@@ -231,7 +236,7 @@ export default function SettingsPage() {
                 value={analysisDepth.toString()}
                 onValueChange={(value) => setAnalysisDepth(parseInt(value))}
               >
-                <SelectTrigger className="w-32">
+                <SelectTrigger className="w-32" aria-label="Analysis depth">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -254,7 +259,7 @@ export default function SettingsPage() {
                 value={computerElo.toString()}
                 onValueChange={(value) => setComputerElo(parseInt(value))}
               >
-                <SelectTrigger className="w-40">
+                <SelectTrigger className="w-40" aria-label="Default computer strength">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -292,7 +297,11 @@ export default function SettingsPage() {
                   Play sounds for moves and captures
                 </p>
               </div>
-              <Switch checked={soundEnabled} onCheckedChange={toggleSound} />
+              <Switch
+                checked={soundEnabled}
+                onCheckedChange={toggleSound}
+                aria-label="Enable sound effects"
+              />
             </div>
           </CardContent>
         </Card>
