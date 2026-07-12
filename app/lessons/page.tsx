@@ -17,16 +17,21 @@ import {
   Brain,
   Flame,
   Loader2,
+  Puzzle,
+  PlayCircle,
+  ArrowRight,
+  Trophy,
   type LucideIcon,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { useUserStore } from '@/store/user-store';
 import { fetchModules } from '@/lib/lessons/client';
-import type { ModuleDTO } from '@/lib/lessons/types';
+import type { ModuleDTO, LessonSummary } from '@/lib/lessons/types';
 
 const ICONS: Record<string, LucideIcon> = {
   Swords,
@@ -109,6 +114,117 @@ function ModuleCard({ module }: { module: ModuleDTO }) {
   );
 }
 
+// The DB returns modules ordered by level *alphabetically* (advanced < beginner
+// < intermediate), so re-rank into true pedagogical order before picking the
+// lesson to resume.
+const LEVEL_RANK: Record<string, number> = { beginner: 0, intermediate: 1, advanced: 2 };
+
+/** First not-yet-completed lesson in pedagogical order, or null if all done. */
+function findNextLesson(
+  modules: ModuleDTO[]
+): { module: ModuleDTO; lesson: LessonSummary } | null {
+  const ordered = [...modules].sort(
+    (a, b) => (LEVEL_RANK[a.level] ?? 99) - (LEVEL_RANK[b.level] ?? 99) || a.order - b.order
+  );
+  for (const mod of ordered) {
+    const lessons = [...mod.lessons].sort((a, b) => a.order - b.order);
+    const lesson = lessons.find((l) => !l.completed);
+    if (lesson) return { module: mod, lesson };
+  }
+  return null;
+}
+
+/**
+ * The "one obvious next action" hero: sends a first-timer straight into the
+ * opening lesson and drops a returning learner back where they left off, with
+ * overall progress alongside. Removes the "which of 13 modules do I click?"
+ * friction. Pure client-side derivation — no extra fetch, works in guest mode.
+ */
+function ResumeHero({
+  modules,
+  completedLessons,
+  totalLessons,
+  overallProgress,
+}: {
+  modules: ModuleDTO[];
+  completedLessons: number;
+  totalLessons: number;
+  overallProgress: number;
+}) {
+  // No lessons loaded (e.g. API/DB unavailable): don't fabricate a "complete"
+  // celebration or a 0/0 progress bar — let the page fall back to its own state.
+  if (totalLessons === 0) return null;
+
+  const next = findNextLesson(modules);
+  const started = completedLessons > 0;
+
+  return (
+    <Card className="mb-8 border-primary-200 dark:border-primary-800">
+      <CardContent className="flex flex-col gap-6 pt-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          {next ? (
+            <>
+              <span className="inline-flex items-center gap-1.5 text-sm font-medium text-primary-600">
+                <Sparkles className="h-4 w-4 shrink-0" />
+                {started ? 'Pick up where you left off' : 'New to chess? Start here'}
+              </span>
+              <h2 className="mt-1 truncate text-2xl font-bold">{next.lesson.title}</h2>
+              <p className="text-sm text-muted-foreground">
+                {next.module.title} · about {next.lesson.estimatedMinutes} min
+              </p>
+              <Link
+                href={`/lessons/${next.module.slug}/${next.lesson.slug}`}
+                className="mt-4 block sm:inline-block"
+              >
+                <Button size="lg" className="w-full sm:w-auto">
+                  <PlayCircle className="mr-2 h-5 w-5" />
+                  {started ? 'Continue' : 'Start here'}
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </>
+          ) : (
+            <>
+              <span className="inline-flex items-center gap-1.5 text-sm font-medium text-primary-600">
+                <Trophy className="h-4 w-4 shrink-0" />
+                Curriculum complete
+              </span>
+              <h2 className="mt-1 text-2xl font-bold">You&apos;ve finished every lesson 🎉</h2>
+              <p className="text-sm text-muted-foreground">
+                Keep it sharp — practise with puzzles or play a game.
+              </p>
+              <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                <Link href="/puzzles">
+                  <Button size="lg" className="w-full sm:w-auto">
+                    <Puzzle className="mr-2 h-5 w-5" />
+                    Solve puzzles
+                  </Button>
+                </Link>
+                <Link href="/play">
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                    <Swords className="mr-2 h-5 w-5" />
+                    Play a game
+                  </Button>
+                </Link>
+              </div>
+            </>
+          )}
+        </div>
+
+        <div className="shrink-0 sm:text-right">
+          <div className="text-3xl font-bold text-primary-600">
+            {Math.round(overallProgress)}%
+          </div>
+          <p className="text-sm text-muted-foreground">
+            {completedLessons} of {totalLessons} lessons
+          </p>
+          <Progress value={overallProgress} className="mt-2 h-2 w-full sm:w-48" />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function LessonsPage() {
   const { startSession } = useUserStore();
   const [modules, setModules] = useState<ModuleDTO[] | null>(null);
@@ -161,22 +277,12 @@ export default function LessonsPage() {
         </p>
       </div>
 
-      <Card className="mb-8">
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="font-semibold">Your Progress</h2>
-              <p className="text-sm text-muted-foreground">
-                {completedLessons} of {totalLessons} lessons completed
-              </p>
-            </div>
-            <span className="text-2xl font-bold text-primary-600">
-              {Math.round(overallProgress)}%
-            </span>
-          </div>
-          <Progress value={overallProgress} className="h-3" />
-        </CardContent>
-      </Card>
+      <ResumeHero
+        modules={modules}
+        completedLessons={completedLessons}
+        totalLessons={totalLessons}
+        overallProgress={overallProgress}
+      />
 
       <Tabs defaultValue="all" className="mb-8">
         <TabsList className="grid w-full grid-cols-4 max-w-md">
