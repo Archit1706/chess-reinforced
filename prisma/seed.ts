@@ -768,6 +768,16 @@ caption: White's king on d6 already covers d7, e7 and f7. The queen swings in to
 2. **Walk your king up** — the queen alone can never mate
 3. **Mate on the edge** with the king guarding the queen
 
+## Watch the whole method
+
+\`\`\`chess
+mode: animate
+fen: 4k3/8/8/8/8/8/8/3QK3 w - - 0 1
+moves: Qd7+ Kf8 Ke2 Kg8 Ke3 Kf8 Ke4 Kg8 Ke5 Kf8 Kf6 Kg8 Qg7#
+autoplay: true
+caption: Qd7 fences the king onto the back rank; the king marches all the way up to f6; then Qg7# — the queen mates, guarded by the king. Notice the king never stalemates its prey on the way.
+\`\`\`
+
 ## Beware stalemate!
 
 \`\`\`chess
@@ -1494,6 +1504,16 @@ caption: Your move: picture the square from the e2-pawn up to e8. The Black king
 mode: interactive
 fen: 4k3/8/4K3/8/4P3/8/8/8 b - - 0 1
 caption: Kings facing off with one square between = opposition. Black is to move and must give way. White will promote.
+\`\`\`
+
+## Watch the opposition convert
+
+\`\`\`chess
+mode: animate
+fen: 4k3/8/4K3/4P3/8/8/8/8 w - - 0 1
+moves: Kd6 Kd8 e6 Ke8 e7 Kf7 Kd7 Kf6 e8=Q
+autoplay: true
+caption: The king leads (never letting the pawn be caught), seizes the key squares, and only THEN pushes: Kd6, e6, e7, Kd7 shepherds — and e8=Q. King first, pawn second.
 \`\`\`
 
 ## The two rules to memorize
