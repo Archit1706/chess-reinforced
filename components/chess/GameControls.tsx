@@ -95,6 +95,7 @@ export function GameControls({
                 <Button
                   variant="ghost"
                   size="icon"
+                  aria-label="Go to start"
                   onClick={goToStart}
                   disabled={!canGoBack}
                 >
@@ -109,6 +110,7 @@ export function GameControls({
                 <Button
                   variant="ghost"
                   size="icon"
+                  aria-label="Previous move"
                   onClick={goBack}
                   disabled={!canGoBack}
                 >
@@ -123,6 +125,7 @@ export function GameControls({
                 <Button
                   variant="ghost"
                   size="icon"
+                  aria-label="Next move"
                   onClick={goForward}
                   disabled={!canGoForward}
                 >
@@ -137,6 +140,7 @@ export function GameControls({
                 <Button
                   variant="ghost"
                   size="icon"
+                  aria-label="Go to end"
                   onClick={goToEnd}
                   disabled={!canGoForward}
                 >
@@ -158,6 +162,7 @@ export function GameControls({
                 <Button
                   variant="ghost"
                   size="icon"
+                  aria-label="Undo move"
                   onClick={undo}
                   disabled={history.length === 0}
                 >
@@ -172,6 +177,7 @@ export function GameControls({
                 <Button
                   variant="ghost"
                   size="icon"
+                  aria-label="Redo move"
                   onClick={redo}
                   disabled={historyIndex === -1}
                 >
@@ -189,7 +195,7 @@ export function GameControls({
         {showFlipBoard && (
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" onClick={flipBoard}>
+              <Button variant="ghost" size="icon" aria-label="Flip board" onClick={flipBoard}>
                 <FlipVertical className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
@@ -204,6 +210,7 @@ export function GameControls({
               <Button
                 variant="ghost"
                 size="icon"
+                aria-label="New game"
                 onClick={() => (onNewGame ? onNewGame() : newGame())}
               >
                 <RefreshCw className="h-4 w-4" />
@@ -221,7 +228,7 @@ export function GameControls({
             {onExport && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={onExport}>
+                  <Button variant="ghost" size="icon" aria-label="Export PGN" onClick={onExport}>
                     <Download className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
@@ -232,7 +239,7 @@ export function GameControls({
             {onImport && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={onImport}>
+                  <Button variant="ghost" size="icon" aria-label="Import PGN" onClick={onImport}>
                     <Upload className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>

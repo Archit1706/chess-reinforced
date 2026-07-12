@@ -596,7 +596,11 @@ export default function PlayPage() {
               {/* Analysis toggle */}
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">Analysis</span>
-                <Switch checked={showAnalysis} onCheckedChange={setShowAnalysis} />
+                <Switch
+                  checked={showAnalysis}
+                  onCheckedChange={setShowAnalysis}
+                  aria-label="Toggle live analysis"
+                />
               </div>
             </div>
           </div>
@@ -656,7 +660,7 @@ export default function PlayPage() {
                   value={computerElo.toString()}
                   onValueChange={handleDifficultyChange}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger aria-label="Computer difficulty">
                     <SelectValue placeholder="Select difficulty" />
                   </SelectTrigger>
                   <SelectContent>
@@ -679,12 +683,20 @@ export default function PlayPage() {
 
               <div className="flex items-center justify-between">
                 <span className="text-sm">Show Evaluation</span>
-                <Switch checked={showEvaluation} onCheckedChange={toggleEvaluation} />
+                <Switch
+                  checked={showEvaluation}
+                  onCheckedChange={toggleEvaluation}
+                  aria-label="Show evaluation bar"
+                />
               </div>
 
               <div className="flex items-center justify-between">
                 <span className="text-sm">Show Legal Moves</span>
-                <Switch checked={showLegalMoves} onCheckedChange={toggleLegalMoves} />
+                <Switch
+                  checked={showLegalMoves}
+                  onCheckedChange={toggleLegalMoves}
+                  aria-label="Show legal moves"
+                />
               </div>
             </CardContent>
           </Card>

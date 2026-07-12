@@ -137,6 +137,9 @@ export function Navbar() {
               variant="ghost"
               size="icon"
               className="lg:hidden"
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-nav-menu"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? (
@@ -151,7 +154,7 @@ export function Navbar() {
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-border">
+        <div id="mobile-nav-menu" className="lg:hidden border-t border-border">
           <div className="container mx-auto px-4 py-4 space-y-2">
             {navItems.map((item) => {
               const isActive =
