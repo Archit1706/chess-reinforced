@@ -56,6 +56,13 @@ export default function SettingsPage() {
 
   const { computerElo, setComputerElo } = useGameStore();
 
+  // next-themes can't know the theme during SSR, so gate theme-dependent UI on
+  // mount: the first client render matches the server (no active button), then
+  // the real theme is applied — avoiding a hydration mismatch on the buttons.
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => setMounted(true), []);
+  const activeTheme = mounted ? theme : undefined;
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <div className="mb-8">
@@ -86,7 +93,7 @@ export default function SettingsPage() {
               </div>
               <div className="flex gap-2">
                 <Button
-                  variant={theme === 'light' ? 'default' : 'outline'}
+                  variant={activeTheme === 'light' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setTheme('light')}
                 >
@@ -94,7 +101,7 @@ export default function SettingsPage() {
                   Light
                 </Button>
                 <Button
-                  variant={theme === 'dark' ? 'default' : 'outline'}
+                  variant={activeTheme === 'dark' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setTheme('dark')}
                 >
@@ -102,7 +109,7 @@ export default function SettingsPage() {
                   Dark
                 </Button>
                 <Button
-                  variant={theme === 'system' ? 'default' : 'outline'}
+                  variant={activeTheme === 'system' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setTheme('system')}
                 >
