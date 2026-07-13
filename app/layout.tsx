@@ -6,14 +6,11 @@ import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { Navbar } from '@/components/layout/Navbar';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { UserSync } from '@/components/auth/UserSync';
+import { SITE_URL } from '@/lib/site';
 
 const clerkEnabled = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
 
-// Canonical site URL for absolute OG/canonical links. Set NEXT_PUBLIC_APP_URL
-// to your production domain on Vercel; falls back to the per-deploy URL.
-const siteUrl =
-  process.env.NEXT_PUBLIC_APP_URL ||
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+const siteUrl = SITE_URL;
 
 const title = 'Chess Reinforced — Learn & Improve Your Chess';
 const description =
@@ -86,6 +83,51 @@ export const viewport: Viewport = {
   ],
 };
 
+// Structured data (schema.org) so search engines can render rich results and
+// understand this is a free, web-based chess learning app.
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${siteUrl}/#website`,
+      url: siteUrl,
+      name: 'Chess Reinforced',
+      description,
+      inLanguage: 'en',
+      publisher: { '@id': `${siteUrl}/#organization` },
+    },
+    {
+      '@type': 'Organization',
+      '@id': `${siteUrl}/#organization`,
+      name: 'Chess Reinforced',
+      url: siteUrl,
+      logo: { '@type': 'ImageObject', url: `${siteUrl}/icon.svg` },
+    },
+    {
+      '@type': 'WebApplication',
+      '@id': `${siteUrl}/#webapp`,
+      name: 'Chess Reinforced',
+      url: siteUrl,
+      applicationCategory: 'EducationalApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires a modern web browser with JavaScript enabled.',
+      description,
+      inLanguage: 'en',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      featureList: [
+        'Interactive chess lessons',
+        'Play against Stockfish at any level',
+        'Lichess tactics puzzles with spaced repetition',
+        'Move-by-move game review with accuracy',
+        'Study famous games',
+      ],
+      publisher: { '@id': `${siteUrl}/#organization` },
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -118,6 +160,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         {clerkEnabled ? <ClerkProvider>{content}</ClerkProvider> : content}
       </body>
     </html>
