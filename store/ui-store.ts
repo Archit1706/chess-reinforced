@@ -36,6 +36,9 @@ interface UIState {
   autoAnalyze: boolean;
   showEvaluation: boolean;
   analysisDepth: number;
+
+  // Opponent personality — in-game banter/coaching from the computer.
+  opponentBanter: boolean;
 }
 
 interface UIActions {
@@ -64,6 +67,9 @@ interface UIActions {
   toggleEvaluation: () => void;
   setAnalysisDepth: (depth: number) => void;
 
+  // Opponent
+  toggleOpponentBanter: () => void;
+
   // Restore every preference to its default value.
   resetSettings: () => void;
 }
@@ -84,6 +90,7 @@ const defaultState: UIState = {
   autoAnalyze: false,
   showEvaluation: true,
   analysisDepth: 15,
+  opponentBanter: true,
 };
 
 export const useUIStore = create<UIState & UIActions>()(
@@ -123,6 +130,10 @@ export const useUIStore = create<UIState & UIActions>()(
       toggleEvaluation: () =>
         set((state) => ({ showEvaluation: !state.showEvaluation })),
       setAnalysisDepth: (analysisDepth) => set({ analysisDepth }),
+
+      // Opponent actions
+      toggleOpponentBanter: () =>
+        set((state) => ({ opponentBanter: !state.opponentBanter })),
 
       // Reset
       resetSettings: () => set(defaultState),

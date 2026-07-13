@@ -7,3 +7,4 @@ export { PuzzleBoard } from './PuzzleBoard';
 export { GameReview } from './GameReview';
 export { GameViewer } from './GameViewer';
 export { MistakeTrainer } from './MistakeTrainer';
+export { OpponentBanter } from './OpponentBanter';

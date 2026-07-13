@@ -49,6 +49,8 @@ export default function SettingsPage() {
     setAnalysisDepth,
     autoAnalyze,
     toggleAutoAnalyze,
+    opponentBanter,
+    toggleOpponentBanter,
     resetSettings,
   } = useUIStore();
 
@@ -194,9 +196,23 @@ export default function SettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle>Engine & Analysis</CardTitle>
-            <CardDescription>Configure Stockfish analysis settings</CardDescription>
+            <CardDescription>Configure the computer opponent and analysis</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">Opponent Banter &amp; Coaching</p>
+                <p className="text-sm text-muted-foreground">
+                  Let the computer react as you play — taunts, praise and tips when you slip
+                </p>
+              </div>
+              <Switch
+                checked={opponentBanter}
+                onCheckedChange={toggleOpponentBanter}
+                aria-label="Opponent banter and coaching"
+              />
+            </div>
+
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Show Evaluation Bar</p>

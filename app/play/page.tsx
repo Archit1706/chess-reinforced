@@ -5,7 +5,7 @@ import { useGameStore } from '@/store/game-store';
 import { saveGameResult } from '@/lib/games/client';
 import { useUIStore } from '@/store/ui-store';
 import { useUserStore } from '@/store/user-store';
-import { ChessBoard, MoveHistory, GameControls, GameInfo, EvaluationBar, GameReview } from '@/components/chess';
+import { ChessBoard, MoveHistory, GameControls, GameInfo, EvaluationBar, GameReview, OpponentBanter } from '@/components/chess';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -605,6 +605,9 @@ export default function PlayPage() {
               )}
             </div>
           </div>
+
+          {/* Opponent personality — cheeky/coaching reactions to notable moments */}
+          <OpponentBanter />
 
           {/* Game controls */}
           <div className="flex flex-wrap items-center justify-between gap-2 bg-muted/50 p-2 rounded-lg">
