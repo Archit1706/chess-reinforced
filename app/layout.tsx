@@ -100,8 +100,15 @@ export default function RootLayout({
     >
       <TooltipProvider>
         <div className="relative min-h-screen flex flex-col">
+          {/* Keyboard/screen-reader users can jump past the nav (WCAG 2.4.1).
+              Hidden until focused, then shown as a floating chip. */}
+          <a href="#main-content" className="skip-link">
+            Skip to main content
+          </a>
           <Navbar />
-          <main className="flex-1">{children}</main>
+          <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
+            {children}
+          </main>
         </div>
         {clerkEnabled && <UserSync />}
       </TooltipProvider>

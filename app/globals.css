@@ -193,4 +193,26 @@
   .focus-ring {
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
   }
+
+  /* Skip-to-content link: kept off-screen until focused, then slides into view
+     (WCAG 2.4.1). Plain CSS so it never depends on utility-variant generation. */
+  .skip-link {
+    position: absolute;
+    left: 1rem;
+    top: -4rem;
+    z-index: 100;
+    border-radius: 0.375rem;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.15), 0 4px 6px -4px rgb(0 0 0 / 0.15);
+    transition: top 0.15s ease;
+  }
+  .skip-link:focus {
+    top: 0.75rem;
+    outline: none;
+    box-shadow: 0 0 0 2px hsl(var(--ring));
+  }
 }
