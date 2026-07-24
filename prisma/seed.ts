@@ -427,9 +427,12 @@ That's an **absolute pin**: the king is behind, so the law of chess forbids the 
 
 \`\`\`chess
 mode: interactive
-respond: true
 fen: r1bqkbnr/ppp2ppp/2np4/1B2p3/3PP3/5N2/PPP2PPP/RNBQK2R w KQkq - 0 5
-caption: The c6-knight is pinned and can't run. Attack it with your cheapest soldier — push d5! — then keep playing.
+solution: d5
+goal: Attack the pinned knight
+hint: The c6-knight is frozen — hit it with your cheapest attacker.
+success: d5 — pile another attacker onto the pinned knight. It can't run.
+caption: The c6-knight is pinned and can't run. Attack it with your cheapest soldier.
 \`\`\`
 
 Once a piece is pinned, **attack it** with more pieces than it has defenders. The pin is the immobilizer; the pile-up is the winner.
@@ -438,9 +441,12 @@ Once a piece is pinned, **attack it** with more pieces than it has defenders. Th
 
 \`\`\`chess
 mode: interactive
-respond: true
 fen: r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3
-caption: Your move — play Bb5, pinning the knight that defends e5. Then keep playing: the board answers back!
+solution: Bb5
+goal: Pin the knight to the king
+hint: Your f1-bishop can reach b5 along the open diagonal.
+success: Bb5 — the c6-knight is pinned to the king and can't move.
+caption: Your move — pin the knight on c6 that defends the e5-pawn.
 \`\`\`
 
 ## The pin checklist
@@ -484,9 +490,12 @@ caption: Rb1+ checks. The king has to move — and you swallow the queen on b8.
 
 \`\`\`chess
 mode: interactive
-respond: true
 fen: 2q5/8/2k5/8/8/8/6K1/5R2 w - - 0 1
-caption: The king and queen share the c-file. Slide your rook onto it with check — the king must step aside, and the queen is yours.
+solution: Rc1+
+goal: Skewer the king and queen
+hint: Put your rook on the file that runs through the king to the queen — with check.
+success: Rc1+ — the king must step off the c-file, and Rxc8 wins the queen.
+caption: The king and queen share the c-file. Slide your rook onto it with check.
 \`\`\`
 
 (Look for the file that runs through the king and onto the queen.)
@@ -529,8 +538,11 @@ Look for **your own piece** sitting in front of one of your rooks, bishops, or q
 
 \`\`\`chess
 mode: interactive
-respond: true
 fen: r2k4/8/8/3B4/8/8/8/3RK3 w - - 0 1
+solution: Bxa8+
+goal: Unleash a discovered check
+hint: Move the bishop off the d-file to open your rook's line to the king.
+success: Bxa8+ — the discovered check means Black can't recapture. A free rook.
 caption: Your bishop blocks your own rook's check. Capture the a8-rook — the move unmasks check, so Black can't recapture!
 \`\`\`
 
@@ -563,9 +575,12 @@ The most reliable double-attack target is an **undefended piece** — one with n
 
 \`\`\`chess
 mode: interactive
-respond: true
 fen: r5k1/6pp/8/8/8/8/5PPP/3Q2K1 w - - 0 1
-caption: Now YOU play it — find the queen move that checks the king AND attacks the loose a8-rook, then take it. The board defends!
+solution: Qd5+
+goal: Win the loose rook
+hint: Find the checking square from which your queen also eyes a8 — and stays safe.
+success: Qd5+ — check plus an attack on the loose a8-rook. The king moves, then Qxa8.
+caption: Find the queen move that checks the king AND attacks the loose a8-rook.
 \`\`\`
 
 ## Fork vs double attack
@@ -603,9 +618,12 @@ Most players ask: *"Can I take that piece?"* Better players also ask: *"What is 
 
 \`\`\`chess
 mode: interactive
-respond: true
 fen: 6k1/3b1ppp/5n2/8/Q7/8/1B3PPP/6K1 w - - 0 1
-caption: The d7-bishop's only guard is the f6-knight. Trade off the knight, then take the bishop — the board defends!
+solution: Bxf6
+goal: Remove the bishop's only guard
+hint: The d7-bishop is defended only by the f6-knight. Eliminate that knight first.
+success: Bxf6 removes the guard — next comes Qxd7 to win the bishop.
+caption: The d7-bishop's only guard is the f6-knight. Take the guard first.
 \`\`\`
 
 ## Three classic targets
