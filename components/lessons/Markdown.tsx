@@ -18,6 +18,10 @@ import { LessonBoard } from './LessonBoard';
  *   moves: e4 e5 Nf3             # SAN/UCI, for animate mode
  *   autoplay: true
  *   respond: true                # interactive: the board answers back
+ *   solution: exd5 d4d5          # interactive: makes it a checkable challenge
+ *   hint: The pawn captures diagonally.
+ *   success: Nice — that wins the queen.
+ *   goal: Win the hanging queen
  *   flip: false
  *   caption: Drag the knight
  *   ```
@@ -28,6 +32,10 @@ interface ChessBlockConfig {
   respond?: boolean;
   fen?: string;
   moves?: string[];
+  solution?: string[];
+  hint?: string;
+  success?: string;
+  goal?: string;
   autoPlay?: boolean;
   flip?: boolean;
   caption?: string;
@@ -44,6 +52,10 @@ function parseChessBlock(body: string): ChessBlockConfig {
     if (key === 'fen') cfg.fen = val;
     else if (key === 'mode') cfg.interactive = val.toLowerCase() === 'interactive';
     else if (key === 'moves') cfg.moves = val.split(/\s+/).filter(Boolean);
+    else if (key === 'solution') cfg.solution = val.split(/\s+/).filter(Boolean);
+    else if (key === 'hint') cfg.hint = val;
+    else if (key === 'success') cfg.success = val;
+    else if (key === 'goal') cfg.goal = val;
     else if (key === 'autoplay') cfg.autoPlay = val.toLowerCase() === 'true';
     else if (key === 'respond') cfg.respond = val.toLowerCase() === 'true';
     else if (key === 'flip') cfg.flip = val.toLowerCase() === 'true';
@@ -199,6 +211,10 @@ export function Markdown({ content, className }: { content: string; className?: 
               respond={cfg.respond}
               fen={cfg.fen}
               moves={cfg.moves}
+              solution={cfg.solution}
+              hint={cfg.hint}
+              success={cfg.success}
+              goal={cfg.goal}
               autoPlay={cfg.autoPlay}
               flip={cfg.flip}
               caption={cfg.caption}
