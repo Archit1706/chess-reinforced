@@ -2,12 +2,24 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
-import { Chess, Square, type PieceSymbol } from 'chess.js';
+import { Chess, Square, type PieceSymbol, type Move } from 'chess.js';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useContainerWidth } from '@/hooks/useContainerWidth';
 import { getLocalBestMove } from '@/lib/local-engine';
-import { Play, Pause, RotateCcw, ChevronLeft, ChevronRight, Hand, Loader2 } from 'lucide-react';
+import {
+  Play,
+  Pause,
+  RotateCcw,
+  ChevronLeft,
+  ChevronRight,
+  Hand,
+  Loader2,
+  CheckCircle2,
+  XCircle,
+  Lightbulb,
+  Eye,
+} from 'lucide-react';
 import { framesFromMoves } from './lessonDemos';
 
 const BOARD_STYLE = {
@@ -30,6 +42,20 @@ interface LessonBoardProps {
    * mini-opponent instead of a static diagram.
    */
   respond?: boolean;
+  /**
+   * Interactive mode only: turns the board into a checkable challenge. The
+   * reader must play one of these moves (SAN like `exd5`/`Nf6+`, or UCI like
+   * `d4d5`); a correct move is confirmed, a wrong-but-legal move is taken back
+   * with a "try again" prompt. When set, `respond` is ignored (a challenge
+   * verifies one move rather than playing on).
+   */
+  solution?: string[];
+  /** Challenge only: a nudge revealed by the "Hint" button. */
+  hint?: string;
+  /** Challenge only: a short explanation shown after the correct move. */
+  success?: string;
+  /** Challenge only: the objective shown above the board. */
+  goal?: string;
   /** Auto-play the animation on mount. */
   autoPlay?: boolean;
   flip?: boolean;
@@ -51,6 +77,10 @@ export function LessonBoard({
   fen,
   interactive = false,
   respond = false,
+  solution,
+  hint,
+  success,
+  goal,
   autoPlay = false,
   flip = false,
   caption,
@@ -65,6 +95,10 @@ export function LessonBoard({
         startFen={fen ?? START_FEN}
         orientation={orientation}
         respond={respond}
+        solution={solution}
+        hint={hint}
+        success={success}
+        goal={goal}
         caption={caption}
         boardWidth={boardWidth}
         className={className}
@@ -173,10 +207,19 @@ function AnimatedBoard({
 /** Delay before the board answers back, so the reader's move settles visually. */
 const REPLY_DELAY_MS = 550;
 
+/** Strip check/mate/annotation glyphs and case for lenient move comparison. */
+function normalizeMoveToken(s: string): string {
+  return s.replace(/[+#!?]/g, '').trim().toLowerCase();
+}
+
 function InteractiveBoard({
   startFen,
   orientation,
   respond,
+  solution,
+  hint,
+  success,
+  goal,
   caption,
   boardWidth,
   className,
@@ -184,6 +227,10 @@ function InteractiveBoard({
   startFen: string;
   orientation: 'white' | 'black';
   respond: boolean;
+  solution?: string[];
+  hint?: string;
+  success?: string;
+  goal?: string;
   caption?: string;
   boardWidth: number;
   className?: string;
@@ -192,9 +239,21 @@ function InteractiveBoard({
   const [fen, setFen] = useState(startFen);
   const [thinking, setThinking] = useState(false);
   const [moveStyles, setMoveStyles] = useState<Record<string, React.CSSProperties>>({});
+  const [feedback, setFeedback] = useState<'none' | 'correct' | 'wrong'>('none');
+  const [solved, setSolved] = useState(false);
+  const [hintShown, setHintShown] = useState(false);
   const replyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [boardRef, containerWidth] = useContainerWidth<HTMLElement>();
   const width = containerWidth > 0 ? Math.min(boardWidth, containerWidth) : boardWidth;
+
+  const isChallenge = !!(solution && solution.length > 0);
+
+  // Accepted moves, normalized once, for O(1) membership checks.
+  const solutionSet = useMemo(() => {
+    const set = new Set<string>();
+    for (const s of solution ?? []) set.add(normalizeMoveToken(s));
+    return set;
+  }, [solution]);
 
   // Clear a pending engine reply if the board unmounts mid-think.
   useEffect(() => {
@@ -207,6 +266,7 @@ function InteractiveBoard({
 
   const showLegalMoves = useCallback(
     (square: Square) => {
+      if (solved) return;
       const moves = game.moves({ square, verbose: true });
       if (moves.length === 0) return;
       const styles: Record<string, React.CSSProperties> = {
@@ -221,7 +281,7 @@ function InteractiveBoard({
       }
       setMoveStyles(styles);
     },
-    [game]
+    [game, solved]
   );
 
   /** In respond mode, answer the reader's move with a light engine reply. */
@@ -247,22 +307,83 @@ function InteractiveBoard({
     }, REPLY_DELAY_MS);
   }, [respond, game]);
 
+  /** Does a played move match any accepted solution (by SAN or by UCI)? */
+  const isSolutionMove = useCallback(
+    (m: Move): boolean => {
+      const candidates = [
+        normalizeMoveToken(m.san),
+        m.lan.toLowerCase(),
+        (m.from + m.to).toLowerCase(),
+        (m.from + m.to + (m.promotion ?? '')).toLowerCase(),
+      ];
+      return candidates.some((c) => solutionSet.has(c));
+    },
+    [solutionSet]
+  );
+
   const onDrop = useCallback(
     (from: string, to: string) => {
-      if (thinking) return false; // wait for the board's answer
+      if (thinking || solved) return false; // wait for the answer / already solved
+      let move: Move | null = null;
       try {
-        const move = game.move({ from, to, promotion: 'q' });
-        if (!move) return false;
-        setFen(game.fen());
-        clearHints();
-        scheduleReply();
-        return true;
+        move = game.move({ from, to, promotion: 'q' });
       } catch {
         return false;
       }
+      if (!move) return false;
+
+      if (isChallenge) {
+        if (isSolutionMove(move)) {
+          setFen(game.fen());
+          clearHints();
+          setFeedback('correct');
+          setSolved(true);
+          return true;
+        }
+        // Wrong but legal: take it back so the reader can try the intended move.
+        game.undo();
+        setFeedback('wrong');
+        clearHints();
+        return false;
+      }
+
+      setFen(game.fen());
+      clearHints();
+      setFeedback('none');
+      scheduleReply();
+      return true;
     },
-    [game, clearHints, scheduleReply, thinking]
+    [game, clearHints, scheduleReply, thinking, solved, isChallenge, isSolutionMove]
   );
+
+  /** Play the first accepted move for the reader who's stuck. */
+  const showSolution = useCallback(() => {
+    const first = (solution ?? [])[0];
+    if (!first) return;
+    let m: Move | null = null;
+    try {
+      m = game.move(first); // SAN (chess.js tolerates trailing +/#)
+    } catch {
+      m = null;
+    }
+    if (!m && first.length >= 4) {
+      try {
+        m = game.move({
+          from: first.slice(0, 2),
+          to: first.slice(2, 4),
+          promotion: (first[4] as PieceSymbol | undefined) || 'q',
+        });
+      } catch {
+        m = null;
+      }
+    }
+    if (m) {
+      setFen(game.fen());
+      clearHints();
+      setFeedback('correct');
+      setSolved(true);
+    }
+  }, [game, solution, clearHints]);
 
   const reset = useCallback(() => {
     if (replyTimer.current) clearTimeout(replyTimer.current);
@@ -270,6 +391,9 @@ function InteractiveBoard({
     game.load(startFen);
     setFen(startFen);
     clearHints();
+    setFeedback('none');
+    setSolved(false);
+    setHintShown(false);
   }, [game, startFen, clearHints]);
 
   const turn = fen.split(' ')[1] === 'b' ? 'Black' : 'White';
@@ -279,12 +403,56 @@ function InteractiveBoard({
   // still invite the reader to move, not show a discouraging "Game over".
   const gameOver = game.isCheckmate() || game.isStalemate();
 
+  // The status pill: solved/correct → green, wrong → amber, else the CTA.
+  const showCorrect = solved || feedback === 'correct';
+  let statusClass: string;
+  let statusNode: React.ReactNode;
+  if (showCorrect) {
+    statusClass = 'border-green-500/40 bg-green-500/10 text-green-600 dark:text-green-500';
+    statusNode = (
+      <>
+        <CheckCircle2 className="h-3 w-3" />
+        Correct!
+      </>
+    );
+  } else if (feedback === 'wrong') {
+    statusClass = 'border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-500';
+    statusNode = (
+      <>
+        <XCircle className="h-3 w-3" />
+        Not the move — try again
+      </>
+    );
+  } else if (gameOver) {
+    statusClass = 'text-muted-foreground';
+    statusNode = 'Game over — hit Reset to try again';
+  } else if (thinking) {
+    statusClass = 'text-muted-foreground';
+    statusNode = (
+      <>
+        <Loader2 className="h-3 w-3 animate-spin" />
+        Thinking…
+      </>
+    );
+  } else {
+    statusClass = 'border-green-500/40 bg-green-500/10 text-green-600 dark:text-green-500';
+    statusNode = (
+      <>
+        <Hand className="h-3 w-3" />
+        {isChallenge ? 'Your move — find it' : `Your move — ${turn} to play`}
+      </>
+    );
+  }
+
   return (
     <figure
       ref={boardRef}
       className={cn('not-prose my-4 w-full mx-auto', className)}
       style={{ maxWidth: boardWidth }}
     >
+      {goal && (
+        <p className="mb-2 text-center text-sm font-medium text-foreground">🎯 {goal}</p>
+      )}
       <Chessboard
         position={fen}
         boardWidth={width}
@@ -296,40 +464,43 @@ function InteractiveBoard({
         animationDuration={200}
         {...BOARD_STYLE}
       />
-      <div className="mt-2 flex items-center justify-center gap-2 flex-wrap">
-        {/* Explicit call to action: whose move is it? */}
+      <div className="mt-2 flex items-center justify-center gap-2 flex-wrap" aria-live="polite">
         <span
           className={cn(
             'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium',
-            gameOver
-              ? 'text-muted-foreground'
-              : thinking
-                ? 'text-muted-foreground'
-                : 'border-green-500/40 bg-green-500/10 text-green-600 dark:text-green-500'
+            statusClass
           )}
         >
-          {gameOver ? (
-            'Game over — hit Reset to try again'
-          ) : thinking ? (
-            <>
-              <Loader2 className="h-3 w-3 animate-spin" />
-              Thinking…
-            </>
-          ) : (
-            <>
-              <Hand className="h-3 w-3" />
-              Your move — {turn} to play
-            </>
-          )}
+          {statusNode}
         </span>
+        {isChallenge && !solved && hint && (
+          <Button variant="outline" size="sm" onClick={() => setHintShown(true)} disabled={hintShown}>
+            <Lightbulb className="h-4 w-4 mr-1" />
+            Hint
+          </Button>
+        )}
+        {isChallenge && !solved && (
+          <Button variant="ghost" size="sm" onClick={showSolution}>
+            <Eye className="h-4 w-4 mr-1" />
+            Show solution
+          </Button>
+        )}
         <Button variant="ghost" size="sm" onClick={reset}>
           <RotateCcw className="h-4 w-4 mr-1" />
           Reset
         </Button>
       </div>
+
+      {isChallenge && hintShown && hint && !solved && (
+        <p className="mt-1 text-center text-xs text-muted-foreground">💡 {hint}</p>
+      )}
+      {showCorrect && success && (
+        <p className="mt-1 text-center text-sm text-green-600 dark:text-green-500">{success}</p>
+      )}
+
       <p className="mt-1 text-center text-[11px] text-muted-foreground">
         Drag the pieces — only legal moves are allowed
-        {respond ? '. The board answers back!' : ''}
+        {respond && !isChallenge ? '. The board answers back!' : ''}
       </p>
       {caption && (
         <figcaption className="mt-1 text-center text-sm text-muted-foreground max-w-[420px]">
