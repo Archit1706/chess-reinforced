@@ -98,7 +98,7 @@ export function Markdown({ content, className }: { content: string; className?: 
   const flushPara = (key: string) => {
     if (para.length === 0) return;
     blocks.push(
-      <p key={`p-${key}`} className="leading-relaxed text-muted-foreground">
+      <p key={`p-${key}`} className="leading-relaxed text-foreground">
         {renderInline(para.join(' '), `p-${key}`)}
       </p>
     );
@@ -107,7 +107,7 @@ export function Markdown({ content, className }: { content: string; className?: 
   const flushList = (key: string) => {
     if (list.length === 0) return;
     blocks.push(
-      <ul key={`ul-${key}`} className="list-disc space-y-1 pl-6 text-muted-foreground">
+      <ul key={`ul-${key}`} className="list-disc space-y-1 pl-6 text-foreground">
         {list.map((item, i) => (
           <li key={i}>{renderInline(item, `li-${key}-${i}`)}</li>
         ))}
@@ -118,7 +118,7 @@ export function Markdown({ content, className }: { content: string; className?: 
   const flushOList = (key: string) => {
     if (olist.length === 0) return;
     blocks.push(
-      <ol key={`ol-${key}`} className="list-decimal space-y-1 pl-6 text-muted-foreground">
+      <ol key={`ol-${key}`} className="list-decimal space-y-1 pl-6 text-foreground">
         {olist.map((item, i) => (
           <li key={i}>{renderInline(item, `oli-${key}-${i}`)}</li>
         ))}
@@ -164,7 +164,7 @@ export function Markdown({ content, className }: { content: string; className?: 
               {rows.map((row, r) => (
                 <tr key={r} className="border-b last:border-0">
                   {header.map((_h, c) => (
-                    <td key={c} className="px-3 py-2 text-muted-foreground align-top">
+                    <td key={c} className="px-3 py-2 text-foreground align-top">
                       {renderInline(row[c] ?? '', `td-${key}-${r}-${c}`)}
                     </td>
                   ))}
