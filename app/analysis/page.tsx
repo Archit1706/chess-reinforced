@@ -31,7 +31,7 @@ import {
   setLimitStrength,
 } from '@/lib/stockfish';
 import { getLocalBestMove } from '@/lib/local-engine';
-import { parseUciMove, uciToSan, formatEvaluation } from '@/lib/chess';
+import { parseUciMove, uciToSan, formatEvaluation, buildPv } from '@/lib/chess';
 
 const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 const BOARD_STYLE = {
@@ -112,7 +112,15 @@ const PALETTE: { code: string; glyph: string }[] = [
   { code: 'bB', glyph: '♝' }, { code: 'bN', glyph: '♞' }, { code: 'bP', glyph: '♟' },
 ];
 
-type BestMove = { uci: string; san: string; from: string; to: string; evalText: string | null };
+type BestMove = {
+  uci: string;
+  san: string;
+  from: string;
+  to: string;
+  evalText: string | null;
+  pv: string;
+  pvUci: string[];
+};
 
 export default function AnalysisPage() {
   // The live position (play/analyse mode) lives in a chess.js instance.
@@ -283,6 +291,7 @@ export default function AnalysisPage() {
     try {
       let uci: string | null = null;
       let evalCp: number | null = null;
+      let pvUci: string[] = [];
       if (isEngineReady()) {
         stopAnalysis();
         const res = await Promise.race<Awaited<ReturnType<typeof analyzePosition>> | null>([
@@ -292,6 +301,7 @@ export default function AnalysisPage() {
         if (res) {
           uci = res.bestMove;
           evalCp = res.evaluation;
+          pvUci = res.pv || [];
         }
       }
       if (!uci) {
@@ -300,12 +310,15 @@ export default function AnalysisPage() {
       }
       if (uci && !stale()) {
         const { from, to } = parseUciMove(uci);
+        const pv = buildPv(requestFen, pvUci.length ? pvUci : [uci]);
         setBest({
           uci,
           from,
           to,
           san: uciToSan(requestFen, uci) || uci,
           evalText: evalCp != null ? formatEvaluation(evalCp) : null,
+          pv: pv.uci.length > 1 ? pv.text : '',
+          pvUci: pv.uci,
         });
       } else if (!uci) {
         setError('Could not find a move for this position.');
@@ -314,7 +327,15 @@ export default function AnalysisPage() {
       const fallback = getLocalBestMove(requestFen, 2600);
       if (fallback && !stale()) {
         const { from, to } = parseUciMove(fallback);
-        setBest({ uci: fallback, from, to, san: uciToSan(requestFen, fallback) || fallback, evalText: null });
+        setBest({
+          uci: fallback,
+          from,
+          to,
+          san: uciToSan(requestFen, fallback) || fallback,
+          evalText: null,
+          pv: '',
+          pvUci: [fallback],
+        });
       }
     } finally {
       setThinking(false);
@@ -330,6 +351,25 @@ export default function AnalysisPage() {
     } catch {
       /* shouldn't happen — the move came from this position */
     }
+  }, [best, game]);
+
+  // Play out the whole principal variation, move by move.
+  const playLine = useCallback(() => {
+    if (!best || best.pvUci.length === 0) return;
+    for (const uci of best.pvUci) {
+      try {
+        const m = game.move({
+          from: uci.slice(0, 2),
+          to: uci.slice(2, 4),
+          promotion: (uci[4] as any) || undefined,
+        });
+        if (!m) break;
+      } catch {
+        break;
+      }
+    }
+    setFen(game.fen());
+    setBest(null);
   }, [best, game]);
 
   const customArrows = useMemo(
@@ -506,7 +546,7 @@ export default function AnalysisPage() {
                   </Button>
 
                   {best && (
-                    <div className="rounded-lg bg-muted p-3">
+                    <div className="space-y-3 rounded-lg bg-muted p-3">
                       <div className="flex items-center justify-between">
                         <div>
                           <div className="text-xs text-muted-foreground">Engine suggests</div>
@@ -521,10 +561,27 @@ export default function AnalysisPage() {
                           </div>
                         )}
                       </div>
-                      <Button variant="outline" size="sm" className="mt-3 w-full" onClick={playBest}>
-                        <Play className="mr-2 h-4 w-4" />
-                        Play this move
-                      </Button>
+
+                      {best.pv && (
+                        <div>
+                          <div className="mb-0.5 text-xs text-muted-foreground">
+                            Main line (engine&apos;s expected continuation)
+                          </div>
+                          <p className="break-words font-mono text-sm leading-relaxed">{best.pv}</p>
+                        </div>
+                      )}
+
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" className="flex-1" onClick={playBest}>
+                          <Play className="mr-1.5 h-4 w-4" />
+                          Play move
+                        </Button>
+                        {best.pvUci.length > 1 && (
+                          <Button variant="ghost" size="sm" className="flex-1" onClick={playLine}>
+                            Play whole line
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   )}
                   <p className="text-xs text-muted-foreground">

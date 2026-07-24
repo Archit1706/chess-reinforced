@@ -144,6 +144,56 @@ export function parseUciMove(uci: string): { from: Square; to: Square; promotion
  * Convert a UCI move to SAN for a given position (e.g., "g1f3" → "Nf3").
  * Returns null if the move is illegal in that position.
  */
+/**
+ * Turn an engine principal variation (a list of UCI moves) into a readable,
+ * numbered SAN line by replaying it from `fen`. Returns the display text plus
+ * the UCI moves that were actually legal (so callers can "play" exactly what's
+ * shown). Capped at `maxPlies` so the line stays compact; appends "…" when the
+ * variation was longer.
+ */
+export function buildPv(
+  fen: string,
+  pvUci: string[],
+  maxPlies = 12
+): { text: string; uci: string[] } {
+  const game = new Chess();
+  try {
+    game.load(fen);
+  } catch {
+    return { text: '', uci: [] };
+  }
+  const parts: string[] = [];
+  const used: string[] = [];
+  const fields = fen.split(' ');
+  let moveNo = parseInt(fields[5] || '1', 10) || 1;
+  let whiteToMove = fields[1] !== 'b';
+  for (let i = 0; i < pvUci.length && i < maxPlies; i++) {
+    const uci = pvUci[i];
+    if (!uci || uci.length < 4) break;
+    let m: Move | null;
+    try {
+      m = game.move({
+        from: uci.slice(0, 2) as Square,
+        to: uci.slice(2, 4) as Square,
+        promotion: (uci[4] as PieceSymbol) || undefined,
+      });
+    } catch {
+      m = null;
+    }
+    if (!m) break;
+    used.push(uci);
+    if (whiteToMove) {
+      parts.push(`${moveNo}.${m.san}`);
+    } else {
+      parts.push(parts.length === 0 ? `${moveNo}…${m.san}` : m.san);
+      moveNo++;
+    }
+    whiteToMove = !whiteToMove;
+  }
+  const truncated = pvUci.length > used.length && used.length > 0;
+  return { text: parts.join(' ') + (truncated ? ' …' : ''), uci: used };
+}
+
 export function uciToSan(fen: string, uci: string): string | null {
   try {
     const game = new Chess(fen);
