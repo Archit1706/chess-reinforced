@@ -42,12 +42,17 @@ before assuming server/DB involvement.
   Defaults to a synthetic `'guest'` user. `fetchUser`/`saveProgress` call `/api/user` and
   `/api/user/progress`, but **those API routes do not exist** — calls fail gracefully and fall
   back to guest. ELO is adjusted by a naive ±10 per game.
-- **`ui-store.ts`** — UI preferences (theme handled separately via `next-themes`).
+- **`ui-store.ts`** — UI preferences, persisted to `chess-ui-storage`: board display
+  (`showCoordinates`/`showLegalMoves`/`highlightLastMove`, all default **on** — beginner-friendly),
+  `animationSpeed`, sound (`soundEnabled`/`volume`), analysis (`autoAnalyze`/`showEvaluation`/
+  `analysisDepth`), and `opponentBanter` (default **on**, drives the play-page banter). Light/dark
+  is separate, via `next-themes`.
 
 ### Chess logic (`lib/chess.ts`)
 Pure functions wrapping `chess.js` (move validation, FEN/PGN, SAN/UCI conversion, eval
-formatting, opening detection). `chess.js` is the authority for legality — never reimplement
-rules. `detectOpening` uses a small hardcoded ECO table, not a real database.
+formatting, opening detection, and `buildPv` — replay a UCI principal variation into a
+numbered SAN line). `chess.js` is the authority for legality — never reimplement rules.
+`detectOpening` uses a small hardcoded ECO table, not a real database.
 
 ### Stockfish engine (`lib/stockfish.ts`)
 Module-level **singleton** engine state (not a React/Zustand concern). `initEngine()` spawns a
@@ -60,7 +65,11 @@ UCI text; searches are serialized through a single in-flight slot with hard time
 handshake and every search, so a blocked worker can never leak a pending promise.
 `next.config.js` still sets `Cross-Origin-Embedder-Policy: require-corp` and `COOP: same-origin`
 (needed for SAB-based engines and other isolated-context APIs) and enables async WebAssembly in
-webpack.
+webpack. In an environment **without** cross-origin isolation (some embedded/preview browsers),
+the Stockfish worker fails to init → `isEngineReady()` stays false → every best-move/analysis
+path falls back to `getLocalBestMove` (which returns a move but no eval or PV). So "no engine
+eval / no principal variation" in such a browser is expected, not a bug — verify engine-dependent
+UI on the real deployment (or a locally-isolated dev server), and unit-test the pure logic instead.
 
 `lib/local-engine.ts` is a **pure-JS fallback opponent** that guarantees the computer always
 moves. Negamax + alpha-beta with iterative deepening, **quiescence search** (depth-bounded,
@@ -148,7 +157,7 @@ locally before any keys exist.
   markdown interleaves short prose with embedded **` ```chess `** blocks — `mode: animate` (a
   worked example that auto-plays a move list) and `mode: interactive` (a "your move" sandbox). The
   Markdown renderer parses these fenced blocks into live boards (an interactive block may also set
-  `respond: true`, `flip: true`, `autoplay: true`, `caption:`). There are 12 modules / 65+ lessons;
+  `respond: true`, `flip: true`, `autoplay: true`, `caption:`). There are 13 modules / 65+ lessons;
   **every FEN and move sequence in `seed.ts` and `lessonDemos.ts` must be validated with chess.js**
   before committing (illegal moves silently break the board). The standard check is a scratch `.cjs`
   verifier (in `scripts/`, deleted before committing) that unescapes the ` ```chess ` fences out of
@@ -214,20 +223,60 @@ Achievements are computed client-side from real `user.stats`.
   Stockfish when ready, else `getLocalBestMove`) and shows it as a green arrow via `ChessBoard`'s
   `customArrows`; the hint clears on the next move and is disabled when it isn't the player's turn.
 
+### Standalone practice tools, sound & opponent banter (all client-only, no DB)
+- **Analysis Board (`app/analysis/page.tsx`)** — a position editor + on-demand engine advisor.
+  Keeps its **own** `chess.js` instance (NOT the game store). Local helpers `boardToFen` /
+  `fenToBoard` / `tryLoad` back the editor (piece palette place/erase/drag, side-to-move toggle,
+  FEN load/copy, presets) and translate chess.js's rejections into plain-language errors. "Best
+  move" runs full-strength Stockfish (`setLimitStrength(false)`) with a race timeout and a
+  `getLocalBestMove` fallback, shown as an arrow + SAN + eval, plus the engine's **principal
+  variation** via `buildPv` ("play move" / "play whole line"). Suggests for whichever side is to
+  move; the reader makes replies manually.
+- **Coordinates Trainer (`app/coordinates/page.tsx`)** — a 30-second "find the named square" drill
+  on a blank board; best score in `localStorage`.
+- **Sound (`lib/sound.ts`)** — a dependency-free Web Audio synth (no audio assets); every call is
+  gated on `ui-store` `soundEnabled`/`volume`, so callers invoke `playSound(kind)` unconditionally.
+  Wired into `game-store` moves and `PuzzleBoard`.
+- **Opponent banter (`lib/banter.ts` + `components/chess/OpponentBanter.tsx`)** — the vs-computer
+  personality: taunts, praise and coaching lines on the play page, gated by `ui-store.opponentBanter`.
+  `deriveBanterEvent` + `banterLine` are **pure and engine-free** — hung-piece/bad-trade detection
+  is a material-swing heuristic (an even trade is deliberately NOT flagged). It only speaks on
+  notable events (blunder, big capture, check, undo, castle, promotion, game start/end, occasional
+  lead nudge), never every move.
+
 ### UI structure
-- `app/` — pages: `play` (vs Stockfish, with Hint + Game Review), `puzzles` (daily/practice/rush/
-  review), `lessons`, `games` (My Games + replay/review/mistake-trainer), `study` (famous games),
-  `dashboard`, `settings`. `app/layout.tsx` mounts `Navbar` + `ThemeProvider`.
+- `app/` — pages: `play` (vs Stockfish, with Hint + Game Review), `analysis` (position setup +
+  engine best-move/PV advisor), `puzzles` (daily/practice/rush/review), `lessons`, `coordinates`
+  (trainer), `games` (My Games + replay/review/mistake-trainer), `study` (famous games),
+  `dashboard`, `settings`. `app/layout.tsx` mounts `Navbar` + `ThemeProvider`, wraps children in a
+  `<main id="main-content">`, and renders a "Skip to main content" link (WCAG 2.4.1).
+- **`Navbar`** (client) shows the labelled links only at `lg+`; below that it collapses to a
+  hamburger with the full labels (the labelled bar overflowed in the `md`–`lg` band).
 - `components/chess/` — board and game UI (`ChessBoard`, `PuzzleBoard`, `MoveHistory`,
-  `EvaluationBar`, `GameControls`, `GameInfo`, `GameReview`, `GameViewer`, `MistakeTrainer`);
-  barrel-exported via `index.ts`.
+  `EvaluationBar`, `GameControls`, `GameInfo`, `GameReview`, `GameViewer`, `MistakeTrainer`,
+  `OpponentBanter`); barrel-exported via `index.ts`.
 - `components/ui/` — shadcn/ui-style primitives over Radix.
 - `types/` — domain types (`chess`, `lesson`, `user`); import via the `@/*` path alias (→ repo root).
 - `hooks/useKeyboardShortcuts.ts` — global board/navigation shortcuts (arrows, F flip, N new, etc.).
+  `hooks/useContainerWidth.ts` — feeds `react-chessboard` a live pixel width; wrap the board in a
+  `min-w-0` element so it can shrink below its intrinsic size on narrow screens (else it overflows).
 
 ## Conventions
 - Import with the `@/*` alias rooted at the repo root (e.g. `@/lib/chess`, `@/store/game-store`).
 - Keep `chess.js` as the rules authority and the Stockfish singleton outside React state.
 - When changing `prisma/schema.prisma`, run `db:generate` then `db:push`.
+- **Accessibility**: icon-only buttons and Radix `Switch`/`SelectTrigger` need an `aria-label`
+  (they have no visible text). Any UI whose markup depends on `next-themes` (e.g. the Settings
+  theme buttons' `variant`) must gate on a `mounted` flag so the first client render matches the
+  server — otherwise React logs a hydration mismatch (which can cascade into a noisy dev-only
+  "Rendered more hooks" error at the router).
+- **Verifying without a test runner**: for tricky *pure* logic (e.g. `buildPv`, `deriveBanterEvent`,
+  the lessons three-pass FEN check) write a throwaway `tsx`/`.cjs` script under `scripts/`, run it,
+  and delete it before committing. `import type` lines are erased at transpile, so a `tsx` script
+  can import from `@/lib/*` modules whose only unresolved imports are types.
+- Do **not** run `npm run build` while `npm run dev` is running — the production build overwrites
+  the dev server's `.next` and corrupts it; stop dev first, or restart dev afterward.
+- The dev-server console buffer accumulates across a tab's whole lifetime (reloads/HMR don't clear
+  it); to judge whether an error is current, read it in a **fresh browser tab**.
 </content>
 </invoke>
