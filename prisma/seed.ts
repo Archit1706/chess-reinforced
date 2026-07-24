@@ -1001,9 +1001,12 @@ caption: Two short moves — O-O for both sides. King in the corner, rook on f1/
 
 \`\`\`chess
 mode: interactive
-respond: true
 fen: rnbqk2r/pppp1ppp/5n2/2b1p3/2B1P3/3P1N2/PPP2PPP/RNBQ1RK1 b kq - 1 5
-caption: Your move: castle kingside (O-O) by dragging the king two squares to the right — the rook jumps over automatically. The board plays on!
+solution: O-O e8g8
+goal: Castle kingside
+hint: Drag the king two squares toward the h-rook — the rook jumps over automatically.
+success: O-O — king safe in the corner, rook active on f8. Opening done.
+caption: Your move: castle kingside (O-O) by dragging the king two squares to the right — the rook jumps over automatically.
 \`\`\`
 
 ## The five rules of castling
@@ -1019,6 +1022,10 @@ caption: Your move: castle kingside (O-O) by dragging the king two squares to th
 \`\`\`chess
 mode: interactive
 fen: r3k2r/pppq1ppp/2npbn2/4p3/4P3/2NPBN2/PPPQ1PPP/R3K2R w KQkq - 0 1
+solution: O-O-O e1c1
+goal: Castle queenside
+hint: Drag the king two squares to the LEFT, toward the a-rook.
+success: O-O-O — queenside castled. The king still moved two squares; the a-rook travelled farther and swings into the center.
 caption: Your move: castle queenside (O-O-O) by dragging the king two squares to the LEFT, toward the a-rook. Notice the king still moves exactly two squares — the rook travels farther.
 \`\`\`
 
@@ -1059,6 +1066,10 @@ Yes, your pawn lands on an **empty** square (d6) and removes a pawn from a **dif
 \`\`\`chess
 mode: interactive
 fen: 4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1
+solution: exd6 e5d6
+goal: Capture en passant
+hint: Your e5-pawn captures diagonally onto the empty d6 square.
+success: exd6 — en passant! Your pawn lands on d6 and the d5-pawn vanishes.
 caption: Your move: Black's pawn just leaped from d7 to d5, right past your e5-pawn. Grab it "in passing" — play exd6, landing on the empty d6 square and removing the d5-pawn.
 \`\`\`
 
@@ -1096,7 +1107,11 @@ caption: One push, one new queen. A pawn became your most powerful piece.
 
 \`\`\`chess
 mode: interactive
-fen: 4k3/4P3/8/8/8/8/8/4K3 w - - 0 1
+fen: 8/4P3/k7/8/8/8/8/4K3 w - - 0 1
+solution: e8=Q e7e8q
+goal: Promote to a queen
+hint: Push the pawn to the last rank — it transforms the instant it lands.
+success: e8=Q — a humble pawn becomes a queen, your most powerful piece.
 caption: Your move: push the e-pawn to e8 — it becomes a queen the instant it lands. (You may promote even if you already have a queen.)
 \`\`\`
 
