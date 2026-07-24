@@ -689,7 +689,11 @@ caption: One move — Ra8 — checkmate. The pawns on f7, g7, h7 block every fli
 \`\`\`chess
 mode: interactive
 fen: 6k1/5ppp/8/8/8/8/5PPP/2Q3K1 w - - 0 1
-caption: Your move: play Qc8 — checkmate. Same trap as the rook, now with the queen. The pawns on f7, g7 and h7 do all the jailing.
+solution: Qc8#
+goal: Deliver back-rank mate
+hint: The queen slides up the open c-file to the 8th rank. The pawns do the jailing.
+success: Qc8# — checkmate. Same trap as the rook, now with the queen.
+caption: Your move: mate the king on the back rank. The pawns on f7, g7 and h7 seal every escape.
 \`\`\`
 
 ## Make "luft" before it's too late
@@ -794,7 +798,11 @@ caption: Qd7 fences the king onto the back rank; the king marches all the way up
 \`\`\`chess
 mode: interactive
 fen: 7k/8/6K1/8/8/8/8/5Q2 w - - 0 1
-caption: Trap: Qf7?? leaves Black with no legal move but no check — STALEMATE, a draw. Always leave the king a square until the killing blow.
+solution: Qf8#
+goal: Deliver mate — and don't stalemate!
+hint: Qf7 would leave Black no move but no check — that's stalemate. Find the mate on the 8th rank instead.
+success: Qf8# — mate! (Qf7 would have been stalemate, a draw. Never trap the king with no square unless it's check.)
+caption: Your move: mate the king. Careful — the tempting Qf7?? is stalemate, a draw. The winning move keeps the king in check.
 \`\`\`
 
 ## Your turn — box the king in
@@ -837,7 +845,11 @@ Every other check (rook, bishop, queen) can be blocked. **A knight check cannot 
 \`\`\`chess
 mode: interactive
 fen: 6rk/6pp/3N4/8/8/8/8/6K1 w - - 0 1
-caption: Your move: the king on h8 is buried by its own rook and pawns. Jump the knight to f7 — a check that can't be blocked and can't be escaped. Mate!
+solution: Nf7#
+goal: Smother the king — mate in one
+hint: A knight check can't be blocked. Which square checks the king that's buried by its own pieces?
+success: Nf7# — the buried king can't escape and the check can't be blocked. Textbook smothered mate.
+caption: Your move: the king on h8 is buried by its own rook and pawns. Find the knight check that ends it.
 \`\`\`
 
 The full Philidor's Legacy combination — Nf7+ Kh8, Nxh6+? No: queen sacrifice on g8 first, *then* the knight returns — is one of the most famous tactics in chess history.`,
@@ -878,10 +890,13 @@ You can also play **...Qe7** (guards f7) or **...Qf6** — both stop mate immedi
 
 \`\`\`chess
 mode: interactive
-respond: true
 flip: true
 fen: r1bqkbnr/pppp1ppp/2n5/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 3 3
-caption: You're Black, and Qxf7# is threatened. Play g6 to attack the queen and guard f7 in one move — the mate threat vanishes. The board plays White, so keep going and harass that queen.
+solution: g6 Qe7 Qf6
+goal: Stop Qxf7 mate
+hint: Attack the queen or defend f7. There are three good answers — g6, Qe7, or Qf6.
+success: That stops the mate. Best is g6 — it guards f7 AND chases the queen, leaving White behind in development.
+caption: You're Black, and Qxf7# is threatened. Find a move that stops it.
 \`\`\`
 
 ## The real lesson
@@ -923,7 +938,11 @@ That's the Arabian. Once you know the shape, you'll spot mate-in-one chances in 
 \`\`\`chess
 mode: interactive
 fen: 7k/1R6/5N2/8/8/8/8/K7 w - - 0 1
-caption: Your move: the knight on f6 already covers g8 and h7. Swing the rook along the 7th rank to h7 — check down the h-file, and every escape is sealed. Mate in one!
+solution: Rh7#
+goal: Finish the Arabian mate
+hint: The knight on f6 covers g8 and defends h7. Bring the rook to the h-file.
+success: Rh7# — check down the h-file, the knight guards the rook, and g8 is covered. The Arabian mate.
+caption: Your move: the knight on f6 already covers g8 and defends h7. Deliver the mate in one.
 \`\`\`
 
 (The rook is untouchable on h7 because the f6-knight defends it — that's the whole Arabian trick.)`,
