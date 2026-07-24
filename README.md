@@ -11,7 +11,7 @@ A comprehensive chess learning platform built with Next.js, featuring interactiv
 - Custom arrows (used by the in-game **Hint** feature)
 - Fully responsive — boards resize to fit any screen
 
-### Structured Learning Path — 12 modules, 65+ interactive lessons
+### Structured Learning Path — 13 modules, 65+ interactive lessons
 Lessons aren't walls of text: each one interleaves short explanations with
 **playable boards** — animated worked examples (```chess mode: animate`) and
 hands-on "your move" sandboxes (```chess mode: interactive`).
@@ -19,11 +19,20 @@ hands-on "your move" sandboxes (```chess mode: interactive`).
 - **Intermediate**: opening principles, endgame basics (K+P, opposition, passed pawns, rook endings, two-bishop mate), middlegame strategy (pawn structure, open files, outposts, good/bad bishops, space), advanced tactics (zwischenzug, windmill, clearance, interference, desperado), strategic thinking (piece values & trading, prophylaxis, two weaknesses, improving your worst piece)
 - **Advanced**: popular openings (Italian, Ruy Lopez, Sicilian, French, Caro-Kann, Queen's Gambit, English, London, King's Indian, Scandinavian, Nimzo-Indian), attacking the king (Greek gift, pawn storms), advanced endgames (Lucena, Philidor, bishop & knight mate, the wrong bishop)
 
+### Coordinates Trainer
+- A fast, gamified way to learn to read the board: a 30-second drill to find named squares (coordinates hidden) from either side's perspective, with a saved best score
+
 ### Play vs the Computer
 - Adjustable difficulty (ELO 800–2500) via Stockfish, with a pure-JS local engine fallback so the computer always moves (even if the Stockfish CDN is blocked)
 - **Hint** button: shows the best move as an on-board arrow (full-strength analysis)
+- **Opponent banter** (on by default, toggle in Settings): the computer reacts as you play — light taunts when it's ahead, praise when you outplay it, and a coaching nudge when you hang a piece
 - **Game Review**: move-by-move accuracy, classification (blunder/mistake/…), and per-side accuracy
 - Finished games are auto-saved to **My Games** (replay, re-analyze, export PGN)
+
+### Analysis Board
+- Set up **any** position — a piece palette (place/erase/drag), side-to-move toggle, and paste/copy FEN — then pick your color
+- Ask the engine for the **best move**: shown as an on-board arrow, SAN, evaluation, and the full **principal variation** (main line) you can play out move by move
+- You make the replies for both sides yourself — a pocket coach for studying any position
 
 ### Puzzles
 - **Daily puzzle** (deterministic per day) — counts toward your stats once per day
