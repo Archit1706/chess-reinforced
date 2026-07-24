@@ -215,10 +215,13 @@ export default function LessonDetailPage() {
         )}
       </div>
 
-      {/* Topic demo (animated or interactive), matched to the lesson */}
+      {/* Topic demo (animated or interactive), matched to the lesson.
+          The lesson content now leads with its own in-context boards, so this
+          curated demo would just duplicate the first one. Show it only for the
+          rare pure-prose lesson that embeds no board of its own. */}
       {(() => {
         const demo = LESSON_DEMOS[lesson.slug];
-        if (!demo) return null;
+        if (!demo || lesson.content.includes('```chess')) return null;
         return (
           <Card className="mb-6 border-primary-200 dark:border-primary-800">
             <CardHeader className="pb-2">
