@@ -34,6 +34,10 @@ Pawns are little, but they decide most games. Each side starts with eight of the
 \`\`\`chess
 mode: interactive
 fen: 4k3/8/8/8/8/8/4P3/4K3 w - - 0 1
+solution: e4 e3
+goal: Move the e-pawn forward
+hint: A pawn on its starting square may step one or two squares straight ahead.
+success: That's it — a pawn moves straight forward, one or two squares from home.
 caption: Your move — push the e-pawn one square (or two, from its starting rank).
 \`\`\`
 
@@ -44,6 +48,10 @@ A pawn moves **only forward**, one square at a time. From its starting row it ca
 \`\`\`chess
 mode: interactive
 fen: 4k3/8/8/3p4/4P3/8/8/4K3 w - - 0 1
+solution: exd5
+goal: Capture the black pawn
+hint: Pawns capture diagonally, never straight ahead.
+success: Exactly — exd5. A pawn captures on the diagonal.
 caption: Your move — capture the d5-pawn with exd5.
 \`\`\`
 
@@ -366,9 +374,12 @@ Knights are the **best forkers** because nothing can block them.
 
 \`\`\`chess
 mode: interactive
-respond: true
 fen: 4r1k1/8/8/3N4/8/8/8/6K1 w - - 0 1
-caption: Find the knight move that checks the king AND attacks the rook — then collect your prize. The board plays Black!
+solution: Nf6+
+goal: Fork the king and rook
+hint: Which knight square gives check to g8 while also hitting the e8-rook?
+success: Nf6+! It checks the king and forks the rook — next you'd play Nxe8 to win it.
+caption: Find the knight move that checks the king AND attacks the rook.
 \`\`\`
 
 (Hint: which knight square checks the king while also covering e8?)
@@ -1146,6 +1157,10 @@ caption: Files (columns) run a–h left to right; ranks (rows) run 1–8 bottom 
 \`\`\`chess
 mode: interactive
 fen: 4k3/8/8/8/8/5N2/8/4K3 w - - 0 1
+solution: Ne5
+goal: Play Ne5
+hint: The knight is on f3; e5 is one L-shape away.
+success: That's Ne5 — the piece letter (N) plus the destination square.
 caption: Your move: drag the knight to e5. You just played "Ne5" — the piece letter (N for knight) followed by the destination square.
 \`\`\`
 
@@ -1154,6 +1169,10 @@ caption: Your move: drag the knight to e5. You just played "Ne5" — the piece l
 \`\`\`chess
 mode: interactive
 fen: 4k3/8/8/8/3p4/5N2/8/4K3 w - - 0 1
+solution: Nxd4
+goal: Capture the pawn with the knight
+hint: The knight goes from f3 to d4 — and x marks a capture.
+success: Nxd4 — the x tells everyone the knight made a capture.
 caption: Your move: capture the pawn by dragging the knight onto d4. That move is written "Nxd4" — the x means "captures".
 \`\`\`
 
@@ -1162,6 +1181,10 @@ caption: Your move: capture the pawn by dragging the knight onto d4. That move i
 \`\`\`chess
 mode: interactive
 fen: 4k3/8/8/8/8/8/8/4K2R w K - 0 1
+solution: O-O e1g1
+goal: Castle kingside
+hint: Slide the king two squares toward the rook.
+success: O-O — that's kingside castling, the one move where king and rook move together.
 caption: Your move: castle kingside by dragging the king two squares to the right. In notation that's "O-O" (queenside would be "O-O-O").
 \`\`\`
 
